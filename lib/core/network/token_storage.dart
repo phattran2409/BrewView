@@ -4,7 +4,7 @@ import 'package:injectable/injectable.dart';
 @lazySingleton
 class TokenStorage {
   final _s = const FlutterSecureStorage();
-  static const _kAccess = 'access_token';
+  static const _kAccess = 'access_token' ;
   static const _kRefresh = 'refresh_token';
 
   Future<void> saveTokens({required String access, required String refresh}) async {
