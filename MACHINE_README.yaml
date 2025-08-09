@@ -1,0 +1,64 @@
+spec_version: 1.0.0
+architecture: MVVM+BLoC
+routing: go_router
+state_management: bloc
+
+directories:
+  app:
+    - di
+    - router
+    - theme
+  core:
+    - constants
+    - errors
+    - network
+    - utils
+    - widgets
+  features:
+    - "<feature_name>/model"
+    - "<feature_name>/view"
+    - "<feature_name>/viewmodel"
+    - "<feature_name>/repository"
+    - "<feature_name>/services"
+
+naming:
+  model: "<entity>.dart"
+  dto: "<entity>_model.dart"
+  page: "<name>_page.dart"
+  widget: "<name>_widget.dart"
+  bloc: "<feature>_bloc.dart"
+  state: "<feature>_state.dart"
+  event: "<feature>_event.dart"
+  repo_abstract: "<feature>_repository.dart"
+  repo_impl: "<feature>_repository_impl.dart"
+  service: "<feature>_service.dart"
+
+workflows:
+  create_feature:
+    steps:
+      - "create model/entity & DTO"
+      - "create service"
+      - "create repository (abstract + impl)"
+      - "create viewmodel (bloc/state/event)"
+      - "create views (pages/widgets)"
+      - "register DI annotations"
+      - "add routes to app_router"
+      - "run build_runner"
+
+commands:
+  di_generate: "flutter pub run build_runner build --delete-conflicting-outputs"
+  di_watch: "flutter pub run build_runner watch --delete-conflicting-outputs"
+
+rules:
+  - "ViewModel/BLoC cannot call HTTP directly; must use repository"
+  - "Service should not map to domain entities"
+  - "Use MVVM layout in feature-first structure"
+  - "No business logic inside Widgets"
+
+quality_gates:
+  - run: "flutter analyze"
+  - run: "flutter test"
+
+outputs_expected:
+  - "New feature compiles without analyzer errors"
+  - "At least 1 bloc test exists"
