@@ -40,8 +40,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
           child: BlocConsumer<OnboardingBloc, OnboardingState>(
             listener: (context, state) {
               if (state is OnboardingCompleted) {
-                // Navigate to user list screen
-                context.go(RoutePaths.userList);
+                // Navigate to login screen
+                context.go(RoutePaths.login);
               }
               if (state is OnboardingPageState) {
                 // Only animate if PageController is attached

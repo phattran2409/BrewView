@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "859739397646",
+    "project_id": "brew-view-b04f3",
+    "storage_bucket": "brew-view-b04f3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859739397646:android:bd2e3ff04a4a28c6bba65f",
+        "android_client_info": {
+          "package_name": "com.example.briewview"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9DFIGdCcr_OTHK1UY-aJAn6D3v3nI8nY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
