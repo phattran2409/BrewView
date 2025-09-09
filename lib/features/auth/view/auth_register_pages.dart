@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/core/utils/validators.dart';
 import 'package:briewview/core/widgets/password_strength_indicator.dart';
+import 'package:go_router/go_router.dart';
 
 class AuthRegisterPage extends StatefulWidget {
   const AuthRegisterPage({super.key});
@@ -41,18 +42,97 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
       create: (_) => getIt<AuthBloc>(),
       child: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthAuthenticated) {
+          // ✅ Enhanced state handling với registration flow
+          if (state is AuthRegisterSuccess) {
+            // Registration successful but may need email verification
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Registration successful! ${state.requiresEmailVerification ? 'Please verify your email.' : 'Welcome!'}',
+                ),
+                backgroundColor: Colors.green,
+              ),
+            );
+
+            if (state.requiresEmailVerification) {
+              print('Navigate to OTP with email verification');
+              context.pushReplacementNamed(
+                'otp',
+                pathParameters: {'id': state.userId?.toString() ?? ''},
+                extra: state.email,
+              );
+            } else {
+              // Direct access, go to home
+              context.goNamed('home');
+            }
+          } else if (state is AuthEmailVerificationSent) {
+            // Email verification sent, navigate to OTP
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Verification email sent to ${state.email}'),
+                backgroundColor: Colors.blue,
+              ),
+            );
+
+            context.pushReplacementNamed(
+              'otp',
+              extra: {
+                'email': state.email,
+                'name': _fullNameController.text.trim(),
+                'needsVerification': true,
+                'isRegistration': true,
+              },
+            );
+          } else if (state is AuthAuthenticated) {
+            // User is already authenticated (social login registration)
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Welcome ${state.user.userJson?.name ?? ''}!'),
                 backgroundColor: Colors.green,
               ),
             );
+
+            // ✅ Check provider to determine navigation
+            if (state.provider == 'email') {
+              // Email authentication might still need verification in some cases
+              // For now, go to home as email auth is complete
+              context.goNamed('home');
+            } else {
+              // Social login registration, go directly to home
+              context.goNamed('home');
+            }
+          } else if (state is AuthEmailRegisterInProgress) {
+            // Show loading state for email registration
+            print('Email registration in progress...');
+          } else if (state is AuthLoading) {
+            // Generic loading state
+            print('Registration in progress...');
           } else if (state is AuthError) {
+            // ✅ Handle different error types
+            print('Registration error: ${state.message}');
+
+            String errorMessage = state.message;
+            Color errorColor = Colors.red;
+
+            // Customize error message based on error code
+            if (state.errorCode == 'EMAIL_ALREADY_EXISTS') {
+              errorMessage =
+                  'This email is already registered. Please sign in instead.';
+              errorColor = Colors.orange;
+            } else if (state.errorCode == 'WEAK_PASSWORD') {
+              errorMessage =
+                  'Password is too weak. Please use a stronger password.';
+            } else if (state.errorCode == 'INVALID_EMAIL') {
+              errorMessage = 'Please enter a valid email address.';
+            } else if (state.errorCode == 'NETWORK_ERROR') {
+              errorMessage =
+                  'Network error. Please check your connection and try again.';
+            }
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
+                content: Text(errorMessage),
+                backgroundColor: errorColor,
                 action: SnackBarAction(
                   label: 'Retry',
                   textColor: Colors.white,
@@ -73,7 +153,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                     color: const Color.fromARGB(255, 172, 89, 1),
                   ),
                 ),
-          
+
                 // Wave ClipPath
                 ClipPath(
                   clipper: WaveClipper(),
@@ -103,14 +183,8 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [ 
-                            Container(
-                              child: Row(
-                                children: [
-                                  _buttonBack(),
-                                ],
-                              ),
-                            ),
+                          children: [
+                            Container(child: Row(children: [_buttonBack()])),
                             _buildHeader(),
                             const SizedBox(height: 16),
                             Text(
@@ -343,8 +417,9 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                             // Register Button
                             ElevatedButton(
                               onPressed:
-                                  (state is AuthEmailLoginInProgress ||
-                                          !_agreeToTerms)
+                                  (state is AuthEmailRegisterInProgress || 
+                                   state is AuthEmailLoginInProgress ||
+                                   !_agreeToTerms)
                                       ? null
                                       : () => _handleRegister(context),
                               style: ElevatedButton.styleFrom(
@@ -486,7 +561,6 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          
           Image(
             width: 120,
             height: 150,
@@ -509,13 +583,16 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
   // Register Handler
   void _handleRegister(BuildContext context) {
     if (_formKey.currentState!.validate() && _agreeToTerms) {
-      context.read<AuthBloc>().add(
-        AuthRegisterRequested(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-          name: _fullNameController.text.trim(),
-        ),
-      );
+      final authBloc = context.read<AuthBloc>();
+      if (!authBloc.isClosed) {
+        authBloc.add(
+          AuthRegisterRequested(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+            name: _fullNameController.text.trim(),
+          ),
+        );
+      }
     } else if (!_agreeToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

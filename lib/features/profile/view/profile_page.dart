@@ -1,0 +1,341 @@
+import 'package:briewview/app/di/locator.dart';
+import 'package:briewview/core/widgets/navigation_bar.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import '../viewmodel/profile_bloc.dart';
+import '../viewmodel/profile_event.dart';
+import '../viewmodel/profile_state.dart';
+import 'widgets/profile_header_widget.dart';
+import 'widgets/menu_item_widget.dart';
+import 'widgets/bottom_navigation_widget.dart';
+
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({Key? key}) : super(key: key);
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  late ProfileBloc _profileBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _profileBloc = getIt<ProfileBloc>();
+    _profileBloc.add(LoadProfile());
+  }
+
+  @override
+  void dispose() {
+    _profileBloc.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF8B4513), // Dark brown background
+      body: BlocProvider(
+        create: (context) => _profileBloc,
+        child: BlocListener<ProfileBloc, ProfileState>(
+          listener: (context, state) {
+            if (state is ProfileError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            } else if (state is LoggedOut) {
+              context.go('/login');
+            } else if (state is AccountDeleted) {
+              // Navigate to login page
+              context.go('/login');
+            }
+          },
+          child: BlocBuilder<ProfileBloc, ProfileState>(
+            builder: (context, state) {
+              if (state is ProfileLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: Color(0xFFF5F1EB), // Light beige
+                  ),
+                );
+              } else if (state is ProfileLoaded || state is ProfileUpdated) {
+                final profile =
+                    state is ProfileLoaded
+                        ? state.profile
+                        : (state as ProfileUpdated).profile;
+
+                return _buildProfileContent(profile);
+              } else if (state is ProfileError) {
+                return _buildErrorWidget(state.message);
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: Color(0xFFF5F1EB), // Light beige
+                  ),
+                );
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileContent(profile) {
+    return Column(
+      children: [
+        // Profile header
+        ProfileHeaderWidget(
+          profile: profile,
+          onEditPressed: () => _showEditDialog(profile),
+          onSeeMorePressed: () => _showMoreInfo(profile),
+          onCameraPressed: () => _showImagePicker(),
+        ),
+
+        // Curved separator
+        Container(
+          height: 20,
+          decoration: const BoxDecoration(
+            color: Color(0xFF8B4513), // Dark brown
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+        ),
+
+        // Menu section
+        Expanded(
+          child: Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: Color(0xFF8B4513), // Dark brown
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                Expanded(
+                  child: ListView(
+                    children: [
+                      MenuItemWidget(
+                        icon: Icons.settings,
+                        title: 'Cài đặt',
+                        onTap: () => _navigateToSettings(),
+                      ),
+                      MenuItemWidget(
+                        icon: Icons.local_offer,
+                        title: 'Voucher của tôi',
+                        onTap: () => _navigateToVouchers(),
+                      ),
+                      MenuItemWidget(
+                        icon: Icons.favorite_border,
+                        title: 'Yêu thích',
+                        onTap: () => _navigateToFavorites(),
+                      ),
+                      MenuItemWidget(
+                        icon: Icons.history,
+                        title: 'Gần đây',
+                        onTap: () => _navigateToRecent(),
+                      ),
+                      MenuItemWidget(
+                        icon: Icons.rate_review,
+                        title: 'Viết review',
+                        onTap: () => _navigateToWriteReview(),
+                      ),
+                      MenuItemWidget(
+                        icon: Icons.payment,
+                        title: 'Thông tin thanh toán',
+                        onTap: () => _navigateToPaymentInfo(),
+                      ),
+                      MenuItemWidget(
+                        icon: Icons.logout,
+                        title: 'Logout',
+                        onTap: () => _showLogoutDialog(),
+                        showDivider: false,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // Bottom navigation
+        CustomNavigationBar()
+        
+      ],
+    );
+  }
+
+  Widget _buildErrorWidget(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.error_outline,
+            color: Color(0xFFF5F1EB), // Light beige
+            size: 64,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Có lỗi xảy ra',
+            style: const TextStyle(
+              color: Color(0xFFF5F1EB), // Light beige
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            message,
+            style: const TextStyle(
+              color: Color(0xFFF5F1EB), // Light beige
+              fontSize: 14,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () => _profileBloc.add(LoadProfile()),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFF5F1EB), // Light beige
+              foregroundColor: const Color(0xFF8B4513), // Dark brown
+            ),
+            child: const Text('Thử lại'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditDialog(profile) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Chỉnh sửa thông tin'),
+            content: const Text(
+              'Tính năng chỉnh sửa sẽ được phát triển trong phiên bản tiếp theo.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Đóng'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  void _showMoreInfo(profile) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Thông tin chi tiết'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Tên: ${profile.name}'),
+                Text('Email: ${profile.email}'),
+                if (profile.phoneNumber != null)
+                  Text('Số điện thoại: ${profile.phoneNumber}'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Đóng'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  void _showImagePicker() {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Thay đổi ảnh đại diện'),
+            content: const Text(
+              'Tính năng thay đổi ảnh đại diện sẽ được phát triển trong phiên bản tiếp theo.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Đóng'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Đăng xuất'),
+            content: const Text('Bạn có chắc chắn muốn đăng xuất?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Hủy'),
+              ),
+              TextButton(
+                onPressed: () {
+                  _profileBloc.add(Logout());
+                },
+                child: const Text('Đăng xuất'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  void _navigateToSettings() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Tính năng cài đặt sẽ được phát triển')),
+    );
+  }
+
+  void _navigateToVouchers() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Tính năng voucher sẽ được phát triển')),
+    );
+  }
+
+  void _navigateToFavorites() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Tính năng yêu thích sẽ được phát triển')),
+    );
+  }
+
+  void _navigateToRecent() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Tính năng gần đây sẽ được phát triển')),
+    );
+  }
+
+  void _navigateToWriteReview() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Tính năng viết review sẽ được phát triển')),
+    );
+  }
+
+  void _navigateToPaymentInfo() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Tính năng thanh toán sẽ được phát triển')),
+    );
+  }
+
+}

@@ -7,6 +7,7 @@ import 'package:briewview/features/onboarding/viewmodel/onboarding_event.dart';
 import 'package:briewview/features/onboarding/viewmodel/onboarding_state.dart';
 import 'package:briewview/features/onboarding/view/widgets/onboarding_item_widget.dart';
 import 'package:briewview/features/onboarding/view/widgets/page_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -38,10 +39,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
         backgroundColor: Colors.white,
         body: SafeArea(
           child: BlocConsumer<OnboardingBloc, OnboardingState>(
-            listener: (context, state) {
+            listener: (context, state) async {
               if (state is OnboardingCompleted) {
                 // Navigate to login screen
-                context.go(RoutePaths.login);
+                final prefs = await SharedPreferences.getInstance();  
+                await prefs.setBool('hasSeenOnboarding', true); 
+                if (mounted) {
+                  context.go(RoutePaths.login);
+                }
               }
               if (state is OnboardingPageState) {
                 // Only animate if PageController is attached

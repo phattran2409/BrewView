@@ -11,6 +11,7 @@ class SocialLoginButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc,AuthState>(
+      
       builder: (context, state) {
         return Column(
           children: [

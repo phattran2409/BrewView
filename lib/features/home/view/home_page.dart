@@ -50,56 +50,65 @@ class _HomePageState extends State<HomePage> {
     },
   ];
 
-  final List<Map<String, dynamic>> _nearbyCoffeShop = [
+  final List<Map<String, dynamic>> _nearbyCoffeeShop = [
     {
+      'id': '1',
       'name': 'Nearby Coffee Shop 1',
       'distance': '1.2 km',
       'address': '123 Main St, City',
-      'image': 'assets/images/coffe_shop_1.jpg',
+      'image': 'assets/images/coffee_shop_1.jpg',
     },
     {
+      'id': '2', 
       'name': 'Nearby Coffee Shop 2',
       'distance': '2.5 km',
       'address': '456 Elm St, City',
-      'image': 'assets/images/coffe_shop_2.jpg',
+      'image': 'assets/images/coffee_shop_2.jpg',
     },
     {
+      'id': '3',
       'name': 'Nearby Coffee Shop 3',
       'distance': '800 m',
       'address': '789 Oak St, City',
       'image': 'assets/images/coffe_shop_3.jpg',
     },
     {
+      'id': '4',  
       'name': 'Nearby Coffee Shop 4',
       'distance': '1.5 km',
       'address': '321 Pine St, City',
       'image': 'assets/images/coffe_shop_4.jpg',
     },
     {
+      'id': '5',
       'name': 'Nearby Coffee Shop 5',
       'distance': '2.0 km',
       'address': '654 Maple St, City',
       'image': 'assets/images/coffe_shop_5.jpg',
     },
     {
-      'name' : 'Nearby Coffee Shop 6',
-      'distance' : '1.0 km',
-      'address' : '987 Cedar St, City',
-      'image' : 'assets/images/coffe_shop_6.jpg',
+      'id': '6',
+      'name': 'Nearby Coffee Shop 6',
+      'distance': '1.0 km',
+      'address': '987 Cedar St, City',
+      'image': 'assets/images/coffe_shop_6.jpg',
     },
     {
+        'id' : '7',
         'name' : 'Nearby Coffee Shop 7',
         'distance' : '1.0 km',
-        'address' : '987 Cedar St, City',
-        'image' : 'assets/images/coffe_shop_6.jpg',
+        'address': '987 Cedar St, City',
+        'image': 'assets/images/coffe_shop_6.jpg',
     },
     {
-      'name' : 'Nearby Coffee Shop 8',
-      'distance' : '1.0 km',
-      'address' : '987 Cedar St, City',
+      'id': '8',
+      'name': 'Nearby Coffee Shop 8',
+      'distance': '1.0 km',
+      'address': '987 Cedar St, City',
       'image' : 'assets/images/coffe_shop_6.jpg',
     },
     {
+      'id' : '9',
       'name' : 'Nearby Coffee Shop 9',
       'distance' : '1.0 km',
       'address' : '987 Cedar St, City',
@@ -135,7 +144,7 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       RecomendationWidget(recommendations: _recommendations),
-                      NearbyCoffeeShop(coffeeShops: _nearbyCoffeShop)
+                      NearbyCoffeeShop(coffeeShops: _nearbyCoffeeShop)
                     ],
                   ),
                 ),

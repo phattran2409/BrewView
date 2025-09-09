@@ -40,7 +40,7 @@ class AuthGoogleLoginRequested extends AuthEvent {
   const AuthGoogleLoginRequested();
 }  
 
-
+ 
 class AuthLogoutRequested extends AuthEvent {
   const AuthLogoutRequested();
 } 

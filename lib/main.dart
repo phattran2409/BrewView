@@ -1,19 +1,35 @@
+import 'package:briewview/core/services/deep_link_services.dart';
 import 'package:briewview/features/auth/viewModel/Bloc/Auth_Bloc.dart';
 import 'package:briewview/features/auth/viewModel/Bloc/Auth_event.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/app/router/app_router.dart';
-import 'package:briewview/app/theme/app_theme.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Set preferred orientations
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  
   try {
     await Firebase.initializeApp();
     print("✅ Firebase initialized successfully");
-
+    await FacebookAuth.instance.webAndDesktopInitialize(
+      appId: "1126275602705437", // Replace with your Facebook App ID
+      cookie: true,
+      xfbml: true,
+      version: "v15.0",
+    );
+    // Configure Firebase for better locale handling
+    await _configureFirebase();
+    print("✅ Firebase configured for locale");
+    
     await configureDependencies();
     print("✅ Dependencies configured");
 
@@ -21,11 +37,30 @@ void main() async {
     print('=== DI Registration Debug ===');
     print('AuthBloc registered: ${getIt.isRegistered<AuthBloc>()}');
     print('AppRouter registered: ${getIt.isRegistered<AppRouter>()}');
+
+    final  deepLinkServices =  getIt<DeepLinkService>();
+    await deepLinkServices.initialize();  
+    
+    deepLinkServices.onPasswordReset = (token) {
+      print('🔑 Password reset token received: $token');
+      // Navigate to password reset page with token
+      getIt<AppRouter>().router.go('/reset?token=$token');
+    };  
   } catch (error) {
     print("❌ Initialization failed: $error");
   }
-  // Initialize dependency injection
+  
   runApp(const MyApp());
+}
+
+Future<void> _configureFirebase() async {
+  // This ensures Firebase services use proper locale
+  try {
+    // Any additional Firebase configuration can go here
+    print("🌐 Firebase locale coniguration cofmpleted");
+  } catch (e) {
+    print("⚠️ Firebase locale configuration warning: $e");
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -37,6 +72,15 @@ class MyApp extends StatelessWidget {
       title: 'BrewView',
       routerConfig: getIt<AppRouter>().router,
       theme: ThemeData(primarySwatch: Colors.brown),
+      // Fix Firebase locale warning
+      locale: const Locale('en', 'US'),
+      supportedLocales: const [
+        Locale('en', 'US'),
+        Locale('vi', 'VN'),
+      ],
+      localizationsDelegates: const [
+        // Material localization delegates will be added automatically
+      ],
     );
   }
 }

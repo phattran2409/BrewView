@@ -83,37 +83,75 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       //     provider: 'email',
       //   )),
       // );
-      if (result != null) {
+      print('result API LOGIN : $result');
+      print(result.userJson);
+      print(result.isSuccess);
+      if (result.isSuccess && result.userJson != null) {
         emit(AuthAuthenticated(user: result, provider: 'email'));
       }
     } catch (e) {
+      print('e: $e'); 
       emit(AuthError(message: e.toString()));
     }
   }
 
   /// Email/Password Register
-  Future<bool> _onAuthRegisterRequested(
+  Future<void> _onAuthRegisterRequested(
     AuthRegisterRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(const AuthLoading());
+    emit(const AuthEmailRegisterInProgress());
     try {
       final result = await _authRepository.registerWithEmail(
         email: event.email,
         password: event.password,
         name: event.name,
       );
-
-      if (result) {
-        emit(const AuthUnauthenticated());
-        return true;
-      } else {
-        emit(const AuthError(message: 'Registration failed'));
-        return false;
-      }
+      result.fold(
+        (failure) => emit(AuthError(
+          message: failure.toString(),
+          errorCode: 'REGISTER_ERROR',
+        )),
+        (user) {
+          if (user.isSuccess && user.userJson != null) {
+            emit(AuthRegisterSuccess(email: event.email , userId: user.userJson?.id , requiresEmailVerification: true));
+          } else {
+            emit(AuthError(
+              message: user.errorMessage ?? 'Registration failed',
+              errorCode: user.errorCode ?? 'REGISTER_FAILED',
+            ));
+          }
+        },
+      );
     } catch (e) {
-      emit(AuthError(message: e.toString()));
-      return false;
+      print('Registration error: $e');
+      
+      // ✅ Improved error handling with specific error codes
+      String errorMessage = e.toString();
+      String? errorCode;
+      
+      if (errorMessage.contains('email already exists') || 
+          errorMessage.contains('EMAIL_ALREADY_EXISTS')) {
+        errorCode = 'EMAIL_ALREADY_EXISTS';
+        errorMessage = 'This email is already registered.';
+      } else if (errorMessage.contains('weak password') || 
+                 errorMessage.contains('WEAK_PASSWORD')) {
+        errorCode = 'WEAK_PASSWORD';
+        errorMessage = 'Password is too weak.';
+      } else if (errorMessage.contains('invalid email') || 
+                 errorMessage.contains('INVALID_EMAIL')) {
+        errorCode = 'INVALID_EMAIL';
+        errorMessage = 'Invalid email format.';
+      } else if (errorMessage.contains('network') || 
+                 errorMessage.contains('connection')) {
+        errorCode = 'NETWORK_ERROR';
+        errorMessage = 'Network error. Please check your connection.';
+      }
+      
+      emit(AuthError(
+        message: errorMessage,
+        errorCode: errorCode,
+      ));
     }
   }
 

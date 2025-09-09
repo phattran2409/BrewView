@@ -1,5 +1,7 @@
+import 'package:briewview/features/auth/services/auth_services.dart';
 import 'package:briewview/features/user_management/model/user.dart';
 import 'package:briewview/features/user_management/model/user_model.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:briewview/features/auth/model/auth_result.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -55,7 +57,9 @@ import 'package:injectable/injectable.dart';
 // }
 class FacebookAuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-
+  final Dio _dio;
+  FacebookAuthService(this._dio);
+  
   Future<({UserCredential credential, String fbAccessToken, UserModel fbProfile})> signIn() async {
     final result = await FacebookAuth.instance.login(permissions: ['email', 'public_profile']);
     if (result.status == LoginStatus.cancelled) {
@@ -71,7 +75,7 @@ class FacebookAuthService {
       id: userProfiles['id'] ?? '',
       name: userProfiles['name'] ?? '',
       email: userProfiles['email'] ?? '',
-      avatarUrl: userProfiles['picture']?['data']?['url'] ?? '',
+      profilePicture: userProfiles['picture']?['data']?['url'] ?? '',
     );
     final credential = FacebookAuthProvider.credential(fbAccessToken);
     final userCred = await _firebaseAuth.signInWithCredential(credential);

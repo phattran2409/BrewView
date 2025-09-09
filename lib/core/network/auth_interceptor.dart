@@ -5,7 +5,7 @@ class AuthInterceptor extends Interceptor {
   final TokenStorage storage;
   AuthInterceptor(this.storage);
 
-  bool _isAuthPath(String path) => path.contains('/auth/login');
+  bool _isAuthPath(String path) => path.contains('/api/auth/email/login');
 
   @override
   void onRequest(

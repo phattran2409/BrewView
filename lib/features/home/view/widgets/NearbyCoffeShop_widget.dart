@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:briewview/core/widgets/dotIndicator.dart';
+import 'package:go_router/go_router.dart';
 
 class NearbyCoffeeShop extends StatefulWidget {
   final List<Map<String, dynamic>> coffeeShops;
@@ -139,7 +140,11 @@ class _NearbyCoffeeShopState extends State<NearbyCoffeeShop> {
   Widget _buildCoffeeShopCard(Map<String, dynamic> coffeeShop) {
     return GestureDetector(
       onTap: () {
-        print('Tapped on ${coffeeShop['name']}');
+        context.goNamed(
+          'coffee-detail',
+          pathParameters: {'id': coffeeShop['id']},
+          extra: coffeeShop,
+        );
       },
       child: Container(
         decoration: BoxDecoration(

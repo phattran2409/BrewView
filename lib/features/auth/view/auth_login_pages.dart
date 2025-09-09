@@ -46,7 +46,7 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
                 backgroundColor: Colors.green,
               ),
             );
-            // context.go('/home');
+            context.go('/home');
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -341,15 +341,15 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
 
   // Email Login Handler
   void _handleEmailLogin(BuildContext context) {
-    // if (_formKey.currentState!.validate()) {
-    //   context.read<AuthBloc>().add(
-    //     AuthLoginRequested(
-    //       email: _emailController.text.trim(),
-    //       password: _passwordController.text,
-    //     ),
-    //   );
-    // }
-    context.pushNamed('home');  
+    if (_formKey.currentState!.validate()) {
+      context.read<AuthBloc>().add(
+        AuthLoginRequested(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        ),
+      );
+    }
+    // context.pushNamed('home');  
   }
 
   // Retry based on error code

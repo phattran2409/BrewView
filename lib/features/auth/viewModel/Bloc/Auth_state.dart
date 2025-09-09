@@ -57,3 +57,32 @@ class AuthGoogleLoginInProgress extends AuthState {
 class AuthEmailLoginInProgress extends AuthState {
   const AuthEmailLoginInProgress();
 }
+
+// ✅ Additional registration states for better flow control
+class AuthEmailRegisterInProgress extends AuthState {
+  const AuthEmailRegisterInProgress();
+}
+
+class AuthRegisterSuccess extends AuthState {
+  final String email;
+  final String? userId;
+  final bool requiresEmailVerification;
+
+  const AuthRegisterSuccess({
+    required this.email,
+    this.userId,
+    this.requiresEmailVerification = true,
+  });
+
+  @override
+  List<Object?> get props => [email, userId, requiresEmailVerification];
+}
+
+class AuthEmailVerificationSent extends AuthState {
+  final String email;
+
+  const AuthEmailVerificationSent({required this.email});
+
+  @override
+  List<Object?> get props => [email];
+}

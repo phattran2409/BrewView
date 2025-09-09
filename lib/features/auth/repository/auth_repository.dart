@@ -8,14 +8,8 @@ abstract class AuthRepository {
     required String password,
   }); 
   
-  Future<void> signInWithEmail(
-    {
-      required String email,  
-      required String password,
-      required String name,
-    }
-  );
-   Future<bool> registerWithEmail({
+
+   Future<Either<Failure, AuthResult>> registerWithEmail({
     required String email,
     required String password,
     required String name,
@@ -31,5 +25,7 @@ abstract class AuthRepository {
 
   Future<Either<Failure, AuthResult?>> getCurrentUser();
   Future<Either<Failure, AuthResult>> saveAuthResult(AuthResult authResult);
+
+  Future<bool> verifyOtp(String otp , String userId);
 }
   

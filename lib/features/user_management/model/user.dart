@@ -3,18 +3,21 @@ class User {
   final String name;
   final String email;
   final String? phoneNumber;
-  final String? avatarUrl;
-
+  final String? profilePicture;
+  final String? accessToken;
+  final String? refreshToken;
   User({
     required this.id,
     required this.name,
     required this.email,
     this.phoneNumber,
-    this.avatarUrl,
+    this.profilePicture,
+    this.accessToken,
+    this.refreshToken,
   });
 
   @override
   String toString() {
-    return 'User(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, avatarUrl: $avatarUrl)';
+    return 'User(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, profilePicture: $profilePicture)';
   }
 }

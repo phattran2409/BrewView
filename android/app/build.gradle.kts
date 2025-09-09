@@ -32,6 +32,9 @@ android {
         targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        manifestPlaceholders["appLinkScheme"] = "https"
+        manifestPlaceholders["appLinkHost"] = "brewview.com"
     }
 
     buildTypes {
