@@ -6,7 +6,7 @@ class CafeDetail extends StatefulWidget {
   final String? coffeeId;
   final Map<String, dynamic>? coffeeData;
 
-  const CafeDetail({Key? key, this.coffeeId, this.coffeeData}) : super(key: key);
+  const CafeDetail({super.key, this.coffeeId, this.coffeeData});
 
   @override
   _CafeDetailState createState() => _CafeDetailState();

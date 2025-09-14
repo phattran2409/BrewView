@@ -1,4 +1,3 @@
-import 'package:briewview/app/router/route_paths.dart';
 import 'package:briewview/core/widgets/wave_clipper.dart';
 import 'package:briewview/features/auth/view/widgets/social_login_buttons.dart';
 import 'package:briewview/features/auth/viewModel/Bloc/Auth_Bloc.dart';
@@ -6,7 +5,6 @@ import 'package:briewview/features/auth/viewModel/Bloc/Auth_event.dart';
 import 'package:briewview/features/auth/viewModel/Bloc/Auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/features/auth/view/widgets/auth_forgotpassword_widget.dart';
 import 'package:briewview/features/auth/view/auth_register_pages.dart';
 import 'package:briewview/core/utils/validators.dart';
@@ -34,40 +32,38 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<AuthBloc>(
-      create: (_) => getIt<AuthBloc>(),
-      child: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthAuthenticated) {
-            // Navigate to home
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Welcome ${state.user.userJson?.name ?? ''}!'),
-                backgroundColor: Colors.green,
-              ),
-            );
-            context.go('/home');
-          } else if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-                action:
-                    state.errorCode != null
-                        ? SnackBarAction(
-                          label: 'Retry',
-                          textColor: Colors.white,
-                          onPressed:
-                              () =>
-                                  _retryBasedOnError(context, state.errorCode!),
-                        )
-                        : null,
-              ),
-            );
-          }
-        },
-        builder: (context, state) {
-          return Scaffold(
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthAuthenticated) {
+          // Navigate to home
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Welcome ${state.user.userJson?.name ?? ''}!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          context.go('/home');
+        } else if (state is AuthError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Colors.red,
+              action:
+                  state.errorCode != null
+                      ? SnackBarAction(
+                        label: 'Retry',
+                        textColor: Colors.white,
+                        onPressed:
+                            () =>
+                                _retryBasedOnError(context, state.errorCode!),
+                      )
+                      : null,
+            ),
+          );
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
             body: Stack(
               children: [
                 // Background
@@ -335,8 +331,7 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
             ),
           );
         },
-      ),
-    );
+      );
   }
 
   // Email Login Handler

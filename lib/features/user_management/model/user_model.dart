@@ -13,13 +13,13 @@ class UserModel extends User {
   DateTime? createdAt; // Thêm
 
   UserModel({
-    required String id,
-    required String name,
-    required String email,
-    String? phoneNumber,
-    String? profilePicture,
-    String? accessToken,
-    String? refreshToken,
+    required super.id,
+    required super.name,
+    required super.email,
+    super.phoneNumber,
+    super.profilePicture,
+    super.accessToken,
+    super.refreshToken,
     String? identityId,
     String? role,
     String? gender, // Thêm
@@ -27,15 +27,7 @@ class UserModel extends User {
     bool? isPremium, // Thêm
     bool? status, // Thêm
     DateTime? createdAt, // Thêm
-  }) : super(
-         id: id,
-         name: name,
-         email: email,
-         phoneNumber: phoneNumber,
-         profilePicture: profilePicture,
-         accessToken: accessToken,
-         refreshToken: refreshToken,
-       );
+  });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     // ✅ Safe DateTime parsing

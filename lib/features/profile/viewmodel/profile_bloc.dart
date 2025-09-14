@@ -10,7 +10,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final ProfileRepository _profileRepository;
   final AuthRepository _authRepository;
 
-  ProfileBloc(this._profileRepository, this._authRepository) : super(ProfileInitial()) {
+  ProfileBloc(this._profileRepository, this._authRepository)
+    : super(ProfileInitial()) {
     on<LoadProfile>(_onLoadProfile);
     on<UpdateProfile>(_onUpdateProfile);
     on<ToggleLanguage>(_onToggleLanguage);
@@ -44,7 +45,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           name: event.name,
           email: event.email,
           phoneNumber: event.phoneNumber,
-      
         );
         final result = await _profileRepository.updateProfile(updatedProfile);
         emit(ProfileUpdated(result));
@@ -97,15 +97,20 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     if (currentState is ProfileLoaded) {
       emit(ProfileUpdating(currentState.profile));
       try {
-        final updatedProfile = currentState.profile.copyWith(
-          profilePicture: event.imagePath,
+        // final updatedProfile = currentState.profile.copyWith(
+        //   profilePicture: event.imagePath,
+        // );
+        final result = await _profileRepository.updateProfilePicture(
+          event.imagePath,
         );
-        final result = await _profileRepository.updateProfile(updatedProfile);
-        emit(ProfileUpdated(result));
+        if (result) {
+          emit(ProfilePictureUpdatedSuccess());
+        } else {
+          emit(ProfileError('Failed to update profile picture'));
+        }
       } catch (e) {
         emit(ProfileError(e.toString()));
       }
     }
   }
 }
-

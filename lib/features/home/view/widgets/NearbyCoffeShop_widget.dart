@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 class NearbyCoffeeShop extends StatefulWidget {
   final List<Map<String, dynamic>> coffeeShops;
-  const NearbyCoffeeShop({Key? key, required this.coffeeShops}) : super(key: key);
+  const NearbyCoffeeShop({super.key, required this.coffeeShops});
   
   @override
   _NearbyCoffeeShopState createState() => _NearbyCoffeeShopState();

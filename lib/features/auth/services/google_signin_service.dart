@@ -88,6 +88,7 @@ class GoogleSignInService {
       print('Error fetching token from server: $e');
       return null;
     }
+    return null;
   }
 
   /// Get user info for profile

@@ -1,4 +1,3 @@
-import 'package:briewview/features/auth/repository/auth_repository_impl.dart';
 import 'package:briewview/features/user_management/model/user_model.dart';
 import 'package:injectable/injectable.dart';
 import '../services/profile_service.dart';
@@ -41,13 +40,25 @@ class ProfileRepositoryImpl implements ProfileRepository {
       throw Exception('Failed to update language preference: $e');
     }
   }
-  
+
   @override
   Future<void> deleteAccount() {
     // TODO: implement deleteAccount
     throw UnimplementedError();
   }
-  
 
- 
+  @override
+  Future<bool> updateProfilePicture(String imagePath) async {
+    try {
+      final result = await _profileService.updateProfilePicture(imagePath);
+      print('Update profile picture result: $result');
+      if (result != null && result['isSuccess'] == true) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      throw Exception('Failed to update profile picture: $e');
+    }
+  }
 }

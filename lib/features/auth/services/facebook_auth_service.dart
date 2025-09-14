@@ -1,9 +1,6 @@
-import 'package:briewview/features/auth/services/auth_services.dart';
-import 'package:briewview/features/user_management/model/user.dart';
 import 'package:briewview/features/user_management/model/user_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:briewview/features/auth/model/auth_result.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:injectable/injectable.dart'; 
 @singleton

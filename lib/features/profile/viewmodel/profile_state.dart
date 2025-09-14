@@ -1,6 +1,5 @@
 import 'package:briewview/features/user_management/model/user_model.dart';
 
-import '../model/profile.dart';
 
 abstract class ProfileState {}
 
@@ -36,6 +35,10 @@ class LanguageToggled extends ProfileState {
   final bool isVietnamese;
 
   LanguageToggled(this.isVietnamese);
+}
+
+class ProfilePictureUpdatedSuccess extends ProfileState {
+
 }
 
 class LoggingOut extends ProfileState {}

@@ -1,18 +1,16 @@
-import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/features/auth/view/otp_page.dart';
-import 'package:briewview/features/auth/viewModel/Bloc/Auth_Bloc.dart';
 import 'package:briewview/features/cafe/view/cafes_detail.dart';
 import 'package:briewview/features/home/view/home_page_demo.dart';
 import 'package:briewview/features/search/widgets/search_page.dart';
 import 'package:briewview/features/profile/view/profile_page.dart';
 import 'package:briewview/features/splash/view/splash_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 import 'package:briewview/app/router/route_paths.dart';
 import 'package:briewview/features/onboarding/view/onboarding_page.dart';
 import 'package:briewview/features/auth/view/auth_login_pages.dart';
+import 'package:briewview/features/auth/view/auth_resetpassword_pages.dart';
 // import 'package:briewview/features/user_management/view/user_list_page.dart';
 
 @singleton
@@ -23,10 +21,11 @@ class AppRouter {
     router = GoRouter(
       initialLocation: RoutePaths.splash,
       routes: [
-        GoRoute(path: RoutePaths.splash,
+        GoRoute(
+          path: RoutePaths.splash,
           name: 'splash',
           builder: (context, state) => const SplashPage(),
-        ),  
+        ),
         GoRoute(
           path: RoutePaths.onboarding,
           name: 'onboarding',
@@ -36,10 +35,7 @@ class AppRouter {
           path: RoutePaths.login,
           name: 'login',
           builder:
-              (context, state) => BlocProvider<AuthBloc>(
-                create: (context) => getIt<AuthBloc>(),
-                child: const AuthLoginPage(),
-              ),
+              (context, state) => const AuthLoginPage(), 
         ),
         GoRoute(
           path: RoutePaths.userList,
@@ -82,15 +78,13 @@ class AppRouter {
           name: 'profile',
           builder: (context, state) => const ProfilePage(),
         ),
-        GoRoute(path: '/reset', 
-          name: 'password-reset',
+        GoRoute(
+          path: RoutePaths.resetPassword,
+          name: 'reset-password',
           builder: (context, state) {
-            final token = state.uri.queryParameters['token'] ?? '';
-            return Scaffold(
-              appBar: AppBar(title: const Text('Reset Password')),
-              body: Center(child: Text('Reset token: $token')),
-            );
-          }
+            final email = state.uri.queryParameters['email'] ?? '';
+            return AuthResetPasswordPage(email: email);
+          },
         ),
       ],
     );

@@ -17,13 +17,10 @@ class AuthLoading extends AuthState {
 }
 
 class AuthAuthenticated extends AuthState {
-  final AuthResult user;  
+  final AuthResult user;
   final String? provider; // 'email', 'facebook', 'google'
 
-  const AuthAuthenticated({
-    required this.user,
-    this.provider,
-  });
+  const AuthAuthenticated({required this.user, this.provider});
 
   @override
   List<Object?> get props => [user, provider];
@@ -37,10 +34,7 @@ class AuthError extends AuthState {
   final String message;
   final String? errorCode;
 
-  const AuthError({
-    required this.message,
-    this.errorCode,
-  });
+  const AuthError({required this.message, this.errorCode});
 
   @override
   List<Object?> get props => [message, errorCode];
@@ -85,4 +79,32 @@ class AuthEmailVerificationSent extends AuthState {
 
   @override
   List<Object?> get props => [email];
+}
+
+// Forgot Password States
+
+class AuthForgotPasswordSuccess extends AuthState {
+  final String message;
+  const AuthForgotPasswordSuccess({required this.message});
+  @override
+  List<Object?> get props => [message];
+}
+
+class AuthEmailForgotPasswordInProgress extends AuthState {
+  @override
+  List<Object?> get props => [];
+}
+
+// Password Reset States
+class AuthPasswordResetInProgress extends AuthState {
+  const AuthPasswordResetInProgress();
+}
+
+class AuthPasswordResetSuccess extends AuthState {
+  final String message;
+
+  const AuthPasswordResetSuccess({required this.message});
+
+  @override
+  List<Object?> get props => [message];
 }

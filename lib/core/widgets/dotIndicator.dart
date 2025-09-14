@@ -17,7 +17,7 @@ class DotIndicator extends StatelessWidget {
   final Function(int)? onDotTap;
 
   const DotIndicator({
-    Key? key,
+    super.key,
     required this.currentIndex,
     required this.dotCount,
     this.pageController,
@@ -31,7 +31,7 @@ class DotIndicator extends StatelessWidget {
     this.animationCurve,
     this.onTap,
     this.onDotTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

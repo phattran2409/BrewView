@@ -3,7 +3,6 @@ import 'package:briewview/core/widgets/navigation_bar.dart';
 import 'package:briewview/features/home/view/widgets/NearbyCoffeShop_widget.dart';
 import 'package:briewview/features/home/view/widgets/Recomendation_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:briewview/core/widgets/wave_clipper.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

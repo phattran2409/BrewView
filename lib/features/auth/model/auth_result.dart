@@ -1,6 +1,4 @@
-import 'package:briewview/features/user_management/model/user.dart';
 import 'package:briewview/features/user_management/model/user_model.dart';
-import 'package:flutter/foundation.dart';
 
 class AuthResult {
   final bool isSuccess;

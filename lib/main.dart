@@ -1,11 +1,11 @@
 import 'package:briewview/core/services/deep_link_services.dart';
 import 'package:briewview/features/auth/viewModel/Bloc/Auth_Bloc.dart';
-import 'package:briewview/features/auth/viewModel/Bloc/Auth_event.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/app/router/app_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 void main() async {
@@ -68,19 +68,28 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'BrewView',
-      routerConfig: getIt<AppRouter>().router,
-      theme: ThemeData(primarySwatch: Colors.brown),
-      // Fix Firebase locale warning
-      locale: const Locale('en', 'US'),
-      supportedLocales: const [
-        Locale('en', 'US'),
-        Locale('vi', 'VN'),
+    return MultiBlocProvider(
+      providers: [
+        // ✅ Global AuthBloc
+        BlocProvider<AuthBloc>(
+          create: (_) => getIt<AuthBloc>(),
+          lazy: false, // Create immediately
+        ),
       ],
-      localizationsDelegates: const [
-        // Material localization delegates will be added automatically
-      ],
+      child: MaterialApp.router(
+        title: 'BrewView',
+        routerConfig: getIt<AppRouter>().router,
+        theme: ThemeData(primarySwatch: Colors.brown),
+        // Fix Firebase locale warning
+        locale: const Locale('en', 'US'),
+        supportedLocales: const [
+          Locale('en', 'US'),
+          Locale('vi', 'VN'),
+        ],
+        localizationsDelegates: const [
+          // Material localization delegates will be added automatically
+        ],
+      ),
     );
   }
 }

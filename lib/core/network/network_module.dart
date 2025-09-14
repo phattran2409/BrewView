@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:briewview/core/constants/app_constants.dart';
 import 'package:briewview/core/network/auth_interceptor.dart';
 import 'package:briewview/core/network/token_storage.dart';
+import 'package:briewview/features/auth/services/auth_services.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
@@ -74,7 +75,7 @@ abstract class NetworkModule {
       if (!kReleaseMode) {
         // ignore: avoid_print
         print('DIO ERR: ${err.type} ${err.message}');
-        if (err is DioException && err.error != null) print(err.error);
+        if (err.error != null) print(err.error);
       }
       handler.next(err);
     },

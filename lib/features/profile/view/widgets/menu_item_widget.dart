@@ -7,12 +7,12 @@ class MenuItemWidget extends StatelessWidget {
   final bool showDivider;
 
   const MenuItemWidget({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
     this.onTap,
     this.showDivider = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

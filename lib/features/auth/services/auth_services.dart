@@ -78,7 +78,7 @@ class AuthApi {
       }
       // Add a return statement to cover all code paths
       return AuthResult(isSuccess: false, userJson: null);
-    } on DioException catch (dioError) {
+    } on DioException {
       String errorMessage = 'Registration failed';
       String errorCode = 'UNKNOWN_ERROR';
 
@@ -125,5 +125,60 @@ class AuthApi {
       print('Error verifying OTP: $e');
       return false;
     }
+  }
+
+  Future<bool> forgotPassword(String email) async {
+    try {
+      final res = await _dio.post(
+        AppConstants.forgotPasswordEndpoint,
+        data: {'email': email},
+      );
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        print('Password reset email sent successfully.');
+        return true;
+      }
+      print(
+        'Failed to send password reset email. Status code: ${res.statusCode}',
+      );
+
+      return false;
+    } catch (e) {
+      print('Error during forgot password: $e');
+      return false;
+    }
+  }
+
+  Future<bool> resetPassword({
+    required String email,
+    required String currentPassword,  
+    required String newPassword,
+  }) async {
+    try {
+      final res = await _dio.post(
+        AppConstants.changePasswordEndpoint,
+        data: {'email': email, 'newPassword': newPassword , 'currentPassword': currentPassword},
+      );
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        print('Password reset successfully.');
+        return true;
+      } else {
+        print('Failed to reset password. Status code: ${res.statusCode}');
+      }
+      return false;
+    } catch (e) {
+      print('Error during password reset: $e');
+      return false;
+    }
+  }
+
+  Future<Map<String, dynamic>?> refreshToken(String refreshToken) async {
+    final res = await _dio.post(
+      AppConstants.refreshTokenEndpoint,
+      data: {'refreshToken': refreshToken},
+    );
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      return res.data;
+    }
+    return null;
   }
 }

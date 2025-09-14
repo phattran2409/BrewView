@@ -11,7 +11,7 @@ final getIt = GetIt.instance;
 Future<void> configureDependencies() async {
   try {
     // Try auto-generated registration first
-    await getIt.init();
+    getIt.init();
     print("✅ Auto DI registration successful");
   } catch (e) {
     print("⚠️ Auto DI failed: $e");

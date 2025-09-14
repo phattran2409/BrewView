@@ -1,5 +1,5 @@
 class RoutePaths {
-  static const String splash = '/'; 
+  static const String splash = '/';
   static const String onboarding = '/onboarding';
   static const String login = '/login';
   static const String home = '/home';
@@ -14,4 +14,5 @@ class RoutePaths {
   static String coffeeDetailPath(String id) => '/coffee/$id';
   // Auth
   static String otp = '/otp/:id';
+  static const String resetPassword = '/reset-password';
 }

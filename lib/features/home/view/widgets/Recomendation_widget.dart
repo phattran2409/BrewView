@@ -2,8 +2,7 @@ import 'package:briewview/core/widgets/dotIndicator.dart';
 import 'package:flutter/material.dart';
 
 class RecomendationWidget extends StatefulWidget {
-  const RecomendationWidget({Key? key, required this.recommendations})
-    : super(key: key);
+  const RecomendationWidget({super.key, required this.recommendations});
   final List<Map<String, dynamic>> recommendations;
 
   @override
@@ -109,7 +108,7 @@ class _RecomendationWidgetState extends State<RecomendationWidget> {
             // Food Image
             ClipRRect(
               borderRadius: BorderRadius.circular(15),
-              child: Container(
+              child: SizedBox(
                 width: double.infinity,
                 height: double.infinity,
                 child:

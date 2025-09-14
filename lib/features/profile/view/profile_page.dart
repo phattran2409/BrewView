@@ -1,5 +1,7 @@
 import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/core/widgets/navigation_bar.dart';
+import 'package:briewview/core/widgets/curvedBottom_clipper.dart';
+import 'package:briewview/features/profile/view/widgets/image_picker_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -9,9 +11,12 @@ import '../viewmodel/profile_state.dart';
 import 'widgets/profile_header_widget.dart';
 import 'widgets/menu_item_widget.dart';
 import 'widgets/bottom_navigation_widget.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'dart:io';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+  const ProfilePage({super.key});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -54,6 +59,17 @@ class _ProfilePageState extends State<ProfilePage> {
               // Navigate to login page
               context.go('/login');
             }
+            if (state is ProfilePictureUpdatedSuccess) {
+              Navigator.of(context).pop(); // Close loading dialog
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Cập nhật ảnh đại diện thành công!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              _profileBloc.add(LoadProfile()); // Reload profile
+            } 
+          
           },
           child: BlocBuilder<ProfileBloc, ProfileState>(
             builder: (context, state) {
@@ -87,89 +103,95 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildProfileContent(profile) {
-    return Column(
-      children: [
-        // Profile header
-        ProfileHeaderWidget(
-          profile: profile,
-          onEditPressed: () => _showEditDialog(profile),
-          onSeeMorePressed: () => _showMoreInfo(profile),
-          onCameraPressed: () => _showImagePicker(),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          colors: const [
+            Color(0xFF8B4513),
+            Color(0xFF3F2700),
+            // Dark brown
+          ],
         ),
-
-        // Curved separator
-        Container(
-          height: 20,
-          decoration: const BoxDecoration(
-            color: Color(0xFF8B4513), // Dark brown
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
+      ),
+      child: Column(
+        children: [
+          // Profile header
+          ProfileHeaderWidget(
+            profile: profile,
+            onEditPressed: () => _showEditDialog(profile),
+            onSeeMorePressed: () => _showMoreInfo(profile),
+            onCameraPressed: () => _showImagePicker(),
           ),
-        ),
-
-        // Menu section
-        Expanded(
-          child: Container(
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              color: Color(0xFF8B4513), // Dark brown
-            ),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                Expanded(
-                  child: ListView(
-                    children: [
-                      MenuItemWidget(
-                        icon: Icons.settings,
-                        title: 'Cài đặt',
-                        onTap: () => _navigateToSettings(),
-                      ),
-                      MenuItemWidget(
-                        icon: Icons.local_offer,
-                        title: 'Voucher của tôi',
-                        onTap: () => _navigateToVouchers(),
-                      ),
-                      MenuItemWidget(
-                        icon: Icons.favorite_border,
-                        title: 'Yêu thích',
-                        onTap: () => _navigateToFavorites(),
-                      ),
-                      MenuItemWidget(
-                        icon: Icons.history,
-                        title: 'Gần đây',
-                        onTap: () => _navigateToRecent(),
-                      ),
-                      MenuItemWidget(
-                        icon: Icons.rate_review,
-                        title: 'Viết review',
-                        onTap: () => _navigateToWriteReview(),
-                      ),
-                      MenuItemWidget(
-                        icon: Icons.payment,
-                        title: 'Thông tin thanh toán',
-                        onTap: () => _navigateToPaymentInfo(),
-                      ),
-                      MenuItemWidget(
-                        icon: Icons.logout,
-                        title: 'Logout',
-                        onTap: () => _showLogoutDialog(),
-                        showDivider: false,
-                      ),
-                    ],
+          // Menu section
+          Expanded(
+            child: SizedBox(
+              width: double.infinity,
+              // decoration: const BoxDecoration(
+              //   gradient: LinearGradient(
+              //     begin: Alignment.bottomCenter,
+              //     end: Alignment.topCenter,
+              //     colors: [
+              //       Color(0xFF783D0D),
+              //       Color(0xFF3F2700), // Màu đậm ở dưới
+              //     ],
+              //   ),
+              // ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        MenuItemWidget(
+                          icon: Icons.settings,
+                          title: 'Cài đặt',
+                          onTap: () => _navigateToSettings(),
+                        ),
+                        MenuItemWidget(
+                          icon: Icons.local_offer,
+                          title: 'Voucher của tôi',
+                          onTap: () => _navigateToVouchers(),
+                        ),
+                        MenuItemWidget(
+                          icon: Icons.favorite_border,
+                          title: 'Yêu thích',
+                          onTap: () => _navigateToFavorites(),
+                        ),
+                        MenuItemWidget(
+                          icon: Icons.history,
+                          title: 'Gần đây',
+                          onTap: () => _navigateToRecent(),
+                        ),
+                        MenuItemWidget(
+                          icon: Icons.rate_review,
+                          title: 'Viết review',
+                          onTap: () => _navigateToWriteReview(),
+                        ),
+                        MenuItemWidget(
+                          icon: Icons.payment,
+                          title: 'Thông tin thanh toán',
+                          onTap: () => _navigateToPaymentInfo(),
+                        ),
+                        MenuItemWidget(
+                          icon: Icons.logout,
+                          title: 'Logout',
+                          onTap: () => _showLogoutDialog(),
+                          showDivider: false,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
 
-        // Bottom navigation
-        CustomNavigationBar()
-        
-      ],
+          // Bottom navigation
+          CustomNavigationBar(),
+        ],
+      ),
     );
   }
 
@@ -264,17 +286,10 @@ class _ProfilePageState extends State<ProfilePage> {
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text('Thay đổi ảnh đại diện'),
-            content: const Text(
-              'Tính năng thay đổi ảnh đại diện sẽ được phát triển trong phiên bản tiếp theo.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Đóng'),
-              ),
-            ],
+          (context) => ImagePickerDialog(
+            onImageSelected: (File imageFile) {
+              _handleImageUpload(imageFile);
+            },
           ),
     );
   }
@@ -338,4 +353,18 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // Method xử lý upload ảnh
+  void _handleImageUpload(File imageFile) {
+    // TODO: Implement upload logic to server
+    print('Selected image: ${imageFile.path}');
+
+    // Hiển thị loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+    _profileBloc.add(UpdateProfilePicture(imageFile.path));
+  }
 }
+

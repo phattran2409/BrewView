@@ -54,7 +54,7 @@ class _SplashPageState extends State<SplashPage> {
   // }
   Future<bool> _hasSeenOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
-    return await prefs.getBool('hasSeenOnboarding') ?? false;
+    return prefs.getBool('hasSeenOnboarding') ?? false;
   }
 
   @override

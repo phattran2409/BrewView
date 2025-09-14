@@ -9,8 +9,6 @@ import 'package:briewview/features/auth/services/google_signin_service.dart';
 import 'package:briewview/features/user_management/model/user_model.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:injectable/injectable.dart';
 
 @LazySingleton(as: AuthRepository)
@@ -132,29 +130,31 @@ class AuthRepositoryImpl implements AuthRepository {
           userDataFromServer.userJson == null ||
           !userDataFromServer.isSuccess) {
         return Left(ServerFailure('Failed to fetch user data from server'));
-      } 
-     UserModel serverUserModel;
-    
-    if (userDataFromServer.userJson is UserModel) {
-      serverUserModel = userDataFromServer.userJson as UserModel;
-    } else if (userDataFromServer.userJson is Map<String, dynamic>) {
-      serverUserModel = UserModel.fromJson(userDataFromServer.userJson as Map<String, dynamic>);
-    } else {
-      print('❌ Invalid user data type from server');
-      return Left(ServerFailure('Invalid user data format from server'));
-    }
-    
-    print('✅ Server user model created: $serverUserModel');
-    
-    // ✅ Step 4: Save tokens from SERVER (not empty strings!)
-    final accessToken = serverUserModel.accessToken ?? '';
-    final refreshToken = serverUserModel.refreshToken ?? '';
+      }
+      UserModel serverUserModel;
+
+      if (userDataFromServer.userJson is UserModel) {
+        serverUserModel = userDataFromServer.userJson as UserModel;
+      } else if (userDataFromServer.userJson is Map<String, dynamic>) {
+        serverUserModel = UserModel.fromJson(
+          userDataFromServer.userJson as Map<String, dynamic>,
+        );
+      } else {
+        print('❌ Invalid user data type from server');
+        return Left(ServerFailure('Invalid user data format from server'));
+      }
+
+      print('✅ Server user model created: $serverUserModel');
+
+      // ✅ Step 4: Save tokens from SERVER (not empty strings!)
+      final accessToken = serverUserModel.accessToken ?? '';
+      final refreshToken = serverUserModel.refreshToken ?? '';
       // Save tokens
       await TokenStorage().saveTokens(
         access: accessToken ?? '',
         refresh: refreshToken ?? '',
       );
-      
+
       print('✅ Tokens saved: access=$accessToken, refresh=$refreshToken');
       await _userStorageServices.saveUser(
         UserModel(
@@ -167,12 +167,7 @@ class AuthRepositoryImpl implements AuthRepository {
         ),
       );
       print('✅ User data saved locally');
-      return Right(
-        AuthResult(
-          isSuccess: true,
-          userJson: serverUserModel,
-        ),
-      );
+      return Right(AuthResult(isSuccess: true, userJson: serverUserModel));
     } on FirebaseAuthException catch (e) {
       return Left(ServerFailure(e.message ?? 'Google Sign-In failed'));
     } catch (e) {
@@ -211,8 +206,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       if (!result.isSuccess) {
         return Left(ServerFailure('Registration failed'));
-        
-      } 
+      }
       final user = UserModel(
         id: result.userJson?.id ?? '',
         email: result.userJson?.email ?? '',
@@ -242,7 +236,7 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(ServerFailure('Failed to save authentication data: $e'));
     }
   }
-  
+
   @override
   Future<bool> verifyOtp(String otp, String userId) async {
     try {
@@ -253,6 +247,44 @@ class AuthRepositoryImpl implements AuthRepository {
       rethrow;
     }
   }
- 
- 
+
+  @override
+  Future<Either<Failure, bool>> forgotPassword(String email) async {
+    try {
+      final result = await _api.forgotPassword(email);
+      if (result) {
+        return Right(true);
+      } else {
+        return Left(ServerFailure('Failed to initiate password reset'));
+      }
+    } catch (e) {
+      print('Error in forgot password: $e');
+      return Left(ServerFailure('Failed to initiate password reset: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> resetPassword({
+    required String email,
+    required String newPassword,
+    required String currentPassword,  
+  }) async {
+    try {
+      final result = await _api.resetPassword(
+        email: email,
+        newPassword: newPassword,
+        currentPassword: currentPassword,
+      );
+      print('Reset password result: $result');  
+      print('email: $email, newPassword: $newPassword, currentPassword: $currentPassword');
+      if (result) {
+        return const Right(null);
+      } else {
+        return Left(ServerFailure('Failed to reset password'));
+      }
+    } catch (e) {
+      print('Error in reset password: $e');
+      return Left(ServerFailure('Failed to reset password: $e'));
+    }
+  }
 }

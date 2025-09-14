@@ -6,7 +6,6 @@ import 'package:briewview/features/auth/viewModel/Bloc/Auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
-
 @singleton
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
@@ -26,6 +25,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthFacebookLoginRequested>(_onAuthFacebookLoginRequested);
     on<AuthGoogleLoginRequested>(_onAuthGoogleLoginRequested);
     on<AuthLogoutRequested>(_onAuthLogoutRequested);
+    on<AuthForgotPasswordRequested>(_onAuthForgotPasswordRequested);
+    on<AuthPasswordResetRequested>(_onAuthPasswordResetRequested);
   }
 
   /// Khởi tạo auth state khi app start
@@ -90,7 +91,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthAuthenticated(user: result, provider: 'email'));
       }
     } catch (e) {
-      print('e: $e'); 
+      print('e: $e');
       emit(AuthError(message: e.toString()));
     }
   }
@@ -108,50 +109,54 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         name: event.name,
       );
       result.fold(
-        (failure) => emit(AuthError(
-          message: failure.toString(),
-          errorCode: 'REGISTER_ERROR',
-        )),
+        (failure) => emit(
+          AuthError(message: failure.toString(), errorCode: 'REGISTER_ERROR'),
+        ),
         (user) {
           if (user.isSuccess && user.userJson != null) {
-            emit(AuthRegisterSuccess(email: event.email , userId: user.userJson?.id , requiresEmailVerification: true));
+            emit(
+              AuthRegisterSuccess(
+                email: event.email,
+                userId: user.userJson?.id,
+                requiresEmailVerification: true,
+              ),
+            );
           } else {
-            emit(AuthError(
-              message: user.errorMessage ?? 'Registration failed',
-              errorCode: user.errorCode ?? 'REGISTER_FAILED',
-            ));
+            emit(
+              AuthError(
+                message: user.errorMessage ?? 'Registration failed',
+                errorCode: user.errorCode ?? 'REGISTER_FAILED',
+              ),
+            );
           }
         },
       );
     } catch (e) {
       print('Registration error: $e');
-      
+
       // ✅ Improved error handling with specific error codes
       String errorMessage = e.toString();
       String? errorCode;
-      
-      if (errorMessage.contains('email already exists') || 
+
+      if (errorMessage.contains('email already exists') ||
           errorMessage.contains('EMAIL_ALREADY_EXISTS')) {
         errorCode = 'EMAIL_ALREADY_EXISTS';
         errorMessage = 'This email is already registered.';
-      } else if (errorMessage.contains('weak password') || 
-                 errorMessage.contains('WEAK_PASSWORD')) {
+      } else if (errorMessage.contains('weak password') ||
+          errorMessage.contains('WEAK_PASSWORD')) {
         errorCode = 'WEAK_PASSWORD';
         errorMessage = 'Password is too weak.';
-      } else if (errorMessage.contains('invalid email') || 
-                 errorMessage.contains('INVALID_EMAIL')) {
+      } else if (errorMessage.contains('invalid email') ||
+          errorMessage.contains('INVALID_EMAIL')) {
         errorCode = 'INVALID_EMAIL';
         errorMessage = 'Invalid email format.';
-      } else if (errorMessage.contains('network') || 
-                 errorMessage.contains('connection')) {
+      } else if (errorMessage.contains('network') ||
+          errorMessage.contains('connection')) {
         errorCode = 'NETWORK_ERROR';
         errorMessage = 'Network error. Please check your connection.';
       }
-      
-      emit(AuthError(
-        message: errorMessage,
-        errorCode: errorCode,
-      ));
+
+      emit(AuthError(message: errorMessage, errorCode: errorCode));
     }
   }
 
@@ -234,6 +239,64 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (e) {
       // Vẫn emit unauthenticated ngay cả khi có lỗi
       emit(const AuthUnauthenticated());
+    }
+  }
+
+  Future<void> _onAuthForgotPasswordRequested(
+    AuthForgotPasswordRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthEmailForgotPasswordInProgress());
+    try {
+      final result = await _authRepository.forgotPassword(event.email);
+      result.fold(
+        (failure) => emit(
+          AuthError(
+            message: failure.toString(),
+            errorCode: 'FORGOT_PASSWORD_ERROR',
+          ),
+        ),
+        (_) {
+          emit(
+            AuthForgotPasswordSuccess(
+              message: 'Password reset link sent to ${event.email}',
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      emit(
+        AuthError(message: e.toString(), errorCode: 'FORGOT_PASSWORD_ERROR'),
+      );
+    }
+  }
+
+  Future<void> _onAuthPasswordResetRequested(
+    AuthPasswordResetRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthPasswordResetInProgress());
+    try {
+      final result = await _authRepository.resetPassword(
+        email: event.email,
+        newPassword: event.newPassword,
+        currentPassword: event.currentPassword, 
+      );
+      result.fold(
+        (failure) => emit(
+          AuthError(
+            message: failure.toString(),
+            errorCode: 'PASSWORD_RESET_ERROR',
+          ),
+        ),
+        (_) {
+          emit(
+            AuthPasswordResetSuccess(message: 'Password reset successfully!'),
+          );
+        },
+      );
+    } catch (e) {
+      emit(AuthError(message: e.toString(), errorCode: 'PASSWORD_RESET_ERROR'));
     }
   }
 
