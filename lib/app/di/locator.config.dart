@@ -89,17 +89,24 @@ extension GetItInjectableX on _i174.GetIt {
       ),
     );
     gh.factory<_i940.OtpBloc>(() => _i940.OtpBloc(gh<_i564.AuthRepository>()));
+    gh.singleton<_i392.ProfileService>(
+      () => _i392.ProfileService(
+        gh<_i369.UserStorageServices>(),
+        gh<_i361.Dio>(),
+      ),
+    );
     gh.lazySingleton<_i689.UserRepository>(
       () => _i595.UserRepositoryImpl(gh<_i480.UserService>()),
-    );
-    gh.singleton<_i392.ProfileService>(
-      () => _i392.ProfileService(gh<_i369.UserStorageServices>()),
     );
     gh.factory<_i310.UserBloc>(
       () => _i310.UserBloc(gh<_i689.UserRepository>()),
     );
     gh.singleton<_i631.ProfileRepository>(
-      () => _i330.ProfileRepositoryImpl(gh<_i392.ProfileService>()),
+      () => _i330.ProfileRepositoryImpl(
+        gh<_i392.ProfileService>(),
+        gh<_i367.AuthApi>(),
+        gh<_i369.UserStorageServices>(),
+      ),
     );
     gh.factory<_i654.ProfileBloc>(
       () => _i654.ProfileBloc(

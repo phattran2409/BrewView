@@ -77,19 +77,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         password: event.password,
       );
 
-      // result.fold(
-      //   (failure) => emit(AuthError(message: failure.toString())),
-      //   (user) => emit(AuthAuthenticated(
-      //     user: user,
-      //     provider: 'email',
-      //   )),
-      // );
-      print('result API LOGIN : $result');
-      print(result.userJson);
-      print(result.isSuccess);
-      if (result.isSuccess && result.userJson != null) {
-        emit(AuthAuthenticated(user: result, provider: 'email'));
-      }
+      result.fold(
+        (failure) => emit(AuthError(message: failure.toString(), errorCode: 'LOGIN_ERROR')),
+        (user) => emit(AuthAuthenticated(
+          user:  user,
+          provider: 'email',
+        )),
+      );
+      // print('result API LOGIN : $result');
+      // print(result.userJson);
+      // print(result.isSuccess);
+      // if (result.isSuccess && result.userJson != null) {
+      //   emit(AuthAuthenticated(user: result, provider: 'email'));
+      // }
     } catch (e) {
       print('e: $e');
       emit(AuthError(message: e.toString()));

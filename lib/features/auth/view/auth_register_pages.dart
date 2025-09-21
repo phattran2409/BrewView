@@ -546,7 +546,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
       child: IconButton(
         onPressed: () {
           // Handle back navigation
-          Navigator.of(context).pop();
+          context.goNamed('login'); 
         },
         icon: Icon(Icons.arrow_back, color: Colors.white, size: 24),
         padding: const EdgeInsets.all(8),

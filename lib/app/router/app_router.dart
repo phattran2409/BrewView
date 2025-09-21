@@ -1,6 +1,7 @@
 import 'package:briewview/features/auth/view/otp_page.dart';
 import 'package:briewview/features/cafe/view/cafes_detail.dart';
 import 'package:briewview/features/home/view/home_page_demo.dart';
+import 'package:briewview/features/profile/view/edit_profile_page.dart';
 import 'package:briewview/features/search/widgets/search_page.dart';
 import 'package:briewview/features/profile/view/profile_page.dart';
 import 'package:briewview/features/splash/view/splash_page.dart';
@@ -77,6 +78,11 @@ class AppRouter {
           path: RoutePaths.profile,
           name: 'profile',
           builder: (context, state) => const ProfilePage(),
+        ),
+        GoRoute(
+          path: RoutePaths.profileEdit,
+          name: 'profile-edit',
+          builder: (context, state) => const EditProfilePage(),
         ),
         GoRoute(
           path: RoutePaths.resetPassword,

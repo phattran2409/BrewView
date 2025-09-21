@@ -5,7 +5,9 @@ class RoutePaths {
   static const String home = '/home';
   static const String map = '/map';
   static const String search = '/search';
+  // Profile
   static const String profile = '/profile';
+  static const String profileEdit = '/profile/edit';
   static const String userList = '/users';
   static const String userDetail = '/users/:id';
   // coffee

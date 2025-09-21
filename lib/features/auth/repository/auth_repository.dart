@@ -3,7 +3,7 @@ import 'package:briewview/features/auth/model/auth_result.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class AuthRepository {
-  Future<AuthResult> loginWithEmail({
+  Future<Either<Failure, AuthResult>> loginWithEmail({
     required String email,
     required String password,
   });

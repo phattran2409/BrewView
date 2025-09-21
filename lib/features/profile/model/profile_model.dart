@@ -5,12 +5,16 @@ part 'profile_model.g.dart';
 
 @JsonSerializable()
 class ProfileModel {
-  final String id;
-  final String name;
-  final String email;
+  final String? id;
+  final String? name;
+  final String? email;
   final String? phoneNumber;
   final String? profilePicture;
   final String? bio;
+  final String? provinceName; 
+  final int?  age;  
+  final String? gender;
+  
   @JsonKey(name: 'is_vietnamese_language')
   final bool isVietnameseLanguage;
   @JsonKey(name: 'created_at')
@@ -19,15 +23,18 @@ class ProfileModel {
   final DateTime? updatedAt;
 
   ProfileModel({
-    required this.id,
-    required this.name,
-    required this.email,
+     this.id,
+     this.name,
+     this.email,
     this.phoneNumber,
     this.profilePicture,
     this.bio,
     this.isVietnameseLanguage = true,
     this.createdAt,
     this.updatedAt,
+    this.provinceName,
+    this.age,
+    this.gender,
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) =>
@@ -51,12 +58,12 @@ class ProfileModel {
 
   Profile toEntity() {
     return Profile(
-      id: id,
-      name: name,
-      email: email,
-      phoneNumber: phoneNumber,
-      profilePicture: profilePicture,
-      bio: bio,
+      id: id ?? '',
+      name: name ?? '',
+      email: email ?? '',
+      phoneNumber: phoneNumber ?? '',
+      profilePicture: profilePicture ?? '',
+      bio: bio ?? '',
       isVietnameseLanguage: isVietnameseLanguage,
       createdAt: createdAt,
       updatedAt: updatedAt,

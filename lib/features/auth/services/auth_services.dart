@@ -1,6 +1,5 @@
 import 'package:briewview/features/auth/model/auth_result.dart';
 import 'package:briewview/features/user_management/model/user_model.dart';
-import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:dio/dio.dart';
 import '../../../core/constants/app_constants.dart';
@@ -14,30 +13,40 @@ class AuthApi {
     required String email,
     required String password,
   }) async {
-    final res = await _dio.post(
-      AppConstants.loginEndpoint,
-      data: {'email': email, 'password': password},
-    );
-
-    if (res.statusCode == 200) {
-      final data = res.data as Map<String, dynamic>;
-      print("Data: $data");
-      print(data['data']);
-      return AuthResult(
-        isSuccess: true,
-        userJson: UserModel(
-          id: data['data']['userId'],
-          name: data['data']['name'],
-          email: data['data']['email'],
-          profilePicture: data['data']['profilePicture'],
-          role: data['data']['role'],
-          identityId: data['data']['identityId'],
-          accessToken: data['data']['accessToken'],
-          refreshToken: data['data']['refreshToken'],
-        ),
+    try {
+      final res = await _dio.post(
+        AppConstants.loginEndpoint,
+        data: {'email': email, 'password': password},
       );
-    } else {
-      return AuthResult(isSuccess: false, userJson: null);
+
+      if (res.statusCode == 200) {
+        final data = res.data as Map<String, dynamic>;
+        print("Data: $data");
+        print(data['data']);
+        return AuthResult(
+          isSuccess: true,
+          userJson: UserModel(
+            id: data['data']['userId'],
+            name: data['data']['name'],
+            email: data['data']['email'],
+            profilePicture: data['data']['profilePictureUrl'],
+            role: data['data']['role'],
+            identityId: data['data']['identityId'],
+            accessToken: data['data']['accessToken'],
+            refreshToken: data['data']['refreshToken'],
+          ),
+        );
+      } else {
+        return AuthResult(isSuccess: false, userJson: null);
+      }
+    } on DioException catch (e) {
+      String errorMessage = 'Login failed';
+      String errorCode = 'UNKNOWN_ERROR';
+      print('DioException during login: $e');
+      return AuthResult.failure(message: errorMessage, errorCode: errorCode);
+    } catch (e) {
+      print('Error during login: $e');
+      return AuthResult.failure(message: 'Unknown error', errorCode: null);
     }
   }
 
@@ -90,16 +99,22 @@ class AuthApi {
     }
   }
 
-  Future<AuthResult?> getCurrentUser() async {
+  Future<Map<String, dynamic>?> getCurrentUser(String userId) async {
     try {
-      final res = await _dio.get(AppConstants.currentUserEndpoint);
+      final res = await _dio.get(AppConstants.getCurrentUserEndpoint(userId));
 
       final data = res.data as Map<String, dynamic>;
-      return AuthResult(
-        isSuccess: data['isSuccess'] as bool,
-        userJson: data['data'],
-      );
+      print("getCurrentUser API response: $data");
+
+      if (data['isSuccess'] == true && data['data'] != null) {
+        final userData = data['data'] as Map<String, dynamic>;
+
+        return {'isSuccess': true, 'userJson': userData};
+      }
+      return {'isSuccess': false, 'userJson': null};
     } catch (e) {
+      print("Error in getCurrentUser: $e");
+
       rethrow;
     }
   }
@@ -150,13 +165,17 @@ class AuthApi {
 
   Future<bool> resetPassword({
     required String email,
-    required String currentPassword,  
+    required String currentPassword,
     required String newPassword,
   }) async {
     try {
       final res = await _dio.post(
         AppConstants.changePasswordEndpoint,
-        data: {'email': email, 'newPassword': newPassword , 'currentPassword': currentPassword},
+        data: {
+          'email': email,
+          'newPassword': newPassword,
+          'currentPassword': currentPassword,
+        },
       );
       if (res.statusCode == 200 || res.statusCode == 201) {
         print('Password reset successfully.');
