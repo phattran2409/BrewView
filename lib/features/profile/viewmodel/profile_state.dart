@@ -1,3 +1,4 @@
+import 'package:briewview/features/profile/model/profile_dto.dart';
 import 'package:briewview/features/user_management/model/user_model.dart';
 
 
@@ -13,6 +14,12 @@ class ProfileLoaded extends ProfileState {
   ProfileLoaded(this.profile);
 }
 
+class ShowMoreInfoState extends ProfileState {
+  final UserModel profile;
+
+  ShowMoreInfoState(this.profile);
+}
+
 class ProfileError extends ProfileState {
   final String message;
 
@@ -25,8 +32,9 @@ class ProfileUpdating extends ProfileState {
   ProfileUpdating(this.profile);
 }
 
+//  State when profile is successfully updated
 class ProfileUpdated extends ProfileState {
-  final UserModel profile;
+  final ProfileDTO profile;
 
   ProfileUpdated(this.profile);
 }
@@ -48,4 +56,13 @@ class LoggedOut extends ProfileState {}
 class DeletingAccount extends ProfileState {}
 
 class AccountDeleted extends ProfileState {}
+
+class ProfileUpdateDto extends ProfileState {
+  final ProfileDTO profileDTO;
+  
+  ProfileUpdateDto(this.profileDTO);
+} 
+
+
+
 

@@ -33,6 +33,13 @@ import 'package:briewview/features/profile/services/profile_service.dart'
     as _i392;
 import 'package:briewview/features/profile/viewmodel/profile_bloc.dart'
     as _i654;
+import 'package:briewview/features/survey/repository/survey_repository.dart'
+    as _i229;
+import 'package:briewview/features/survey/repository/survey_repository_impl.dart'
+    as _i546;
+import 'package:briewview/features/survey/services/survey_service.dart'
+    as _i434;
+import 'package:briewview/features/survey/viewmodel/survey_bloc.dart' as _i327;
 import 'package:briewview/features/user_management/repository/user_repository.dart'
     as _i689;
 import 'package:briewview/features/user_management/repository/user_repository_impl.dart'
@@ -69,6 +76,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i476.GoogleSignInService>(
       () => _i476.GoogleSignInService(gh<_i361.Dio>()),
     );
+    gh.singleton<_i434.SurveyService>(
+      () => _i434.SurveyService(gh<_i361.Dio>()),
+    );
     gh.lazySingleton<_i480.UserService>(
       () => _i480.UserService(gh<_i361.Dio>()),
     );
@@ -88,18 +98,34 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i476.GoogleSignInService>(),
       ),
     );
+    gh.singleton<_i229.SurveyRepository>(
+      () => _i546.SurveyRepositoryImpl(gh<_i434.SurveyService>()),
+    );
     gh.factory<_i940.OtpBloc>(() => _i940.OtpBloc(gh<_i564.AuthRepository>()));
+    gh.singleton<_i392.ProfileService>(
+      () => _i392.ProfileService(
+        gh<_i369.UserStorageServices>(),
+        gh<_i361.Dio>(),
+      ),
+    );
     gh.lazySingleton<_i689.UserRepository>(
       () => _i595.UserRepositoryImpl(gh<_i480.UserService>()),
-    );
-    gh.singleton<_i392.ProfileService>(
-      () => _i392.ProfileService(gh<_i369.UserStorageServices>()),
     );
     gh.factory<_i310.UserBloc>(
       () => _i310.UserBloc(gh<_i689.UserRepository>()),
     );
+    gh.factory<_i327.SurveyBloc>(
+      () => _i327.SurveyBloc(
+        gh<_i229.SurveyRepository>(),
+        gh<_i369.UserStorageServices>(),
+      ),
+    );
     gh.singleton<_i631.ProfileRepository>(
-      () => _i330.ProfileRepositoryImpl(gh<_i392.ProfileService>()),
+      () => _i330.ProfileRepositoryImpl(
+        gh<_i392.ProfileService>(),
+        gh<_i367.AuthApi>(),
+        gh<_i369.UserStorageServices>(),
+      ),
     );
     gh.factory<_i654.ProfileBloc>(
       () => _i654.ProfileBloc(

@@ -1,4 +1,5 @@
 import 'package:briewview/features/auth/repository/auth_repository.dart';
+import 'package:briewview/features/profile/model/profile_dto.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import '../repository/profile_repository.dart';
@@ -18,6 +19,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<Logout>(_onLogout);
     on<DeleteAccount>(_onDeleteAccount);
     on<UpdateProfilePicture>(_onUpdateProfilePicture);
+    on<LoadFullProfile>(_onLoadFullProfile);
   }
 
   Future<void> _onLoadProfile(
@@ -33,6 +35,20 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     }
   }
 
+  Future<void> _onLoadFullProfile(
+    LoadFullProfile event,
+    Emitter<ProfileState> emit,
+  ) async {
+    emit(ProfileLoading());
+    try {
+      final profile = await _profileRepository.loadFullProfile();
+      print('Full profile loaded: $profile');
+      emit(ProfileLoaded(profile));
+    } catch (e) {
+      emit(ProfileError(e.toString()));
+    }
+  }
+
   Future<void> _onUpdateProfile(
     UpdateProfile event,
     Emitter<ProfileState> emit,
@@ -41,13 +57,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     if (currentState is ProfileLoaded) {
       emit(ProfileUpdating(currentState.profile));
       try {
-        final updatedProfile = currentState.profile.copyWith(
-          name: event.name,
-          email: event.email,
-          phoneNumber: event.phoneNumber,
+        final result = await _profileRepository.updateProfile(
+          event.profileDTO,
         );
-        final result = await _profileRepository.updateProfile(updatedProfile);
-        emit(ProfileUpdated(result));
+        print('Result after update: $result');
+        final updatedProfile = ProfileDTO.fromJson(result);
+        emit(ProfileUpdated(updatedProfile));
       } catch (e) {
         emit(ProfileError(e.toString()));
       }

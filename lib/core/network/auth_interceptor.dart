@@ -26,6 +26,9 @@ class AuthInterceptor extends Interceptor {
 
   bool _isAuthPath(String path) =>
       path.contains('/api/auth/email/login') ||
+      path.contains('/api/auth/email/register') ||
+      path.contains('/api/auth/forgot-password') ||
+      path.contains('/api/auth/reset-password') ||
       path.contains('/api/users/avatar/');
 
   @override

@@ -1,18 +1,23 @@
+import 'package:briewview/features/profile/model/profile_dto.dart';
+import 'package:briewview/features/user_management/model/user_model.dart';
+
 abstract class ProfileEvent {}
 
 class LoadProfile extends ProfileEvent {}
 
+class LoadFullProfile extends ProfileEvent {}
+ 
 class UpdateProfile extends ProfileEvent {
-  final String name;
-  final String email;
-  final String? phoneNumber;
-  final String? bio;
-
+   final ProfileDTO profileDTO;
   UpdateProfile({
-    required this.name,
-    required this.email,
-    this.phoneNumber,
-    this.bio,
+    required this.profileDTO, 
+  });
+}
+
+class ShowMoreInfo extends ProfileEvent {
+  final UserModel profile;  
+  ShowMoreInfo({
+    required this.profile,
   });
 }
 

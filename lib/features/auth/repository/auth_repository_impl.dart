@@ -8,6 +8,7 @@ import 'package:briewview/features/auth/services/facebook_auth_service.dart';
 import 'package:briewview/features/auth/services/google_signin_service.dart';
 import 'package:briewview/features/user_management/model/user_model.dart';
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:injectable/injectable.dart';
 
@@ -28,7 +29,7 @@ class AuthRepositoryImpl implements AuthRepository {
   );
 
   @override
-  Future<AuthResult> loginWithEmail({
+  Future<Either<Failure, AuthResult>> loginWithEmail({
     required String email,
     required String password,
   }) async {
@@ -36,14 +37,16 @@ class AuthRepositoryImpl implements AuthRepository {
       final authResp = await _api.login(email: email, password: password);
 
       if (!authResp.isSuccess) {
-        // Return a negative AuthResult (or throw Failure according to your error flow)
-        return AuthResult(isSuccess: false, userJson: null);
+        // Trả về Left với Failure nếu đăng nhập thất bại
+        return Left(ServerFailure('Email or password is incorrect'));
       }
       final access = authResp.userJson?.accessToken ?? '';
       final refresh = authResp.userJson?.refreshToken ?? '';
 
-      // Save tokens defensively
+      // Lưu token
       await _tokenStorage.saveTokens(access: access, refresh: refresh);
+
+      // Lưu user vào local storage
       final userDataSave = UserModel(
         id: authResp.userJson?.id ?? '',
         name: authResp.userJson?.name ?? '',
@@ -52,16 +55,23 @@ class AuthRepositoryImpl implements AuthRepository {
         role: authResp.userJson?.role ?? '',
         identityId: authResp.userJson?.identityId ?? '',
       );
-      _userStorageServices.saveUser(userDataSave);
+      await _userStorageServices.saveUser(userDataSave);
 
-      // Map to your UserModel if exists
+      // Map lại UserModel đầy đủ
       final Map<String, dynamic> userMap = authResp.userJson?.toJson() ?? {};
       final userModel = userMap.isNotEmpty ? UserModel.fromJson(userMap) : null;
 
-      return AuthResult(isSuccess: true, userJson: userModel);
+      return Right(AuthResult(isSuccess: true, userJson: userModel));
     } catch (e) {
-      // map exception to AuthResult false or rethrow as Failure/Either as you prefer
-      rethrow;
+       if (e is DioError) {
+         if(e.response?.statusCode == 400 || e.response?.statusCode == 401) {
+           final errorMessage = e.response?.data['detail'] ?? 'Login error: ${e.message}';
+           return Left(ServerFailure(errorMessage));
+         } else {
+           return Left(NetworkFailure('Network error'));
+         } 
+       }
+      return Left(ServerFailure('Login error'));
     }
   }
 
@@ -121,11 +131,10 @@ class AuthRepositoryImpl implements AuthRepository {
       if (cred == null || cred.user == null) {
         return Left(ServerFailure('Google Sign-In canceled or failed'));
       }
-      print('Credential user: ${cred.additionalUserInfo}');
-      print('Credential user : ${cred.user}');
+ 
       final userDataFromServer =
           await _googleSignInService.getUserDataFromServer();
-      print('User Data from server: ${userDataFromServer?.userJson}');
+
       if (userDataFromServer == null ||
           userDataFromServer.userJson == null ||
           !userDataFromServer.isSuccess) {
@@ -158,7 +167,7 @@ class AuthRepositoryImpl implements AuthRepository {
       print('✅ Tokens saved: access=$accessToken, refresh=$refreshToken');
       await _userStorageServices.saveUser(
         UserModel(
-          id: cred.user?.uid ?? '',
+          id: serverUserModel.id,
           name: cred.user?.displayName ?? '',
           email: cred.user?.email ?? '',
           profilePicture: cred.user?.photoURL ?? '',
@@ -184,12 +193,13 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, AuthResult?>> getCurrentUser() async {
-    try {
-      final result = await _api.getCurrentUser();
-      return Right(result);
-    } catch (e) {
-      return Left(CacheFailure());
-    }
+    // try {
+    //   final result = await _api.getCurrentUser(userId);
+    //   return Right(result);
+    // } catch (e) {
+    //   return Left(CacheFailure());
+    // }
+    throw UnimplementedError();
   }
 
   @override

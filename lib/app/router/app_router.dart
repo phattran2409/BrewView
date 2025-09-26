@@ -1,9 +1,11 @@
 import 'package:briewview/features/auth/view/otp_page.dart';
 import 'package:briewview/features/cafe/view/cafes_detail.dart';
 import 'package:briewview/features/home/view/home_page_demo.dart';
+import 'package:briewview/features/profile/view/edit_profile_page.dart';
 import 'package:briewview/features/search/widgets/search_page.dart';
 import 'package:briewview/features/profile/view/profile_page.dart';
 import 'package:briewview/features/splash/view/splash_page.dart';
+import 'package:briewview/features/survey/view/survey_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
@@ -79,12 +81,22 @@ class AppRouter {
           builder: (context, state) => const ProfilePage(),
         ),
         GoRoute(
+          path: RoutePaths.profileEdit,
+          name: 'profile-edit',
+          builder: (context, state) => const EditProfilePage(),
+        ),
+        GoRoute(
           path: RoutePaths.resetPassword,
           name: 'reset-password',
           builder: (context, state) {
             final email = state.uri.queryParameters['email'] ?? '';
             return AuthResetPasswordPage(email: email);
           },
+        ),
+        GoRoute(
+          path: RoutePaths.survey,
+          name: 'survey',
+          builder: (context, state) => const SurveyPage(),
         ),
       ],
     );

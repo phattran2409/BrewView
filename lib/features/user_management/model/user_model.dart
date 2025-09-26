@@ -6,6 +6,7 @@ part 'user_model.g.dart';
 class UserModel extends User {
   String? identityId;
   String? role;
+  int? age; // Thêm
   String? gender; // Thêm
   String? provinceName; // Thêm
   bool? isPremium; // Thêm
@@ -22,6 +23,7 @@ class UserModel extends User {
     super.refreshToken,
     String? identityId,
     String? role,
+    int? age, // Thêm
     String? gender, // Thêm
     String? provinceName, // Thêm
     bool? isPremium, // Thêm
@@ -55,6 +57,7 @@ class UserModel extends User {
       accessToken: json['accessToken'] as String?,
       refreshToken: json['refreshToken'] as String?,
       phoneNumber: json['phoneNumber'] as String?,
+      age: json['age'] as int?,
       provinceName: json['provinceName'] as String?,
       isPremium: json['isPremium'] as bool?,
       status: json['status'] as bool?,
@@ -74,10 +77,12 @@ class UserModel extends User {
       'accessToken': accessToken,
       'refreshToken': refreshToken,
       'phoneNumber': phoneNumber,
+      'age': age,
       'provinceName': provinceName,
       'isPremium': isPremium,
       'status': status,
-      'createdAt': createdAt?.toIso8601String(), // ✅ Convert back to String for JSON
+      'createdAt':
+          createdAt?.toIso8601String(), // ✅ Convert back to String for JSON
       'gender': gender,
     };
   }
@@ -88,6 +93,7 @@ class UserModel extends User {
     // You can format as needed, e.g., using intl package
     return createdAt!.toIso8601String();
   }
+
   User toEntity() {
     return User(
       id: id,
@@ -108,6 +114,12 @@ class UserModel extends User {
     String? refreshToken,
     String? identityId,
     String? role,
+    int? age,
+    String? gender,
+    String? provinceName,
+    bool? isPremium,
+    bool? status,
+    DateTime? createdAt,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -119,6 +131,12 @@ class UserModel extends User {
       refreshToken: refreshToken ?? this.refreshToken,
       identityId: identityId ?? this.identityId,
       role: role ?? this.role,
+      age: age ?? this.age,
+      gender: gender ?? this.gender,
+      provinceName: provinceName ?? this.provinceName,
+      isPremium: isPremium ?? this.isPremium,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 }

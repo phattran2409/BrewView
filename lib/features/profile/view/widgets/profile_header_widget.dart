@@ -30,16 +30,14 @@ class ProfileHeaderWidget extends StatelessWidget {
     return ClipPath(
       clipper: CurvedBottomClipper(),
       child: Container(
-        height: 320,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Color(0xFFD8B699),
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(40),
-            bottomRight: Radius.circular(40),
-          ), // Light beige color
+        height: 300, // Giảm từ 400 xuống 280
+        padding: const EdgeInsets.only(
+          top: 10,
+          left: 10,
+          right: 10,
+          bottom: 20,
         ),
-
+        decoration: BoxDecoration(color: Color(0xFFEDE4DD)),
         child: Column(
           children: [
             // Back button and language toggle
@@ -54,28 +52,28 @@ class ProfileHeaderWidget extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-
+            const SizedBox(height: 10), // Giảm từ 20 xuống 10
             // Profile info section
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
                   flex: 1,
-                  child: Center( 
+                  child: Center(
                     child: Stack(
                       children: [
                         CircleAvatar(
-                          radius: 40,
+                          radius: 35, // Giảm từ 40 xuống 35
                           backgroundColor: const Color(0xFF8B4513),
                           backgroundImage: getProfileImage(),
-                          child: profile.profilePicture == null
-                              ? const Icon(
-                                Icons.person,
-                                size: 40,
-                                color: Colors.white,
-                              )
-                              : null,
+                          child:
+                              profile.profilePicture == null
+                                  ? const Icon(
+                                    Icons.person,
+                                    size: 35, // Giảm từ 40 xuống 35
+                                    color: Colors.white,
+                                  )
+                                  : null,
                         ),
                         Positioned(
                           bottom: 0,
@@ -100,7 +98,7 @@ class ProfileHeaderWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 Expanded(
                   flex: 1,
                   child: Column(
@@ -110,7 +108,7 @@ class ProfileHeaderWidget extends StatelessWidget {
                         profile.name,
                         style: const TextStyle(
                           color: Color(0xFF8B4513),
-                          fontSize: 20,
+                          fontSize: 18, // Giảm từ 20 xuống 18
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -119,7 +117,7 @@ class ProfileHeaderWidget extends StatelessWidget {
                         profile.email,
                         style: const TextStyle(
                           color: Color(0xFF8B4513),
-                          fontSize: 14,
+                          fontSize: 13, // Giảm từ 14 xuống 13
                         ),
                       ),
                     ],
@@ -129,7 +127,6 @@ class ProfileHeaderWidget extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Action buttons
             Row(
               children: [
                 Expanded(
@@ -138,7 +135,9 @@ class ProfileHeaderWidget extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF8B4513), // Dark brown
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                      ), // Giảm từ 12 xuống 10
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -146,7 +145,7 @@ class ProfileHeaderWidget extends StatelessWidget {
                     child: const Text(
                       'Chỉnh sửa',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15, // Giảm từ 16 xuống 15
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -163,7 +162,9 @@ class ProfileHeaderWidget extends StatelessWidget {
                         color: Color(0xFF8B4513), // Dark brown
                         width: 1,
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                      ), // Giảm từ 12 xuống 10
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -171,7 +172,7 @@ class ProfileHeaderWidget extends StatelessWidget {
                     child: const Text(
                       'Xem thêm',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15, // Giảm từ 16 xuống 15
                         fontWeight: FontWeight.w500,
                       ),
                     ),
