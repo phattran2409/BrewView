@@ -26,6 +26,7 @@ class AppConstants {
 
 
 
+
   static String updateProfilePicture(String userId) {
     return updatePictureProfileEndpoint.replaceAll('{id}', userId);
   }
