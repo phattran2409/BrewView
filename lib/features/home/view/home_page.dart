@@ -1,8 +1,18 @@
+import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/app/theme/app_color.dart';
+import 'package:briewview/core/network/user_storage_services.dart';
+import 'package:briewview/core/utils/ShowImage.dart';
 import 'package:briewview/core/widgets/navigation_bar.dart';
+import 'package:briewview/features/cafe/model/cafeMode.dart';
+import 'package:briewview/features/cafe/viewmodel/cafe_bloc.dart';
+import 'package:briewview/features/cafe/viewmodel/cafe_event.dart';
+import 'package:briewview/features/cafe/viewmodel/cafe_sate.dart';
 import 'package:briewview/features/home/view/widgets/NearbyCoffeShop_widget.dart';
 import 'package:briewview/features/home/view/widgets/Recomendation_widget.dart';
+import 'package:briewview/features/home/view/widgets/rating_cafe_widget.dart';
+import 'package:briewview/features/user_management/model/user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,109 +22,53 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedCategoryIndex = 0;
-  final List<String> _categories = ['All', 'Salad', 'Donuts', 'Pizza', 'Pasta'];
-  final List<Map<String, dynamic>> _recommendations = [
-    {
-      'name': 'Civetta',
-      'rating': 4.5,
-      'reviews': '13k',
-      'price': '80.00',
-      'image': 'assets/images/coffe_shop_1.jpg',
-      'isFavorite': true,
-    },
-    {
-      'name': 'Creamy Salad',
-      'rating': 4.2,
-      'reviews': '8k',
-      'price': '45.00',
-      'image': 'assets/images/coffe_shop_2.jpg',
-      'isFavorite': false,
-    },
-    {
-      'name': 'Pepperoni Pizza',
-      'rating': 4.8,
-      'reviews': '12k',
-      'price': '90.00',
-      'image': 'assets/images/coffe_shop_3.jpg',
-      'isFavorite': true,
-    },
-    {
-      'name': 'Pasta Primavera',
-      'rating': 4.6,
-      'reviews': '10k',
-      'price': '70.00',
-      'image': 'assets/images/coffe_shop_3.jpg',
-      'isFavorite': false,
-    },
-  ];
+  late CafeBloc _cafeBloc;
+  // late ProfileBloc _profileBloc;
+  UserModel? _currentUser;
 
-  final List<Map<String, dynamic>> _nearbyCoffeeShop = [
-    {
-      'id': '1',
-      'name': 'Nearby Coffee Shop 1',
-      'distance': '1.2 km',
-      'address': '123 Main St, City',
-      'image': 'assets/images/coffee_shop_1.jpg',
-    },
-    {
-      'id': '2', 
-      'name': 'Nearby Coffee Shop 2',
-      'distance': '2.5 km',
-      'address': '456 Elm St, City',
-      'image': 'assets/images/coffee_shop_2.jpg',
-    },
-    {
-      'id': '3',
-      'name': 'Nearby Coffee Shop 3',
-      'distance': '800 m',
-      'address': '789 Oak St, City',
-      'image': 'assets/images/coffe_shop_3.jpg',
-    },
-    {
-      'id': '4',  
-      'name': 'Nearby Coffee Shop 4',
-      'distance': '1.5 km',
-      'address': '321 Pine St, City',
-      'image': 'assets/images/coffe_shop_4.jpg',
-    },
-    {
-      'id': '5',
-      'name': 'Nearby Coffee Shop 5',
-      'distance': '2.0 km',
-      'address': '654 Maple St, City',
-      'image': 'assets/images/coffe_shop_5.jpg',
-    },
-    {
-      'id': '6',
-      'name': 'Nearby Coffee Shop 6',
-      'distance': '1.0 km',
-      'address': '987 Cedar St, City',
-      'image': 'assets/images/coffe_shop_6.jpg',
-    },
-    {
-        'id' : '7',
-        'name' : 'Nearby Coffee Shop 7',
-        'distance' : '1.0 km',
-        'address': '987 Cedar St, City',
-        'image': 'assets/images/coffe_shop_6.jpg',
-    },
-    {
-      'id': '8',
-      'name': 'Nearby Coffee Shop 8',
-      'distance': '1.0 km',
-      'address': '987 Cedar St, City',
-      'image' : 'assets/images/coffe_shop_6.jpg',
-    },
-    {
-      'id' : '9',
-      'name' : 'Nearby Coffee Shop 9',
-      'distance' : '1.0 km',
-      'address' : '987 Cedar St, City',
-      'image' : 'assets/images/coffe_shop_6.jpg',
+  List<CafeModel> _recommendations = [];
+  List<CafeModel> _nearbyCoffeeShop = [];
+  List<CafeModel> _cafesRating = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _cafeBloc = getIt<CafeBloc>();
+    _loadCurrentUserAndCafes();
+  }
+
+  Future<void> _loadCurrentUserAndCafes() async {
+    try{
+      _currentUser = await getIt<UserStorageServices>().getCurrentUser();
+    
+       if  (mounted){
+        setState(() {});
+        final userId = _currentUser?.id ?? '';
+        _cafeBloc.add(LoadRecommendedCafes(pageNumber: 1, pageSize: 5 ,userId: userId)); // Recommendations
+        _cafeBloc.add(LoadCafesByDistance(pageNumber: 1, pageSize: 5)); // Nearby
+        _cafeBloc.add(
+          LoadCafesRating(
+            pageNumber: 1,
+            pageSize: 5,
+            sortBy: 'rating',
+            sortDirection: 'Descending',
+          ),
+        ); // Top Rated
+      }
+    }catch (e){
+      // Handle error if needed
+      print('Error loading user: $e');
+       _cafeBloc.add(LoadCafes(pageNumber: 1, pageSize: 5)); // Load cafes without user context 
+      _cafeBloc.add(LoadCafesByDistance(pageNumber: 1, pageSize: 5)); // Nearby
+      _cafeBloc.add(LoadCafesRating(
+            pageNumber: 1,
+            pageSize: 5,
+            sortBy: 'rating',
+            sortDirection: 'Descending',
+          ),
+        ); // Top Rated 
     }
-
-  ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,12 +93,38 @@ class _HomePageState extends State<HomePage> {
               // Recommendations Section
               Expanded(
                 child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      RecomendationWidget(recommendations: _recommendations),
-                      NearbyCoffeeShop(coffeeShops: _nearbyCoffeeShop)
-                    ],
+                  child: BlocProvider(
+                    create: (context) => _cafeBloc,
+                    child: BlocConsumer<CafeBloc, CafeState>(
+                      listener: (context, state) {
+                        if (state is CafeError) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(state.message)),
+                          );
+                        }
+                      },
+                      builder: (context, state) {
+                        //   mainAxisAlignment: MainAxisAlignment.center,
+                        //   children: [
+                        //     RecomendationWidget(
+                        //       recommendations:
+                        //           _recommendations
+                        //               .map((cafe) => cafe.toJson())
+                        //               .toList(),
+                        //     ),
+                        //     NearbyCoffeeShop(
+                        //       coffeeShops:
+                        //           _nearbyCoffeeShop
+                        //               .map((cafe) => cafe.toJson())
+                        //               .toList(),
+                        //     ),
+                        //   ],
+                        // ),
+                        return SingleChildScrollView(
+                          child: _buildContent(state),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -158,7 +138,56 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildContent(CafeState state) {
+    if (state is CafeLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // Handle different states and update corresponding lists
+    // if (state is CafesLoaded) {
+    //   _recommendations =  state.cafes;
+    // }
+    // if (state is CafesByDistanceLoaded) {
+    //   _nearbyCoffeeShop = state.cafes;
+    // }
+    // if (state is CafesRatingLoaded) {
+    //   _cafesRating =   state.cafes;
+    // }
+
+    // Show loading indicator if any of the lists are still empty
+    // if (_recommendations.isEmpty ||
+    //     _nearbyCoffeeShop.isEmpty ||
+    //     _cafesRating.isEmpty) {
+    //   return const Center(child: CircularProgressIndicator());
+    // }
+    if (state is CombinedCafesLoaded) {
+      return Column(
+        children: [
+          RecomendationWidget(
+            recommendations: state.recommendations,
+          ),
+          NearbyCoffeeShop( 
+            coffeeShops: state.nearbyCafes.map((cafe) => cafe.toJson()).toList(),
+          ),  
+          RatingCafeWidget(cafes: state.topRatedCafes),
+        ],
+      );
+    }
+    return Column (
+      children: [
+          RecomendationWidget(
+            recommendations:  [],
+          ),
+          NearbyCoffeeShop( 
+            coffeeShops: [],
+          ),  
+          RatingCafeWidget(cafes: []),
+        ],
+    );
+  }
+
   Widget _buildHeaderSection() {
+    final userName = _currentUser?.name ?? 'Guest';
     return Container(
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -172,19 +201,10 @@ class _HomePageState extends State<HomePage> {
               border: Border.all(color: Colors.white24, width: 2),
             ),
             child: ClipOval(
-              child: Image.asset(
-                'assets/images/user_profile.png',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[800],
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.person, color: Colors.white, size: 30),
-                  );
-                },
-              ),
+              child:
+                  _currentUser?.profilePicture != null
+                      ? ShowImage.get(_currentUser!.profilePicture!)
+                      : ShowImage.asset('assets/images/user_profile.png'),
             ),
           ),
 
@@ -201,7 +221,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Hello, James',
+                  userName,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -286,297 +306,51 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 20),
 
           // Category Filters
-          SizedBox(
-            height: 40,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _categories.length,
-              itemBuilder: (context, index) {
-                final isSelected = index == _selectedCategoryIndex;
-                return Padding(
-                  padding: EdgeInsets.only(right: 12),
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedCategoryIndex = index;
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected ? Colors.white : Colors.transparent,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color:
-                              isSelected ? Colors.white : Colors.grey.shade700,
-                          width: 1,
-                        ),
-                      ),
-                      child: Text(
-                        _categories[index],
-                        style: TextStyle(
-                          color: isSelected ? Colors.black : Colors.white,
-                          fontWeight:
-                              isSelected ? FontWeight.bold : FontWeight.normal,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+          // SizedBox(
+          //   height: 40,
+          //   child: ListView.builder(
+          //     scrollDirection: Axis.horizontal,
+          //     itemCount: _categories.length,
+          //     itemBuilder: (context, index) {
+          //       final isSelected = index == _selectedCategoryIndex;
+          //       return Padding(
+          //         padding: EdgeInsets.only(right: 12),
+          //         child: GestureDetector(
+          //           onTap: () {
+          //             setState(() {
+          //               _selectedCategoryIndex = index;
+          //             });
+          //           },
+          //           child: Container(
+          //             padding: const EdgeInsets.symmetric(
+          //               horizontal: 20,
+          //               vertical: 8,
+          //             ),
+          //             decoration: BoxDecoration(
+          //               color: isSelected ? Colors.white : Colors.transparent,
+          //               borderRadius: BorderRadius.circular(20),
+          //               border: Border.all(
+          //                 color:
+          //                     isSelected ? Colors.white : Colors.grey.shade700,
+          //                 width: 1,
+          //               ),
+          //             ),
+          //             child: Text(
+          //               _categories[index],
+          //               style: TextStyle(
+          //                 color: isSelected ? Colors.black : Colors.white,
+          //                 fontWeight:
+          //                     isSelected ? FontWeight.bold : FontWeight.normal,
+          //               ),
+          //             ),
+          //           ),
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildRecommendationsSection() {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Section Title
-          Text(
-            'Recommendation',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Featured Food Card
-          _buildFeaturedFoodCard(_recommendations[0]),
-
-          const SizedBox(height: 20),
-
-          // More Recommendations
-          _buildMoreRecommendations(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFeaturedFoodCard(Map<String, dynamic> food) {
-    return Container(
-      height: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.grey[900]!, Colors.grey[800]!],
-        ),
-      ),
-      child: Stack(
-        children: [
-          // Background Text
-          Positioned(
-            left: 20,
-            top: 20,
-            child: Text(
-              food['name'],
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.1),
-                fontSize: 48,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-
-          // Rating and Reviews
-          Positioned(
-            left: 20,
-            top: 20,
-            child: Row(
-              children: [
-                Icon(Icons.star, color: Colors.amber, size: 20),
-                const SizedBox(width: 5),
-                Text(
-                  '${food['rating']} (${food['reviews']} reviews)',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Favorite Button
-          Positioned(
-            right: 20,
-            top: 20,
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  food['isFavorite'] = !food['isFavorite'];
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: food['isFavorite'] ? Colors.white : Colors.transparent,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: food['isFavorite'] ? Colors.white : Colors.white24,
-                    width: 1,
-                  ),
-                ),
-                child: Icon(
-                  food['isFavorite'] ? Icons.favorite : Icons.favorite_border,
-                  color: food['isFavorite'] ? Colors.black : Colors.white,
-                  size: 20,
-                ),
-              ),
-            ),
-          ),
-
-          // Food Name
-          Positioned(
-            left: 20,
-            bottom: 60,
-            child: Text(
-              food['name'],
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-
-          // Price
-          Positioned(
-            left: 20,
-            bottom: 20,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Starting price',
-                  style: TextStyle(color: Colors.grey[400], fontSize: 12),
-                ),
-                Text(
-                  '\$${food['price']}',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Food Image
-          Positioned(
-            right: 20,
-            bottom: 20,
-            child: Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                image: DecorationImage(
-                  image: AssetImage(food['image']),
-                  fit: BoxFit.cover,
-                  onError: (exception, stackTrace) {
-                    // Handle image error
-                  },
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMoreRecommendations() {
-    return SizedBox(
-      height: 120,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _recommendations.length - 1,
-        itemBuilder: (context, index) {
-          final food = _recommendations[index + 1];
-          return Container(
-            width: 150,
-            margin: const EdgeInsets.only(right: 15),
-            decoration: BoxDecoration(
-              color: Colors.amber[100],
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Stack(
-              children: [
-                // Food Image
-                Positioned(
-                  right: 10,
-                  top: 10,
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      image: DecorationImage(
-                        image: AssetImage(food['image']),
-                        fit: BoxFit.cover,
-                        onError: (exception, stackTrace) {
-                          // Handle image error
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Food Info
-                Positioned(
-                  left: 15,
-                  bottom: 15,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        food['name'],
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Row(
-                        children: [
-                          Icon(Icons.star, color: Colors.amber, size: 16),
-                          const SizedBox(width: 5),
-                          Text(
-                            '${food['rating']}',
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
       ),
     );
   }
 }
-
-

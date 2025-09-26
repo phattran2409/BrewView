@@ -1,3 +1,5 @@
+import 'package:briewview/core/utils/ShowImage.dart';
+import 'package:briewview/core/utils/priceFormatter.dart';
 import 'package:flutter/material.dart';
 import 'package:briewview/core/widgets/dotIndicator.dart';
 import 'package:go_router/go_router.dart';
@@ -163,20 +165,9 @@ class _NearbyCoffeeShopState extends State<NearbyCoffeeShop> {
             fit: StackFit.expand,
             children: [
               // Background Image
-              Image.asset(
-                coffeeShop['image'] ?? 'assets/images/placeholder.jpg',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey[800],
-                    child: const Icon(
-                      Icons.local_cafe,
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                  );
-                },
-              ),
+              coffeeShop['imageUrl'] != null 
+                  ? ShowImage.get(coffeeShop['imageUrl'] ?? '')
+                  : ShowImage.asset('assets/images/placeholder.png'), 
 
               // Gradient Overlay
               Container(
@@ -292,7 +283,7 @@ class _NearbyCoffeeShopState extends State<NearbyCoffeeShop> {
                           ),
                           // Price
                           Text(
-                            '\$${coffeeShop['price'] ?? '0.00'}',
+                           '${PriceFormatter.formatWithSymbol(coffeeShop['priceMin'] ?? 0)} - ${PriceFormatter.formatWithSymbol(coffeeShop['priceMax'] ?? 0)}',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 12,

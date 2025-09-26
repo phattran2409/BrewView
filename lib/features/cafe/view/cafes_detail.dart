@@ -1,12 +1,21 @@
+import 'package:briewview/app/di/locator.dart';
+import 'package:briewview/core/utils/videoController.dart';
+import 'package:briewview/core/widgets/navigation_bar.dart';
+import 'package:briewview/features/cafe/model/cafeMode.dart';
+import 'package:briewview/features/cafe/view/widgets/cafeImage_widget.dart';
+import 'package:briewview/features/cafe/viewmodel/cafe_bloc.dart';
+import 'package:briewview/features/cafe/viewmodel/cafe_event.dart';
+import 'package:briewview/features/cafe/viewmodel/cafe_sate.dart';
 import 'package:flutter/material.dart';
 import 'package:briewview/app/theme/app_color.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class CafeDetail extends StatefulWidget {
-  final String? coffeeId;
-  final Map<String, dynamic>? coffeeData;
+  final String? cafeId;
 
-  const CafeDetail({super.key, this.coffeeId, this.coffeeData});
+
+  const CafeDetail({super.key, this.cafeId});
 
   @override
   _CafeDetailState createState() => _CafeDetailState();
@@ -15,11 +24,20 @@ class CafeDetail extends StatefulWidget {
 class _CafeDetailState extends State<CafeDetail> {
   final ScrollController _scrollController = ScrollController();
   bool _isScrolled = false;
-
+  late CafeBloc _cafeBloc;
+  
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    _cafeBloc = getIt<CafeBloc>();
+    _cafeBloc.add(LoadCafeById(widget.cafeId ?? '')); 
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void _onScroll() {
@@ -32,99 +50,127 @@ class _CafeDetailState extends State<CafeDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return
+     Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          // ✅ Main scrollable content
-          CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              // ✅ Image header với parallax effect
-              SliverAppBar(
-                expandedHeight: 400,
-                pinned: true,
-                backgroundColor: Colors.transparent,
-                leading: _buildBackButton(),
-                actions: [_buildShareButton()],
-                flexibleSpace: FlexibleSpaceBar(
-                  background: _buildCafeImage(),
-                ),
-              ),
-
-              // ✅ Cafe details content
-              SliverToBoxAdapter(
-                child: _buildCafeDetailsContent(),
-              ),
-            ],
-          ),
-          
-          // ✅ Floating elements
-          _buildFloatingElements(),
-        ],
+      body: BlocProvider.value (
+        value: _cafeBloc,
+        child:BlocConsumer<CafeBloc, CafeState>(
+          listener: (context, state) {
+            if (state is CafeError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.message)),
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is CafeLoading) {
+              return const Center(child: CircularProgressIndicator(color: Colors.white));
+            } else if (state is CafeDetailsLoaded) {
+              final cafeData = state.cafe;
+            
+              return Stack(
+                children: [
+                  _buildCafeDetailsUI(cafeData),
+                ],
+              );
+            } else if (state is CafeError) {
+              return _buildErrorWidget(state.message);
+            } else {
+              return const Center(child: Text('No data available', style: TextStyle(color: Colors.white),));
+            }
+          },
+        ),  
       ),
     );
   }
 
-  // ✅ Coffee image với gradient overlay
-  Widget _buildCafeImage() {
+
+  Widget _buildCafeDetailsUI(CafeModel cafe) {
     return Stack(
-      fit: StackFit.expand,
       children: [
-        // Background image
-        Image.asset(
-          widget.coffeeData?['image'] ?? 'assets/images/coffe_shop_3.jpg',
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              color: Colors.grey[800],
-              child: const Icon(
-                Icons.local_cafe,
-                color: Colors.white,
-                size: 100,
+        CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            SliverAppBar(
+              expandedHeight: 400,
+              pinned: true,
+              backgroundColor: Colors.transparent,
+              leading: _buildBackButton(),
+              actions: [_buildShareButton()],
+              flexibleSpace: FlexibleSpaceBar(
+                background: CafeImageWidget(cafeData: cafe),
               ),
-            );
-          },
-        ),
-        
-        // Gradient overlay
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black.withOpacity(0.3),
-                Colors.black.withOpacity(0.6),
-                Colors.black.withOpacity(0.9),
-              ],
-              stops: const [0.0, 0.6, 1.0],
             ),
-          ),
-        ),
-        
-        // Dots indicator ở giữa
-        const Positioned(
-          bottom: 120,
-          left: 0,
-          right: 0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircleAvatar(radius: 4, backgroundColor: Colors.white),
-              SizedBox(width: 8),
-              CircleAvatar(radius: 4, backgroundColor: Colors.white54),
-              SizedBox(width: 8),
-              CircleAvatar(radius: 4, backgroundColor: Colors.white54),
-            ],
-          ),
+            SliverToBoxAdapter(
+              child: _buildCafeDetailsContent(cafe),
+            ),
+          ],
         ),
       ],
     );
   }
 
+
+  // ✅ Coffee image với gradient overlay
+  // Widget _buildCafeImage(CafeModel? cafeData) {
+  //   return Stack(
+  //     fit: StackFit.expand,
+  //     children: [
+  //       // Background image
+  //       Image.asset(
+  //         cafeData?.imageUrl ?? 'assets/images/coffe_shop_3.jpg',
+  //         fit: BoxFit.cover,
+  //         errorBuilder: (context, error, stackTrace) {
+  //           return Container(
+  //             color: Colors.grey[800],
+  //             child: const Icon(
+  //               Icons.local_cafe,
+  //               color: Colors.white,
+  //               size: 100,
+  //             ),
+  //           );
+  //         },
+  //       ),
+        
+  //       // Gradient overlay
+  //       Container(
+  //         decoration: BoxDecoration(
+  //           gradient: LinearGradient(
+  //             begin: Alignment.topCenter,
+  //             end: Alignment.bottomCenter,
+  //             colors: [
+  //               Colors.black.withOpacity(0.3),
+  //               Colors.black.withOpacity(0.6),
+  //               Colors.black.withOpacity(0.9),
+  //             ],
+  //             stops: const [0.0, 0.6, 1.0],
+  //           ),
+  //         ),
+  //       ),
+        
+  //       // Dots indicator ở giữa
+  //       const Positioned(
+  //         bottom: 120,
+  //         left: 0,
+  //         right: 0,
+  //         child: Row(
+  //           mainAxisAlignment: MainAxisAlignment.center,
+  //           children: [
+  //             CircleAvatar(radius: 4, backgroundColor: Colors.white),
+  //             SizedBox(width: 8),
+  //             CircleAvatar(radius: 4, backgroundColor: Colors.white54),
+  //             SizedBox(width: 8),
+  //             CircleAvatar(radius: 4, backgroundColor: Colors.white54),
+  //           ],
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+
   // ✅ Cafe details content section
-  Widget _buildCafeDetailsContent() {
+  Widget _buildCafeDetailsContent(CafeModel? cafeData) {
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFF8B4513), // Coffee brown background
@@ -136,7 +182,7 @@ class _CafeDetailState extends State<CafeDetail> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Cafe name và favorite
-            _buildCafeHeader(),
+            _buildCafeHeader(cafeData),
             
             const SizedBox(height: 16),
             
@@ -165,7 +211,7 @@ class _CafeDetailState extends State<CafeDetail> {
     );
   }
 
-  Widget _buildCafeHeader() {
+  Widget _buildCafeHeader(CafeModel? cafeData) {
     return Row(
       children: [
         Expanded(
@@ -173,7 +219,7 @@ class _CafeDetailState extends State<CafeDetail> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.coffeeData?['name'] ?? 'Quán Bé Bò',
+                cafeData?.name ?? 'N/A',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 28,
@@ -433,52 +479,67 @@ class _CafeDetailState extends State<CafeDetail> {
     );
   }
 
-  Widget _buildFloatingElements() {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.8),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 30,
-          children: [
-            // Home button
-            _buildBottomNavButton(Icons.home, () {}),
-            const SizedBox(width: 20),
-            // Search button  
-            _buildBottomNavButton(Icons.search, () {}),
-            const SizedBox(width: 20),
-            // Profile button
-            _buildBottomNavButton(Icons.person, () {}),
-          ],
-        ),
+  // Widget _buildFloatingElements() {
+  //   return Positioned(
+  //     bottom: 0,
+  //     left: 0,
+  //     right: 0,
+  //     child: Container(
+  //       padding: const EdgeInsets.all(20),
+  //       decoration: BoxDecoration(
+  //         color: Colors.black.withOpacity(0.8),
+  //         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+  //       ),
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.center,
+  //         spacing: 30,
+  //         children: [
+  //           // Home button
+  //           _buildBottomNavButton(Icons.home, () {}),
+  //           const SizedBox(width: 20),
+  //           // Search button  
+  //           _buildBottomNavButton(Icons.search, () {}),
+  //           const SizedBox(width: 20),
+  //           // Profile button
+  //           _buildBottomNavButton(Icons.person, () {}),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  Widget _buildErrorWidget(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.error_outline,
+            color: Colors.white,
+            size: 64,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Failed to load cafe details',
+            style: const TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            message,
+            style: TextStyle(color: Colors.grey[400], fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              if (widget.cafeId != null) {
+                _cafeBloc.add(LoadCafeById(widget.cafeId!));
+              }
+            },
+            child: const Text('Retry'),
+          ),
+        ],
       ),
     );
-  }
-
-  Widget _buildBottomNavButton(IconData icon, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: const Color(0xFF8B4513),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(icon, color: Colors.white, size: 24),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 }

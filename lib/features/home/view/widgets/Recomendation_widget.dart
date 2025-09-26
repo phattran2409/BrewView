@@ -1,10 +1,13 @@
+import 'package:briewview/core/utils/ShowImage.dart';
+import 'package:briewview/core/utils/priceFormatter.dart';
 import 'package:briewview/core/widgets/dotIndicator.dart';
+import 'package:briewview/features/cafe/model/cafeMode.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class RecomendationWidget extends StatefulWidget {
   const RecomendationWidget({super.key, required this.recommendations});
-  final List<Map<String, dynamic>> recommendations;
-
+  final List<CafeModel> recommendations;
   @override
   State<RecomendationWidget> createState() => _RecomendationWidgetState();
 }
@@ -64,7 +67,7 @@ class _RecomendationWidgetState extends State<RecomendationWidget> {
                 return Padding(
                   // Space between cards
                   padding: const EdgeInsets.only(right: 10, left: 10),
-                  child: _buildFeaturedFoodCard(widget.recommendations[index]),
+                  child: _buildFeaturedCafeCard(widget.recommendations[index]),
                 );
               },
             ),
@@ -85,11 +88,12 @@ class _RecomendationWidgetState extends State<RecomendationWidget> {
   }
 
 
-  Widget _buildFeaturedFoodCard(Map<String, dynamic> food) {
+  Widget _buildFeaturedCafeCard(CafeModel cafe) {
     return GestureDetector(
       onTap: () {
         // Handle card tap
-        print('Tapped on ${food['name']}');
+        print('Tapped on ${cafe.cafeId}');
+        context.goNamed('cafe-detail', pathParameters: {'id': cafe.cafeId ?? ''});
       },
       child: Container(
         decoration: BoxDecoration(
@@ -111,30 +115,9 @@ class _RecomendationWidgetState extends State<RecomendationWidget> {
               child: SizedBox(
                 width: double.infinity,
                 height: double.infinity,
-                child:
-                    food['image'] != null
-                        ? Image.asset(
-                          food['image'],
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.grey[800],
-                              child: const Icon(
-                                Icons.fastfood,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            );
-                          },
-                        )
-                        : Container(
-                          color: Colors.grey[800],
-                          child: const Icon(
-                            Icons.fastfood,
-                            color: Colors.white,
-                            size: 50,
-                          ),
-                        ),
+                child:ShowImage.isValidImageUrl(cafe.imageUrl ?? '')
+                    ? ShowImage.get(cafe.imageUrl ?? '')
+                    : ShowImage.asset('assets/images/placeholder.png'),
               ),
             ),
 
@@ -145,7 +128,7 @@ class _RecomendationWidgetState extends State<RecomendationWidget> {
               child: GestureDetector(
                 onTap: () {
                   setState(() {
-                    food['isFavorite'] = !(food['isFavorite'] ?? false);
+                    // cafe.isFavorite = !cafe.isFavorite;
                   });
                 },
                 child: Container(
@@ -155,11 +138,13 @@ class _RecomendationWidgetState extends State<RecomendationWidget> {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    food['isFavorite'] == true
-                        ? Icons.favorite
-                        : Icons.favorite_border,
+                    // cafe.isFavorite == true
+                    //     ? Icons.favorite
+                    //     : Icons.favorite_border,
+                      Icons.favorite,   
                     color:
-                        food['isFavorite'] == true ? Colors.red : Colors.white,
+                        // cafe.isFavorite == true ? Colors.red : Colors.white,
+                        Colors.red,
                     size: 20,
                   ),
                 ),
@@ -192,7 +177,7 @@ class _RecomendationWidgetState extends State<RecomendationWidget> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      food['name'] ?? 'Unknown Dish',
+                      cafe.name ?? 'N/A',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -208,7 +193,7 @@ class _RecomendationWidgetState extends State<RecomendationWidget> {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            '${food['rating'] ?? 0.0} (${food['reviews'] ?? '0'})',
+                            '${cafe.rating ?? 0.0}',
                             style: TextStyle(
                               color: Colors.grey[400],
                               fontSize: 14,
@@ -216,7 +201,7 @@ class _RecomendationWidgetState extends State<RecomendationWidget> {
                           ),
                         ),
                         Text(
-                          '\$${food['price'] ?? '0.00'}',
+                          '${PriceFormatter.formatWithSymbol(cafe.priceMin ?? 0)} - ${PriceFormatter.formatWithSymbol(cafe.priceMax ?? 0)}',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -231,25 +216,25 @@ class _RecomendationWidgetState extends State<RecomendationWidget> {
             ),
 
             // ✅ Card Index Badge (Top Left)
-            Positioned(
-              top: 12,
-              left: 12,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '${widget.recommendations.indexOf(food) + 1}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+            // Positioned(
+            //   top: 12,
+            //   left: 12,
+            //   child: Container(
+            //     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            //     decoration: BoxDecoration(
+            //       color: Colors.black.withOpacity(0.6),
+            //       borderRadius: BorderRadius.circular(12),
+            //     ),
+            //     child: Text(
+            //       '${widget.recommendations.indexOf(cafe) + 1}',
+            //       style: const TextStyle(
+            //         color: Colors.white,
+            //         fontSize: 12,
+            //         fontWeight: FontWeight.bold,
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

@@ -195,6 +195,7 @@ class AuthApi {
       AppConstants.refreshTokenEndpoint,
       data: {'refreshToken': refreshToken},
     );
+    print('Refresh token response SERVICES: ${res.data}');
     if (res.statusCode == 200 || res.statusCode == 201) {
       return res.data;
     }

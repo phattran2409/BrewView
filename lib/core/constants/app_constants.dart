@@ -20,14 +20,48 @@ class AppConstants {
   // Profile
   static const String updatePictureProfileEndpoint = '/api/user/avatar/{id}';
 
-
   static String updateProfilePicture(String userId) {
     return updatePictureProfileEndpoint.replaceAll('{id}', userId);
   }
+
   static String getCurrentUserEndpoint(String userId) {
     return currentUserEndpoint.replaceAll('{id}', userId);
   }
+
   static String getUpdateUserProfile(String userId) {
     return currentUserEndpoint.replaceAll('{id}', userId);
+  }
+
+  // Cafe
+  static const String cafeListEndpoint = '/api/cafes';
+  static const String cafePreferenceEndpoint = '/api/cafes/by-user-preferences/{userId}';
+  static String getCafeList({
+    int pageSize = 1,
+    int pageNumber = 10,
+    String sortBy = '',
+    String sortDirection = '',
+  }) {
+    final uri = Uri.parse(cafeListEndpoint).replace(
+      queryParameters: {
+        'pageSize': pageSize.toString(),
+        'pageNumber': pageNumber.toString(),
+        'sortBy': sortBy,
+        'sortDirection': sortDirection,
+      },
+    );
+    return uri.toString();
+  }
+  static String getCafeByUserPreferences({
+    String userId = '', 
+    int pageSize = 1, 
+    int pageNumber = 10,  
+  }) {
+    final uri = Uri.parse(cafePreferenceEndpoint.replaceAll('{userId}', userId)).replace(
+      queryParameters: {
+        'pageSize': pageSize.toString(),
+        'pageNumber': pageNumber.toString(),
+      },
+    );
+    return uri.toString();
   }
 }

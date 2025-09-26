@@ -1,6 +1,6 @@
 import 'package:briewview/features/auth/view/otp_page.dart';
 import 'package:briewview/features/cafe/view/cafes_detail.dart';
-import 'package:briewview/features/home/view/home_page_demo.dart';
+import 'package:briewview/features/home/view/home_page.dart';
 import 'package:briewview/features/profile/view/edit_profile_page.dart';
 import 'package:briewview/features/search/widgets/search_page.dart';
 import 'package:briewview/features/profile/view/profile_page.dart';
@@ -49,7 +49,7 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.home,
           name: 'home',
-          builder: (context, state) => const HomePageDemo(),
+          builder: (context, state) => const HomePage(),
         ),
         GoRoute(
           path: RoutePaths.search,
@@ -58,11 +58,10 @@ class AppRouter {
         ),
         GoRoute(
           path: RoutePaths.coffeeDetail,
-          name: 'coffee-detail',
+          name: 'cafe-detail',
           builder: (context, state) {
-            final coffeeId = state.pathParameters['id'];
-            final coffeeData = state.extra as Map<String, dynamic>?;
-            return CafeDetail(coffeeId: coffeeId, coffeeData: coffeeData);
+            final cafeId = state.pathParameters['id'];
+            return CafeDetail(cafeId: cafeId);
           },
         ),
         GoRoute(

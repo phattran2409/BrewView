@@ -11,9 +11,9 @@ class RoutePaths {
   static const String userList = '/users';
   static const String userDetail = '/users/:id';
   // coffee
-  static const String coffeeList = '/coffee';
-  static const String coffeeDetail = '/coffee/:id';
-  static String coffeeDetailPath(String id) => '/coffee/$id';
+  static const String coffeeList = '/cafes';
+  static const String coffeeDetail = '/cafe/:id';
+  static String coffeeDetailPath(String id) => '/cafe/$id';
   // Auth
   static String otp = '/otp/:id';
   static const String resetPassword = '/reset-password';

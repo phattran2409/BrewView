@@ -7,9 +7,9 @@ part of 'profile_model.dart';
 // **************************************************************************
 
 ProfileModel _$ProfileModelFromJson(Map<String, dynamic> json) => ProfileModel(
-  id: json['userId'] as String,
-  name: json['name'] as String,
-  email: json['email'] as String,
+  id: json['id'] as String?,
+  name: json['name'] as String?,
+  email: json['email'] as String?,
   phoneNumber: json['phoneNumber'] as String?,
   profilePicture: json['profilePicture'] as String?,
   bio: json['bio'] as String?,
@@ -22,6 +22,9 @@ ProfileModel _$ProfileModelFromJson(Map<String, dynamic> json) => ProfileModel(
       json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
+  provinceName: json['provinceName'] as String?,
+  age: (json['age'] as num?)?.toInt(),
+  gender: json['gender'] as String?,
 );
 
 Map<String, dynamic> _$ProfileModelToJson(ProfileModel instance) =>
@@ -32,6 +35,9 @@ Map<String, dynamic> _$ProfileModelToJson(ProfileModel instance) =>
       'phoneNumber': instance.phoneNumber,
       'profilePicture': instance.profilePicture,
       'bio': instance.bio,
+      'provinceName': instance.provinceName,
+      'age': instance.age,
+      'gender': instance.gender,
       'is_vietnamese_language': instance.isVietnameseLanguage,
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
