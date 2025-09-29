@@ -2,8 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:briewview/features/survey/model/category_model.dart';
 import 'package:briewview/features/survey/model/feature_tag_model.dart';
-import 'package:briewview/features/survey/model/user_preferred_category_model.dart';
-import 'package:briewview/features/survey/model/user_preferred_feature_tag_model.dart';
 import '../services/survey_service.dart';
 import 'survey_repository.dart';
 
@@ -34,14 +32,14 @@ class SurveyRepositoryImpl implements SurveyRepository {
   @override
   Future<bool> submitUserPreferences({
     required String userId,
-    required List<UserPreferredCategoryModel> preferredCategories,
-    required List<UserPreferredFeatureTagModel> preferredFeatureTags,
+    required List<int> categoryIds,
+    required List<int> featureTagIds,
   }) async {
     try {
       return await _surveyService.submitUserPreferences(
         userId: userId,
-        preferredCategories: preferredCategories,
-        preferredFeatureTags: preferredFeatureTags,
+        categoryIds: categoryIds,
+        featureTagIds: featureTagIds,
       );
     } catch (e) {
       throw Exception('Failed to submit user preferences: $e');

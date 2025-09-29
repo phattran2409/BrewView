@@ -6,6 +6,7 @@ class User {
   final String? profilePicture;
   final String? accessToken;
   final String? refreshToken;
+  final bool? isSurvey;
   User({
     required this.id,
     required this.name,
@@ -14,10 +15,11 @@ class User {
     this.profilePicture,
     this.accessToken,
     this.refreshToken,
+    this.isSurvey,
   });
 
   @override
   String toString() {
-    return 'User(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, profilePicture: $profilePicture)';
+    return 'User(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, profilePicture: $profilePicture, isSurvey: $isSurvey)';
   }
 }

@@ -37,13 +37,18 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
       listener: (context, state) {
         if (state is AuthAuthenticated) {
           // Navigate to home
+          final userHasCompletedSurvey = state.user.userJson?.isSurvey == true;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Welcome ${state.user.userJson?.name ?? ''}!'),
               backgroundColor: Colors.green,
             ),
           );
-          context.go('/home');
+           if (userHasCompletedSurvey) {
+            context.go('/home'); 
+          } else {
+            context.go('/survey'); 
+          }
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -378,8 +383,5 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
     ).push(MaterialPageRoute(builder: (context) => const AuthRegisterPage()));
   }
 
-  void _navigateToSurvey() {
-    // Navigate to survey page
-    context.pushNamed('survey');
-  }
+
 }

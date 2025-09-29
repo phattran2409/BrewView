@@ -34,7 +34,8 @@ class AuthApi {
             identityId: data['data']['identityId'],
             accessToken: data['data']['accessToken'],
             refreshToken: data['data']['refreshToken'],
-          ),
+             isSurvey: data['data']['isSurvey'] as bool?,
+          ),  
         );
       } else {
         return AuthResult(isSuccess: false, userJson: null);

@@ -19,6 +19,7 @@ class UserStorageServices {
       'profilePicture' : user.profilePicture,
       'role' : user.role,
       'identityId' : user.identityId,
+      'isSurvey' : user.isSurvey,
     }; 
     
     await _storage.write(key: _userKey, value: jsonEncode(userJson));
@@ -38,6 +39,7 @@ class UserStorageServices {
         profilePicture: userMap['profilePicture'] as String?,
         role: userMap['role'] as String?,
         identityId: userMap['identityId'] as String?,
+        isSurvey: userMap['isSurvey'] as bool?,
       );
     }catch(e) {
       return null;

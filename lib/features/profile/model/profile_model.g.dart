@@ -7,9 +7,9 @@ part of 'profile_model.dart';
 // **************************************************************************
 
 ProfileModel _$ProfileModelFromJson(Map<String, dynamic> json) => ProfileModel(
-  id: json['userId'] as String,
-  name: json['name'] as String,
-  email: json['email'] as String,
+  id: json['id'] as String?,
+  name: json['name'] as String?,
+  email: json['email'] as String?,
   phoneNumber: json['phoneNumber'] as String?,
   profilePicture: json['profilePicture'] as String?,
   bio: json['bio'] as String?,

@@ -130,7 +130,7 @@ class CategorySelectionWidget extends StatelessWidget {
                             },
                           )
                         : const Center(
-                            child: Text('No categories available'),
+                            child: Text(''),
                           ),
               ),
 

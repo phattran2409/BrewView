@@ -21,6 +21,7 @@ class UserModel extends User {
     super.profilePicture,
     super.accessToken,
     super.refreshToken,
+    super.isSurvey,
     String? identityId,
     String? role,
     int? age, // Thêm
@@ -61,6 +62,7 @@ class UserModel extends User {
       provinceName: json['provinceName'] as String?,
       isPremium: json['isPremium'] as bool?,
       status: json['status'] as bool?,
+      isSurvey: json['isSurvey'] as bool?,
       createdAt: createdAtDateTime,
       gender: json['gender'] as String?,
     );
@@ -81,6 +83,7 @@ class UserModel extends User {
       'provinceName': provinceName,
       'isPremium': isPremium,
       'status': status,
+      'isSurvey': isSurvey,
       'createdAt':
           createdAt?.toIso8601String(), // ✅ Convert back to String for JSON
       'gender': gender,
@@ -101,6 +104,7 @@ class UserModel extends User {
       email: email,
       phoneNumber: phoneNumber,
       profilePicture: profilePicture,
+      isSurvey: isSurvey,
     );
   }
 
@@ -119,6 +123,7 @@ class UserModel extends User {
     String? provinceName,
     bool? isPremium,
     bool? status,
+    bool? isSurvey,
     DateTime? createdAt,
   }) {
     return UserModel(
@@ -136,6 +141,7 @@ class UserModel extends User {
       provinceName: provinceName ?? this.provinceName,
       isPremium: isPremium ?? this.isPremium,
       status: status ?? this.status,
+      isSurvey: isSurvey ?? this.isSurvey,
       createdAt: createdAt ?? this.createdAt,
     );
   }

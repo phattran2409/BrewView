@@ -4,8 +4,7 @@ import 'package:injectable/injectable.dart';
 import 'package:briewview/core/constants/app_constants.dart';
 import 'package:briewview/features/survey/model/category_model.dart';
 import 'package:briewview/features/survey/model/feature_tag_model.dart';
-import 'package:briewview/features/survey/model/user_preferred_category_model.dart';
-import 'package:briewview/features/survey/model/user_preferred_feature_tag_model.dart';
+
 
 @singleton
 class SurveyService {
@@ -65,17 +64,16 @@ class SurveyService {
   // Submit user preferences
   Future<bool> submitUserPreferences({
     required String userId,
-    required List<UserPreferredCategoryModel> preferredCategories,
-    required List<UserPreferredFeatureTagModel> preferredFeatureTags,
+    required List<int> categoryIds,
+    required List<int> featureTagIds,
   }) async {
     try {
 
       final response = await _dio.post(
         AppConstants.getUserPreferencesEndpoint(userId),
         data: {
-          'userId': userId,
-          'preferredCategories': preferredCategories.map((e) => e.toJson()).toList(),
-          'preferredFeatureTags': preferredFeatureTags.map((e) => e.toJson()).toList(),
+          'preferenceCategoryIds': categoryIds,
+          'preferenceFeatureTagIds': featureTagIds,
         },
       );
 

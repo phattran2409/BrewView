@@ -4,6 +4,7 @@ import 'package:briewview/features/survey/viewmodel/survey_bloc.dart';
 import 'package:briewview/features/survey/viewmodel/survey_event.dart';
 import 'package:briewview/features/survey/viewmodel/survey_state.dart';
 import 'package:briewview/features/survey/model/feature_tag_model.dart';
+import 'package:go_router/go_router.dart';
 
 class FeatureTagSelectionWidget extends StatelessWidget {
   final VoidCallback onSubmit;
@@ -19,18 +20,19 @@ class FeatureTagSelectionWidget extends StatelessWidget {
       listener: (context, state) {
         if (state is SurveySubmitted) {
           // Show success message
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Survey submitted successfully!'),
+              content: Text('Survey submitted successfully! Please wait...'),
               backgroundColor: Colors.green,
             ),
           );
           
           // Navigate back or to next screen
           // Navigator.of(context).pop();
-           Navigator.of(
-            context,
-          ).pushNamedAndRemoveUntil('/home', (route) => false);
+          Future.delayed( const Duration(seconds: 2), () {
+            context.go('/home');
+          });
         } else if (state is SurveyError) {
           // Show error message
           ScaffoldMessenger.of(context).showSnackBar(
@@ -156,7 +158,7 @@ class FeatureTagSelectionWidget extends StatelessWidget {
                               },
                             )
                           : const Center(
-                              child: Text('No feature tags available'),
+                              child: Text(''),
                             ),
                 ),
 

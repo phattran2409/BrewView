@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:briewview/features/survey/model/category_model.dart';
 import 'package:briewview/features/survey/model/feature_tag_model.dart';
-import 'package:briewview/features/survey/model/user_preferred_category_model.dart';
-import 'package:briewview/features/survey/model/user_preferred_feature_tag_model.dart';
 import 'package:briewview/features/survey/repository/survey_repository.dart';
 import 'survey_event.dart';
 import 'survey_state.dart';
@@ -158,26 +156,20 @@ class SurveyBloc extends Bloc<SurveyEvent, SurveyState> {
           emit(SurveyError(message: 'Failed to submit survey. Please try again.'));
           return;
         }
-        // Convert selected categories to UserPreferredCategoryModel
-        final preferredCategories = currentState.selectedCategories
-            .map((category) => UserPreferredCategoryModel(
-                  userId: currentUser.id,
-                  categoryId: category.categoryId,
-                ))
+       
+        final categoryIds = currentState.selectedCategories
+            .map((category) => category.categoryId)
             .toList();
 
-        // Convert selected feature tags to UserPreferredFeatureTagModel
-        final preferredFeatureTags = currentState.selectedFeatureTags
-            .map((featureTag) => UserPreferredFeatureTagModel(
-                  userId: currentUser.id,
-                  featureTagId: featureTag.tagId,
-                ))
+        final featureTagIds = currentState.selectedFeatureTags
+            .map((featureTag) => featureTag.tagId)
             .toList();
+
 
         final success = await _repository.submitUserPreferences(
           userId: currentUser.id,
-          preferredCategories: preferredCategories,
-          preferredFeatureTags: preferredFeatureTags,
+          categoryIds: categoryIds,
+          featureTagIds: featureTagIds,
         );
 
         if (success) {
