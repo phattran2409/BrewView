@@ -1,6 +1,8 @@
 import 'package:briewview/features/auth/view/otp_page.dart';
 import 'package:briewview/features/cafe/view/cafes_detail.dart';
 import 'package:briewview/features/home/view/home_page_demo.dart';
+import 'package:briewview/features/post/view/post_detail.dart';
+import 'package:briewview/features/post/view/post_list_page.dart';
 import 'package:briewview/features/profile/view/edit_profile_page.dart';
 import 'package:briewview/features/search/widgets/search_page.dart';
 import 'package:briewview/features/profile/view/profile_page.dart';
@@ -98,7 +100,22 @@ class AppRouter {
           name: 'survey',
           builder: (context, state) => const SurveyPage(),
         ),
+
+        GoRoute(path: RoutePaths.postList, 
+        name: 'post-list', 
+        builder: (context, state) => const PostListPage()),
+
+        GoRoute(
+          path: RoutePaths.postDetail,
+          name: 'post-detail',
+          builder: (context, state) {
+            final postId = state.pathParameters['id'];
+            return PostDetailPage(postId: postId);
+          },
+        ),
       ],
     );
   }
 }
+
+     

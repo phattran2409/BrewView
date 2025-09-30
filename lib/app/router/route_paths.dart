@@ -19,4 +19,9 @@ class RoutePaths {
   static const String resetPassword = '/reset-password';
   // Survey
   static const String survey = '/survey';
+
+  // Posts
+  static const String postList = '/posts';
+  static const String postDetail = '/posts/:id';
+  static String postDetailPath(String id) => '/posts/$id';
 }
