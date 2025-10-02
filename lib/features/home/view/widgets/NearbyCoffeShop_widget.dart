@@ -142,11 +142,7 @@ class _NearbyCoffeeShopState extends State<NearbyCoffeeShop> {
   Widget _buildCoffeeShopCard(Map<String, dynamic> coffeeShop) {
     return GestureDetector(
       onTap: () {
-        context.goNamed(
-          'coffee-detail',
-          pathParameters: {'id': coffeeShop['id']},
-          extra: coffeeShop,
-        );
+       context.goNamed('cafe-detail', pathParameters: {'id': coffeeShop['cafeId'] ?? ''});
       },
       child: Container(
         decoration: BoxDecoration(

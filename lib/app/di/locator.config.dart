@@ -29,8 +29,14 @@ import 'package:briewview/features/cafe/repository/cafes_repository.dart'
     as _i994;
 import 'package:briewview/features/cafe/repository/cafes_repository_impl.dart'
     as _i47;
+import 'package:briewview/features/cafe/repository/review_repository.dart'
+    as _i207;
+import 'package:briewview/features/cafe/repository/review_repository_impl.dart'
+    as _i808;
 import 'package:briewview/features/cafe/services/cafe_service.dart' as _i762;
+import 'package:briewview/features/cafe/services/review_service.dart' as _i458;
 import 'package:briewview/features/cafe/viewmodel/cafe_bloc.dart' as _i237;
+import 'package:briewview/features/cafe/viewmodel/review_bloc.dart' as _i661;
 import 'package:briewview/features/profile/repository/profile_repository.dart'
     as _i631;
 import 'package:briewview/features/profile/repository/profile_repository_impl.dart'
@@ -69,6 +75,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => networkModule.dio(gh<_i439.TokenStorage>()),
     );
     gh.factory<_i762.CafeService>(() => _i762.CafeService(gh<_i361.Dio>()));
+    gh.factory<_i458.ReviewService>(() => _i458.ReviewService(gh<_i361.Dio>()));
     gh.singleton<_i367.AuthApi>(() => _i367.AuthApi(gh<_i361.Dio>()));
     gh.singleton<_i785.FacebookAuthService>(
       () => _i785.FacebookAuthService(gh<_i361.Dio>()),
@@ -108,8 +115,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i689.UserRepository>(
       () => _i595.UserRepositoryImpl(gh<_i480.UserService>()),
     );
+    gh.lazySingleton<_i207.ReviewRepository>(
+      () => _i808.ReviewRepositoryImpl(gh<_i458.ReviewService>()),
+    );
     gh.factory<_i310.UserBloc>(
       () => _i310.UserBloc(gh<_i689.UserRepository>()),
+    );
+    gh.factory<_i661.ReviewBloc>(
+      () => _i661.ReviewBloc(gh<_i207.ReviewRepository>()),
     );
     gh.factory<_i237.CafeBloc>(
       () => _i237.CafeBloc(gh<_i994.CafesRepository>()),

@@ -64,4 +64,21 @@ class AppConstants {
     );
     return uri.toString();
   }
+
+  // Review
+  static const String reviewEndpoint = '/api/reviews/{cafeId}'; 
+  static const String reviewCreateEndpoint = '/api/reviews/{cafeId}';
+  static String getReviewEndpoint({
+    String cafeId = '', 
+    int pageNumber = 1, 
+    int pageSize = 10,  
+  }) {
+    final uri = Uri.parse(reviewEndpoint.replaceAll('{cafeId}', cafeId)).replace(
+      queryParameters: {
+        'pageNumber': pageNumber.toString(),
+        'pageSize': pageSize.toString(),
+      },
+    );
+    return uri.toString();
+  }
 }

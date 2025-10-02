@@ -46,6 +46,9 @@ class DeepLinkService {
         case '/verify':
           _handleEmailVerification(uri);
           break;
+        case '/payment':
+         _handlePaymentLink(uri.path);
+          break;
         default:
           _handleCustomLink(uri);
       }
@@ -83,6 +86,20 @@ class DeepLinkService {
     print('🔗 Custom link received: $params');
     onCustomLink?.call(params);
   }
+  void _handlePaymentLink(String path) {
+    switch (path) {
+      case '/success':
+        print('💰 Payment successful');
+        // Handle payment success
+        break;
+      case '/cancel':
+        print('❌ Payment cancelled');
+        // Handle payment cancellation
+        break;
+      default:
+        print('❓ Unknown payment path: $path');
+    } 
+  }  
   
   void dispose() {
     _linkSubscription?.cancel();

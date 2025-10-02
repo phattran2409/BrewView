@@ -12,6 +12,7 @@ import 'package:briewview/app/router/route_paths.dart';
 import 'package:briewview/features/onboarding/view/onboarding_page.dart';
 import 'package:briewview/features/auth/view/auth_login_pages.dart';
 import 'package:briewview/features/auth/view/auth_resetpassword_pages.dart';
+import 'package:briewview/features/cafe/view/review_list_page.dart';
 // import 'package:briewview/features/user_management/view/user_list_page.dart';
 
 @singleton
@@ -35,8 +36,7 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.login,
           name: 'login',
-          builder:
-              (context, state) => const AuthLoginPage(), 
+          builder: (context, state) => const AuthLoginPage(),
         ),
         GoRoute(
           path: RoutePaths.userList,
@@ -62,6 +62,14 @@ class AppRouter {
           builder: (context, state) {
             final cafeId = state.pathParameters['id'];
             return CafeDetail(cafeId: cafeId);
+          },
+        ),
+        GoRoute(
+          path: RoutePaths.cafeReviews,
+          name: 'cafe-reviews',
+          builder: (context, state) {
+            final cafeId = state.pathParameters['id'] ?? '';
+            return ReviewListPage(cafeId: cafeId);
           },
         ),
         GoRoute(
