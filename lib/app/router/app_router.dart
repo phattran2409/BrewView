@@ -16,6 +16,10 @@ import 'package:briewview/features/onboarding/view/onboarding_page.dart';
 import 'package:briewview/features/auth/view/auth_login_pages.dart';
 import 'package:briewview/features/auth/view/auth_resetpassword_pages.dart';
 import 'package:briewview/features/cafe/view/review_list_page.dart';
+import 'package:briewview/features/my_cafe/view/my_cafes_list_page.dart';
+import 'package:briewview/features/my_cafe/view/my_cafe_form_page.dart';
+import 'package:briewview/features/my_cafe/view/my_cafe_detail_page.dart';
+
 // import 'package:briewview/features/user_management/view/user_list_page.dart';
 
 @singleton
@@ -120,6 +124,32 @@ class AppRouter {
             return PostDetailPage(postId: postId);
           },
         ),
+
+      GoRoute(
+          path: RoutePaths.myCafes,
+          name: 'my-cafes',
+          builder: (context, state) => const MyCafesListPage()),
+        // GoRoute(
+        //   path: RoutePaths.myCafeDetail,
+        //   name: 'my-cafe-detail',
+        //   builder: (context, state) {
+        //     final cafeId = state.pathParameters['id']!;
+        //     return MyCafeDetailPage(cafeId: cafeId);
+        //   },
+        // ),
+        GoRoute(
+          path: RoutePaths.myCafeCreate,
+          name: 'my-cafe-create',
+          builder: (context, state) => const MyCafeFormPage(),
+        ),
+        // GoRoute(
+        //   path: RoutePaths.myCafeEdit,
+        //   name: 'my-cafe-edit',
+        //   builder: (context, state) {
+        //     final cafeId = state.pathParameters['id']!;
+        //     return MyCafeFormPage(cafeId: cafeId);
+        //   },
+        // ),
       ],
     );
   }

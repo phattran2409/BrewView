@@ -27,4 +27,12 @@ class RoutePaths {
   static const String postList = '/posts';
   static const String postDetail = '/posts/:id';
   static String postDetailPath(String id) => '/posts/$id';
+
+  // My Cafe
+  static const String myCafes = '/my-cafes';
+  static const String myCafeDetail = '/my-cafes/:id';
+  static const String myCafeCreate = '/my-cafes/create';
+  static const String myCafeEdit = '/my-cafes/:id/edit';
+  static String myCafeDetailPath(String id) => '/my-cafes/$id';
+  static String myCafeEditPath(String id) => '/my-cafes/$id/edit';
 }
