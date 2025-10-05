@@ -20,7 +20,7 @@ class _CafeHeaderWidgetState extends State<CafeHeaderWidget> {
               const SizedBox(height: 16), 
              _buildTimeOpenAndDistance(widget.cafe),
              const SizedBox(height: 16), 
-             _buildTags(),
+             _buildTags(widget.cafe),
              const SizedBox(height: 16), 
              _buildRatingSection(widget.cafe),
              const SizedBox(height: 16), 
@@ -80,14 +80,15 @@ class _CafeHeaderWidgetState extends State<CafeHeaderWidget> {
     );
   }
 
-  Widget _buildTags() {
-    final tags = ['Yên tĩnh', 'Chill', 'HCM'];
-    return Row(
-      children:
-          tags.map((tag) {
-            return Container(
-              margin: const EdgeInsets.only(right: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+  Widget _buildTags(CafeModel? cafeData) {
+    final tags = cafeData?.cafeFeatureTags?.map((tag) => tag.name).toList() ?? [];
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal, 
+      child: Row(
+        children: tags.map((tag) {
+          return Container(
+            margin: const EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.amber,
                 borderRadius: BorderRadius.circular(16),
@@ -102,7 +103,7 @@ class _CafeHeaderWidgetState extends State<CafeHeaderWidget> {
               ),
             );
           }).toList(),
-    );
+    ));
   }
 
   Widget _buildRatingSection(CafeModel? cafeData) {

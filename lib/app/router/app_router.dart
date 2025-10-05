@@ -1,10 +1,13 @@
 import 'package:briewview/features/auth/view/otp_page.dart';
 import 'package:briewview/features/cafe/view/cafes_detail.dart';
 import 'package:briewview/features/home/view/home_page.dart';
+import 'package:briewview/features/post/view/post_detail.dart';
+import 'package:briewview/features/post/view/post_list_page.dart';
 import 'package:briewview/features/profile/view/edit_profile_page.dart';
-import 'package:briewview/features/search/widgets/search_page.dart';
+import 'package:briewview/features/search/view/search_page.dart';
 import 'package:briewview/features/profile/view/profile_page.dart';
 import 'package:briewview/features/splash/view/splash_page.dart';
+import 'package:briewview/features/survey/view/survey_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
@@ -99,7 +102,27 @@ class AppRouter {
             return AuthResetPasswordPage(email: email);
           },
         ),
+        GoRoute(
+          path: RoutePaths.survey,
+          name: 'survey',
+          builder: (context, state) => const SurveyPage(),
+        ),
+
+        GoRoute(path: RoutePaths.postList, 
+        name: 'post-list', 
+        builder: (context, state) => const PostListPage()),
+
+        GoRoute(
+          path: RoutePaths.postDetail,
+          name: 'post-detail',
+          builder: (context, state) {
+            final postId = state.pathParameters['id'];
+            return PostDetailPage(postId: postId);
+          },
+        ),
       ],
     );
   }
 }
+
+     

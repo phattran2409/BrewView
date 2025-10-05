@@ -14,6 +14,7 @@ class CafesRepositoryImpl implements CafesRepository {
   Future<Either<Failure, List<CafeModel>>> getCafes({
     int pageNumber = 1,
     int pageSize = 10,
+    String? searchTerm,
     String? sortBy,
     String? sortDirection,
   }) async {
@@ -21,6 +22,7 @@ class CafesRepositoryImpl implements CafesRepository {
       var result = await cafeService.getCafes(
         pageNumber: pageNumber,
         pageSize: pageSize,
+        searchTerm: searchTerm,
         sortBy: sortBy,
         sortDirection: sortDirection,
       );

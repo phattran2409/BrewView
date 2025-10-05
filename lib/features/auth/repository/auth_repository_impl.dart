@@ -54,12 +54,18 @@ class AuthRepositoryImpl implements AuthRepository {
         profilePicture: authResp.userJson?.profilePicture ?? '',
         role: authResp.userJson?.role ?? '',
         identityId: authResp.userJson?.identityId ?? '',
+        isSurvey: authResp.userJson?.isSurvey,
       );
       await _userStorageServices.saveUser(userDataSave);
 
       // Map lại UserModel đầy đủ
       final Map<String, dynamic> userMap = authResp.userJson?.toJson() ?? {};
       final userModel = userMap.isNotEmpty ? UserModel.fromJson(userMap) : null;
+
+       if (userModel != null) {
+        await _userStorageServices.saveUser(userModel);
+       
+      }
 
       return Right(AuthResult(isSuccess: true, userJson: userModel));
     } catch (e) {
@@ -173,6 +179,7 @@ class AuthRepositoryImpl implements AuthRepository {
           profilePicture: cred.user?.photoURL ?? '',
           role: 'customer',
           identityId: '',
+          isSurvey: serverUserModel.isSurvey,
         ),
       );
       print('✅ User data saved locally');

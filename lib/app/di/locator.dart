@@ -1,6 +1,7 @@
 import 'package:briewview/core/network/network_module.dart';
 import 'package:briewview/core/network/token_storage.dart';
-import 'package:dio/dio.dart';
+import 'package:briewview/features/search/viewmodel/search_bloc.dart';
+import 'package:briewview/features/cafe/repository/cafes_repository.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'locator.config.dart';

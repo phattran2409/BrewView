@@ -19,6 +19,13 @@ class AppConstants {
       '/api/auth/login-with-refresh-token';
   // Profile
   static const String updatePictureProfileEndpoint = '/api/user/avatar/{id}';
+  // Survey
+  static const String categoriesEndpoint = '/api/categories';
+  static const String featureTagsEndpoint = '/api/feature-tags';
+  static const String userPreferencesEndpoint = '/api/user-preferences/{userId}';
+
+
+
 
   static String updateProfilePicture(String userId) {
     return updatePictureProfileEndpoint.replaceAll('{id}', userId);
@@ -40,6 +47,7 @@ class AppConstants {
     int pageNumber = 10,
     String sortBy = '',
     String sortDirection = '',
+    String searchTerm = '', 
   }) {
     final uri = Uri.parse(cafeListEndpoint).replace(
       queryParameters: {
@@ -47,6 +55,7 @@ class AppConstants {
         'pageNumber': pageNumber.toString(),
         'sortBy': sortBy,
         'sortDirection': sortDirection,
+        'searchTerm': searchTerm,
       },
     );
     return uri.toString();
@@ -80,5 +89,10 @@ class AppConstants {
       },
     );
     return uri.toString();
+  }
+
+
+  static String getUserPreferencesEndpoint(String userId) {
+    return userPreferencesEndpoint.replaceAll('{userId}', userId);
   }
 }

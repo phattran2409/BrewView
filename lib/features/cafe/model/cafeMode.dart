@@ -1,36 +1,35 @@
-import 'dart:ffi';
-
 import 'package:briewview/features/cafe/model/cafeMedia.dart';
+import 'package:briewview/features/survey/model/feature_tag_model.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 
 class CafeModel extends Equatable {
-  String? cafeId;
-  int? categoryId;  
-  String? name;
-  String? address;
-  String? description;
-  int? priceMin;
-  int? priceMax;
-  String? openingTime;
-  String? closingTime;
-  String? hotLine;
-  String? linkPage;
-  double? rating;
-  String? imageUrl;
-  String? videoUrl;
-  String? ownerId;
-  DateTime? createdAt;
-  String? createdById;
-  bool? isPromoted;
-  bool? status;
+  final String? cafeId;
+  final int? categoryId;  
+  final String? name;
+  final String? address;
+  final String? description;
+  final int? priceMin;
+  final int? priceMax;
+  final String? openingTime;
+  final String? closingTime;
+  final String? hotLine;
+  final String? linkPage;
+  final double? rating;
+  final String? imageUrl;
+  final String? videoUrl;
+  final String? ownerId;
+  final DateTime? createdAt;
+  final String? createdById;
+  final bool? isPromoted;
+  final bool? status;
   // final List<String>? tags;
   final List<CafeMedias>? cafeMedias;
   final List<dynamic>? cafeCategories;
-  final List<int>? cafeFeatureTags;   
+  final List<FeatureTagModel>? cafeFeatureTags;   
 
-  CafeModel({
+  const CafeModel({
     this.cafeId,
+    this.categoryId,
     this.name,
     this.address,
     this.description,
@@ -51,7 +50,6 @@ class CafeModel extends Equatable {
     this.cafeMedias,
     this.cafeCategories,
     this.cafeFeatureTags,
-    this.categoryId,
   });
   factory CafeModel.fromJson(Map<String, dynamic> json) {
     return CafeModel(
@@ -84,8 +82,12 @@ class CafeModel extends Equatable {
               : null,
       cafeCategories: json['cafeCategories'] as List<dynamic>?,
       cafeFeatureTags: (json['cafeFeatureTags'] as List<dynamic>?)
-          ?.map((item) => item as int)
+          ?.map((item) => FeatureTagModel(
+                tagId: item['tagId'] as int,
+                name: item['tagName'] as String,
+              ))
           .toList(),
+      categoryId: _parseInt(json['categoryId']),
     );
   }
 
@@ -111,27 +113,31 @@ class CafeModel extends Equatable {
       'status': status,
       'cafeMedias': cafeMedias?.map((media) => media.toJson()).toList(),
       'cafeCategories': cafeCategories,
-      'cafeFeatureTags': cafeFeatureTags,
+      'cafeFeatureTags': cafeFeatureTags?.map((tag) => tag.toJson()).toList(),
+      'categoryId': categoryId,
     };
   }
 
-  static int? _parseInt(dynamic? value) {
-   if (value == null) return null;
+  static int? _parseInt(dynamic value) {
+    if (value == null) return null;
     if (value is double) return value.toInt();
     if (value is int) return value;
     if (value is String) return int.tryParse(value);
+    return null;
   }
 
-  static double? _parseDouble(dynamic? value) {
+  static double? _parseDouble(dynamic value) {
     if (value == null) return null;
     if (value is double) return value;
     if (value is int) return value.toDouble();
     if (value is String) return double.tryParse(value);
+    return null;
   }
 
   @override
   List<Object?> get props => [
     cafeId,
+    categoryId,
     name,
     address,
     description,
@@ -149,5 +155,8 @@ class CafeModel extends Equatable {
     createdById,
     isPromoted,
     status,
+    cafeMedias,
+    cafeCategories,
+    cafeFeatureTags,
   ];
 }

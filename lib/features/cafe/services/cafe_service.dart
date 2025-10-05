@@ -13,6 +13,7 @@ class CafeService {
     int pageNumber = 1,
     int pageSize = 10,
     String? sortBy, 
+    String? searchTerm,  
     String? sortDirection,  
   }) async {
     try {
@@ -21,6 +22,7 @@ class CafeService {
         pageSize: pageSize,
         sortBy: sortBy ?? '',
         sortDirection: sortDirection ?? '',
+        searchTerm: searchTerm ?? '',
       );
       final response = await dio.get(endPoint);
       print('Response data layer Services: ${response.data}'); // Debug log

@@ -3,6 +3,8 @@ import 'package:briewview/features/auth/view/widgets/social_login_buttons.dart';
 import 'package:briewview/features/auth/viewModel/Bloc/Auth_Bloc.dart';
 import 'package:briewview/features/auth/viewModel/Bloc/Auth_event.dart';
 import 'package:briewview/features/auth/viewModel/Bloc/Auth_state.dart';
+import 'package:briewview/features/post/view/post_navigation.dart';
+import 'package:briewview/features/survey/view/widgets/survey_navigation_example.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:briewview/features/auth/view/widgets/auth_forgotpassword_widget.dart';
@@ -36,13 +38,18 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
       listener: (context, state) {
         if (state is AuthAuthenticated) {
           // Navigate to home
+          final userHasCompletedSurvey = state.user.userJson?.isSurvey == true;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Welcome ${state.user.userJson?.name ?? ''}!'),
               backgroundColor: Colors.green,
             ),
           );
-          context.go('/home');
+           if (userHasCompletedSurvey) {
+            context.go('/home'); 
+          } else {
+            context.go('/survey'); 
+          }
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -321,6 +328,12 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
 
                             // Social Login Buttons
                             SocialLoginButtons(),
+
+                            const SizedBox(height: 24),
+
+                            // Survey Demo Button
+                            SurveyNavigationButton(),
+                            PostNavigation(),
                           ],
                         ),
                       ),
@@ -371,4 +384,6 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
       context,
     ).push(MaterialPageRoute(builder: (context) => const AuthRegisterPage()));
   }
+
+
 }
