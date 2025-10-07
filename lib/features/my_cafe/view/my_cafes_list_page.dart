@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/core/widgets/navigation_bar.dart';
-import 'package:briewview/features/my_cafe/viewmodel/my_cafe_bloc.dart';
-import 'package:briewview/features/my_cafe/viewmodel/my_cafe_event.dart';
-import 'package:briewview/features/my_cafe/viewmodel/my_cafe_state.dart';
+import 'package:briewview/features/cafe/viewmodel/cafe_bloc.dart';
+import 'package:briewview/features/cafe/viewmodel/cafe_event.dart';
+import 'package:briewview/features/cafe/viewmodel/cafe_sate.dart';
 import 'package:briewview/features/my_cafe/view/widgets/cafe_card_widget.dart';
-import 'package:briewview/features/my_cafe/model/cafe_model.dart';
+import 'package:briewview/features/cafe/model/cafeMode.dart';
 
 class MyCafesListPage extends StatefulWidget {
   const MyCafesListPage({super.key});
@@ -17,89 +17,18 @@ class MyCafesListPage extends StatefulWidget {
 }
 
 class _MyCafesListPageState extends State<MyCafesListPage> {
-  late MyCafeBloc _myCafeBloc;
+  late CafeBloc _cafeBloc;
 
   @override
   void initState() {
     super.initState();
-    _myCafeBloc = getIt<MyCafeBloc>();
-    // Temporarily comment out real API call
-    // _myCafeBloc.add(LoadMyCafes());
-  }
-
-  // Mock data for testing
-  List<CafeModel> _getMockCafes() {
-    return [
-      CafeModel(
-        id: '1',
-        categoryId: 1,
-        name: 'Cafe Trung Nguyên',
-        address: '123 Nguyễn Huệ, Quận 1, TP.HCM',
-        description: 'Cafe truyền thống với không gian ấm cúng, phục vụ các loại cà phê đặc sản Việt Nam.',
-        priceMin: 25000,
-        priceMax: 65000,
-        openingTime: '06:00',
-        closingTime: '22:00',
-        hotline: '0123456789',
-        linkPage: 'https://trungnguyenlegend.com',
-        rating: 4.5,
-        reviewCount: 128,
-        mediaUrls: [
-          'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=500',
-          'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=500',
-        ],
-        selectedFeatureTagIds: [1, 2, 3],
-        createdAt: DateTime.now().subtract(const Duration(days: 30)),
-        updatedAt: DateTime.now(),
-      ),
-      CafeModel(
-        id: '2',
-        categoryId: 2,
-        name: 'Starbucks Coffee',
-        address: '456 Lê Lợi, Quận 3, TP.HCM',
-        description: 'Thương hiệu cà phê quốc tế với menu đa dạng và không gian hiện đại.',
-        priceMin: 45000,
-        priceMax: 120000,
-        openingTime: '07:00',
-        closingTime: '23:00',
-        hotline: '0987654321',
-        rating: 4.2,
-        reviewCount: 89,
-        mediaUrls: [
-          'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=500',
-          'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=500',
-        ],
-        selectedFeatureTagIds: [2, 4, 5],
-        createdAt: DateTime.now().subtract(const Duration(days: 15)),
-        updatedAt: DateTime.now(),
-      ),
-      CafeModel(
-        id: '3',
-        categoryId: 1,
-        name: 'Cafe Cộng',
-        address: '789 Điện Biên Phủ, Quận Bình Thạnh, TP.HCM',
-        description: 'Cafe vintage với thiết kế độc đáo, không gian rộng rãi phù hợp cho làm việc và học tập.',
-        priceMin: 30000,
-        priceMax: 80000,
-        openingTime: '06:30',
-        closingTime: '23:30',
-        hotline: '0369258147',
-        rating: 4.7,
-        reviewCount: 156,
-        mediaUrls: [
-          'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500',
-          'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=500',
-        ],
-        selectedFeatureTagIds: [1, 3, 6],
-        createdAt: DateTime.now().subtract(const Duration(days: 7)),
-        updatedAt: DateTime.now(),
-      ),
-    ];
+    _cafeBloc = getIt<CafeBloc>();
+    _cafeBloc.add(LoadMyCafes());
   }
 
   @override
   void dispose() {
-    _myCafeBloc.close();
+    _cafeBloc.close();
     super.dispose();
   }
 
@@ -130,10 +59,10 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
         ],
       ),
       body: BlocProvider(
-        create: (context) => _myCafeBloc,
-        child: BlocListener<MyCafeBloc, MyCafeState>(
+        create: (context) => _cafeBloc,
+        child: BlocListener<CafeBloc, CafeState>(
           listener: (context, state) {
-            if (state is MyCafeError) {
+            if (state is CafeOperationError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
@@ -143,64 +72,55 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
             } else if (state is CafeCreated) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Tạo cafe thành công!'),
+                  content: Text('Create cafe success!'),
                   backgroundColor: Colors.green,
                 ),
               );
-              _myCafeBloc.add(LoadMyCafes());
+              _cafeBloc.add(LoadMyCafes());
             } else if (state is CafeUpdated) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Cập nhật cafe thành công!'),
+                  content: Text('Update cafe success!'),
                   backgroundColor: Colors.green,
                 ),
               );
-              _myCafeBloc.add(LoadMyCafes());
+              _cafeBloc.add(LoadMyCafes());
             } else if (state is CafeDeleted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Xóa cafe thành công!'),
+                  content: Text('Delete cafe success!'),
                   backgroundColor: Colors.green,
                 ),
               );
-              _myCafeBloc.add(LoadMyCafes());
+              _cafeBloc.add(LoadMyCafes());
             }
           },
           child: Builder(
             builder: (context) {
-              // Temporarily use mock data instead of bloc state
-              final mockCafes = _getMockCafes();
-              
-              if (mockCafes.isEmpty) {
-                return _buildEmptyState();
-              }
-              return _buildCafesList(mockCafes);
-              
-              // Original bloc builder code (commented out for mock data)
-              // return BlocBuilder<MyCafeBloc, MyCafeState>(
-              //   builder: (context, state) {
-              //     if (state is MyCafeLoading) {
-              //       return const Center(
-              //         child: CircularProgressIndicator(
-              //           color: Color(0xFFF5F1EB),
-              //         ),
-              //       );
-              //     } else if (state is MyCafesLoaded) {
-              //       if (state.cafes.isEmpty) {
-              //         return _buildEmptyState();
-              //       }
-              //       return _buildCafesList(state.cafes);
-              //     } else if (state is MyCafeError) {
-              //       return _buildErrorState(state.message);
-              //     } else {
-              //       return const Center(
-              //         child: CircularProgressIndicator(
-              //           color: Color(0xFFF5F1EB),
-              //         ),
-              //       );
-              //     }
-              //   },
-              // );
+              return BlocBuilder<CafeBloc, CafeState>(
+                builder: (context, state) {
+                  if (state is MyCafesLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFFF5F1EB),
+                      ),
+                    );
+                  } else if (state is MyCafesLoaded) {
+                    if (state.cafes.isEmpty) {
+                      return _buildEmptyState();
+                    }
+                    return _buildCafesList(state.cafes);
+                  } else if (state is CafeOperationError) {
+                    return _buildErrorState(state.message);
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFFF5F1EB),
+                      ),
+                    );
+                  }
+                },
+              );
             },
           ),
         ),
@@ -229,7 +149,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Chưa có cafe nào',
+            'You have no cafes yet',
             style: TextStyle(
               color: Colors.white.withOpacity(0.8),
               fontSize: 18,
@@ -238,7 +158,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Hãy tạo cafe đầu tiên của bạn',
+            'Create your first cafe',
             style: TextStyle(
               color: Colors.white.withOpacity(0.6),
               fontSize: 14,
@@ -255,7 +175,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('Tạo cafe mới'),
+            child: const Text('Create new cafe'),
           ),
         ],
       ),
@@ -274,7 +194,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Có lỗi xảy ra',
+            'An error occurred',
             style: TextStyle(
               color: Colors.white.withOpacity(0.8),
               fontSize: 18,
@@ -292,7 +212,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
           ),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () => _myCafeBloc.add(LoadMyCafes()),
+            onPressed: () => _cafeBloc.add(LoadMyCafes()),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFF5F1EB),
               foregroundColor: const Color(0xFF8B4513),
@@ -301,7 +221,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('Thử lại'),
+            child: const Text('Retry'),
           ),
         ],
       ),
@@ -326,7 +246,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
           final cafe = cafes[index];
           return CafeCardWidget(
             cafe: cafe,
-            onTap: () => context.pushNamed('my-cafe-detail', pathParameters: {'id': cafe.id!}),
+            onTap: () => context.pushNamed('my-cafe-detail', pathParameters: {'id': cafe.cafeId!}),
           );
         },
       ),

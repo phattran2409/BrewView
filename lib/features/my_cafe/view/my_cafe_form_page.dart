@@ -1,38 +1,38 @@
 import 'dart:io';
+import 'package:briewview/features/cafe/model/cafeMutation.dart';
+import 'package:briewview/features/my_cafe/view/widgets/feature_tag_widget.dart';
 import 'package:briewview/features/my_cafe/view/widgets/form/basic_info_section.dart';
 import 'package:briewview/features/my_cafe/view/widgets/form/contact_info_section.dart';
 import 'package:briewview/features/my_cafe/view/widgets/form/form_section_wrapper.dart';
 import 'package:briewview/features/my_cafe/view/widgets/form/pricing_section.dart';
 import 'package:briewview/features/my_cafe/view/widgets/form/schedule_section.dart';
+import 'package:briewview/features/survey/model/category_model.dart';
+import 'package:briewview/features/survey/model/feature_tag_model.dart';
+import 'package:briewview/features/survey/repository/survey_repository.dart';
+import 'package:briewview/core/widgets/ImageUploadWIdget.dart';
+import 'package:briewview/core/widgets/VideoUploadWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/core/widgets/navigation_bar.dart';
-import 'package:briewview/features/my_cafe/model/cafe_model.dart';
-import 'package:briewview/features/my_cafe/model/category_model.dart';
-import 'package:briewview/features/my_cafe/model/feature_tag_model.dart';
-import 'package:briewview/features/my_cafe/model/create_cafe_request.dart';
-import 'package:briewview/features/my_cafe/model/update_cafe_request.dart';
-import 'package:briewview/features/my_cafe/viewmodel/my_cafe_bloc.dart';
-import 'package:briewview/features/my_cafe/viewmodel/my_cafe_event.dart';
-import 'package:briewview/features/my_cafe/viewmodel/my_cafe_state.dart';
+import 'package:briewview/features/cafe/model/cafeMode.dart';
+import 'package:briewview/features/cafe/viewmodel/cafe_bloc.dart';
+import 'package:briewview/features/cafe/viewmodel/cafe_event.dart';
+import 'package:briewview/features/cafe/viewmodel/cafe_sate.dart';
 
 class MyCafeFormPage extends StatefulWidget {
   final String? cafeId; // null for create, non-null for edit
 
-  const MyCafeFormPage({
-    super.key,
-    this.cafeId,
-  });
+  const MyCafeFormPage({super.key, this.cafeId});
 
   @override
   State<MyCafeFormPage> createState() => _MyCafeFormPageState();
 }
 
 class _MyCafeFormPageState extends State<MyCafeFormPage> {
-  late MyCafeBloc _myCafeBloc;
+  late CafeBloc _cafeBloc;
+  late SurveyRepository _surveyRepository;
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _addressController = TextEditingController();
@@ -49,6 +49,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
   CategoryModel? _selectedCategory;
   List<int> _selectedFeatureTagIds = [];
   List<File> _selectedImages = [];
+  List<File> _selectedVideos = [];
   CafeModel? _editingCafe;
 
   bool get _isEditing => widget.cafeId != null;
@@ -56,16 +57,34 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
   @override
   void initState() {
     super.initState();
-    _myCafeBloc = getIt<MyCafeBloc>();
+    _cafeBloc = getIt<CafeBloc>();
+    _surveyRepository = getIt<SurveyRepository>();
     _loadData();
   }
 
   void _loadData() async {
-    _myCafeBloc.add(LoadCategories());
-    _myCafeBloc.add(LoadFeatureTags());
-    
+    try {
+      // Load categories and feature tags
+      final categories = await _surveyRepository.getCategories();
+      final featureTags = await _surveyRepository.getFeatureTags();
+
+      setState(() {
+        _categories = categories;
+        _featureTags = featureTags;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load data: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+
     if (_isEditing) {
-      _myCafeBloc.add(LoadCafeById(widget.cafeId!));
+      _cafeBloc.add(LoadCafeById(widget.cafeId!));
     }
   }
 
@@ -80,7 +99,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
     _hotlineController.dispose();
     _openingTimeController.dispose();
     _closingTimeController.dispose();
-    _myCafeBloc.close();
+    _cafeBloc.close();
     super.dispose();
   }
 
@@ -105,40 +124,38 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
         ),
       ),
       body: BlocProvider(
-        create: (context) => _myCafeBloc,
-        child: BlocListener<MyCafeBloc, MyCafeState>(
+        create: (context) => _cafeBloc,
+        child: BlocListener<CafeBloc, CafeState>(
           listener: (context, state) {
-            if (state is MyCafeError) {
+            if (state is CafeOperationError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
                   backgroundColor: Colors.red,
                 ),
               );
-            } else if (state is CategoriesLoaded) {
-              _categories = state.categories;
-            } else if (state is FeatureTagsLoaded) {
-              _featureTags = state.featureTags;
-            } else if (state is CafeLoaded) {
+            } else if (state is CafeDetailsLoaded) {
               _editingCafe = state.cafe;
               _populateForm(state.cafe);
             } else if (state is CafeCreated || state is CafeUpdated) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(_isEditing ? 'Update cafe success!' : 'Create cafe success!'),
+                  content: Text(
+                    _isEditing
+                        ? 'Update cafe success!'
+                        : 'Create cafe success!',
+                  ),
                   backgroundColor: Colors.green,
                 ),
               );
               context.pop();
             }
           },
-          child: BlocBuilder<MyCafeBloc, MyCafeState>(
+          child: BlocBuilder<CafeBloc, CafeState>(
             builder: (context, state) {
-              if (state is MyCafeLoading && !_isEditing) {
+              if (state is MyCafesLoading && !_isEditing) {
                 return const Center(
-                  child: CircularProgressIndicator(
-                    color: Color(0xFFF5F1EB),
-                  ),
+                  child: CircularProgressIndicator(color: Color(0xFFF5F1EB)),
                 );
               }
               return _buildForm();
@@ -156,11 +173,33 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          FormSectionWrapper(
+            title: 'Hình ảnh Cafe',
+            icon: Icons.photo_camera,
+            child: ImageUploadWidget(
+              onImagesChanged: (images) {
+                setState(() {
+                  _selectedImages = images;
+                });
+              },
+              maxImages: 5,
+              isPremium: false,
+            ),
+          ),
 
           FormSectionWrapper(
-            title: 'Cafe Images',
-            icon: Icons.photo_camera,
-            child: _buildImagePicker(),
+            title: 'Video Cafe',
+            icon: Icons.videocam,
+            child: VideoUploadWidget(
+              onVideosChanged: (videos) {
+                setState(() {
+                  _selectedVideos = videos;
+                });
+              },
+              maxVideos: 1,
+              maxVideoDurationSeconds: 60,
+              isPremium: false,
+            ),
           ),
 
           FormSectionWrapper(
@@ -210,7 +249,16 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
           FormSectionWrapper(
             title: 'Feature Tags',
             icon: Icons.local_offer,
-            child: _buildFeatureTagSelector(),
+            child: FeatureTagSelector(
+              featureTags: _featureTags,
+              selectedTagIds: _selectedFeatureTagIds,
+              onSelectionChanged: (tagIds) {
+                setState(() {
+                  _selectedFeatureTagIds = tagIds;
+                });
+              },
+              maxSelection: 10, // Optional: limit selection
+            ),
           ),
 
           const SizedBox(height: 30),
@@ -221,32 +269,32 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
     );
   }
 
-
   Widget _buildSubmitButton() {
-  return BlocBuilder<MyCafeBloc, MyCafeState>(
-    builder: (context, state) {
-      final isLoading = state is MyCafeCreating || state is MyCafeUpdating;
-      return ElevatedButton(
-        onPressed: isLoading ? null : _submitForm,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFF5F1EB),
-          foregroundColor: const Color(0xFF8B4513),
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+    return BlocBuilder<CafeBloc, CafeState>(
+      builder: (context, state) {
+        final isLoading = state is CafeCreating || state is CafeUpdating;
+        return ElevatedButton(
+          onPressed: isLoading ? null : _submitForm,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFF5F1EB),
+            foregroundColor: const Color(0xFF8B4513),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
-        ),
-        child: isLoading
-            ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Color(0xFF8B4513),
-                ),
-              )
-               : Text(
-                    _isEditing ? 'Cập nhật cafe' : 'Tạo cafe',
+          child:
+              isLoading
+                  ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Color(0xFF8B4513),
+                    ),
+                  )
+                  : Text(
+                    _isEditing ? 'Update Cafe' : 'Create Cafe',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -257,173 +305,30 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
     );
   }
 
-  Widget _buildImagePicker() {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F1EB),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              'Images of cafe',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF8B4513),
-              ),
-            ),
-          ),
-          if (_selectedImages.isNotEmpty)
-            SizedBox(
-              height: 100,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: _selectedImages.length,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    child: Stack(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
-                            _selectedImages[index],
-                            width: 80,
-                            height: 80,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        Positioned(
-                          top: 4,
-                          right: 4,
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedImages.removeAt(index);
-                              });
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.close,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: ElevatedButton.icon(
-              onPressed: _pickImages,
-              icon: const Icon(Icons.add_photo_alternate),
-              label: const Text('Add images'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8B4513),
-                foregroundColor: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-
-  Widget _buildFeatureTagSelector() {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F1EB),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              'Feature tags',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF8B4513),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _featureTags.map((tag) {
-                final isSelected = _selectedFeatureTagIds.contains(tag.id);
-                return FilterChip(
-                  label: Text(tag.name),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    setState(() {
-                      if (selected) {
-                        _selectedFeatureTagIds.add(tag.id);
-                      } else {
-                        _selectedFeatureTagIds.remove(tag.id);
-                      }
-                    });
-                  },
-                  selectedColor: const Color(0xFF8B4513),
-                  checkmarkColor: Colors.white,
-                );
-              }).toList(),
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ),
-    );
-  }
-
   void _populateForm(CafeModel cafe) {
-    _nameController.text = cafe.name;
-    _addressController.text = cafe.address;
-    _descriptionController.text = cafe.description;
-    _priceMinController.text = cafe.priceMin.toString();
-    _priceMaxController.text = cafe.priceMax.toString();
-    _openingTimeController.text = cafe.openingTime;
-    _closingTimeController.text = cafe.closingTime;
+    _nameController.text = cafe.name ?? '';
+    _addressController.text = cafe.address ?? '';
+    _descriptionController.text = cafe.description ?? '';
+    _priceMinController.text = cafe.priceMin?.toString() ?? '';
+    _priceMaxController.text = cafe.priceMax?.toString() ?? '';
+    _openingTimeController.text = cafe.openingTime ?? '';
+    _closingTimeController.text = cafe.closingTime ?? '';
     _linkPageController.text = cafe.linkPage ?? '';
-    _hotlineController.text = cafe.hotline ?? '';
-    
-    // Set selected category
-    _selectedCategory = _categories.firstWhere(
-      (cat) => cat.id == cafe.categoryId,
-      orElse: () => _categories.first,
-    );
-    
-    // Set selected feature tags
-    _selectedFeatureTagIds = cafe.selectedFeatureTagIds ?? [];
-  }
+    _hotlineController.text = cafe.hotLine ?? '';
 
-  Future<void> _pickImages() async {
-    final ImagePicker picker = ImagePicker();
-    final List<XFile> images = await picker.pickMultiImage();
-    
-    setState(() {
-      _selectedImages.addAll(images.map((image) => File(image.path)));
-    });
+    // Set selected category
+    if (_categories.isNotEmpty) {
+      _selectedCategory = _categories.firstWhere(
+        (cat) => cat.categoryId == cafe.categoryId,
+        orElse: () => _categories.first,
+      );
+    }
+
+    // Set selected feature tags
+    if (cafe.cafeFeatureTags != null) {
+      _selectedFeatureTagIds =
+          cafe.cafeFeatureTags!.map((featureTag) => featureTag.tagId).toList();
+    }
   }
 
   void _submitForm() {
@@ -432,8 +337,8 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
 
     if (_isEditing && _editingCafe != null) {
       final request = UpdateCafeRequest(
-        cafeId: _editingCafe!.id!,
-        categoryId: _selectedCategory!.id,
+        cafeId: _editingCafe!.cafeId!,
+        categoryId: _selectedCategory!.categoryId,
         name: _nameController.text.trim(),
         address: _addressController.text.trim(),
         description: _descriptionController.text.trim(),
@@ -441,14 +346,26 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
         priceMax: int.parse(_priceMaxController.text.trim()),
         openingTime: _openingTimeController.text.trim(),
         closingTime: _closingTimeController.text.trim(),
-        linkPage: _linkPageController.text.trim().isEmpty ? null : _linkPageController.text.trim(),
-        hotline: _hotlineController.text.trim().isEmpty ? null : _hotlineController.text.trim(),
+        linkPage:
+            _linkPageController.text.trim().isEmpty
+                ? null
+                : _linkPageController.text.trim(),
+        hotLine:
+            _hotlineController.text.trim().isEmpty
+                ? null
+                : _hotlineController.text.trim(),
         cafeFeatureTags: _selectedFeatureTagIds,
       );
-      _myCafeBloc.add(UpdateCafe(request, mediaFiles: _selectedImages.isNotEmpty ? _selectedImages : null));
+      final allMediaFiles = [..._selectedImages, ..._selectedVideos];
+      _cafeBloc.add(
+        UpdateCafe(
+          request,
+          mediaFiles: allMediaFiles.isNotEmpty ? allMediaFiles : null,
+        ),
+      );
     } else {
       final request = CreateCafeRequest(
-        categoryId: _selectedCategory!.id,
+        categoryId: _selectedCategory!.categoryId,
         name: _nameController.text.trim(),
         address: _addressController.text.trim(),
         description: _descriptionController.text.trim(),
@@ -456,11 +373,23 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
         priceMax: int.parse(_priceMaxController.text.trim()),
         openingTime: _openingTimeController.text.trim(),
         closingTime: _closingTimeController.text.trim(),
-        linkPage: _linkPageController.text.trim().isEmpty ? null : _linkPageController.text.trim(),
-        hotline: _hotlineController.text.trim().isEmpty ? null : _hotlineController.text.trim(),
+        linkPage:
+            _linkPageController.text.trim().isEmpty
+                ? null
+                : _linkPageController.text.trim(),
+        hotLine:
+            _hotlineController.text.trim().isEmpty
+                ? null
+                : _hotlineController.text.trim(),
         selectedFeatureTagIds: _selectedFeatureTagIds,
       );
-      _myCafeBloc.add(CreateCafe(request, mediaFiles: _selectedImages.isNotEmpty ? _selectedImages : null));
+      final allMediaFiles = [..._selectedImages, ..._selectedVideos];
+      _cafeBloc.add(
+        CreateCafe(
+          request,
+          mediaFiles: allMediaFiles.isNotEmpty ? allMediaFiles : null,
+        ),
+      );
     }
   }
 }

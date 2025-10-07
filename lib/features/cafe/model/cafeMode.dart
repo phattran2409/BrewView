@@ -1,6 +1,7 @@
 import 'package:briewview/features/cafe/model/cafeMedia.dart';
 import 'package:briewview/features/survey/model/feature_tag_model.dart';
 import 'package:equatable/equatable.dart';
+import 'dart:io';
 
 class CafeModel extends Equatable {
   final String? cafeId;

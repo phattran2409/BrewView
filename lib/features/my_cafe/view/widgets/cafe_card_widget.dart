@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:briewview/features/my_cafe/model/cafe_model.dart';
+import 'package:briewview/features/cafe/model/cafeMode.dart';
 
 class CafeCardWidget extends StatelessWidget {
   final CafeModel cafe;
@@ -39,11 +39,11 @@ class CafeCardWidget extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                       color: Colors.grey[300],
                     ),
-                    child: cafe.mediaUrls != null && cafe.mediaUrls!.isNotEmpty
+                    child: cafe.imageUrl != null && cafe.imageUrl!.isNotEmpty
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.network(
-                              cafe.mediaUrls!.first,
+                              cafe.imageUrl!,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
                                 return const Icon(
@@ -67,7 +67,7 @@ class CafeCardWidget extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          cafe.name,
+                          cafe.name ?? '',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -87,7 +87,7 @@ class CafeCardWidget extends StatelessWidget {
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                cafe.address,
+                                cafe.address ?? '',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey[600],
@@ -124,7 +124,7 @@ class CafeCardWidget extends StatelessWidget {
               const SizedBox(height: 12),
               // Description
               Text(
-                cafe.description,
+                cafe.description ?? '',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey[700],
@@ -144,7 +144,7 @@ class CafeCardWidget extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '${cafe.priceMin.toInt()}K - ${cafe.priceMax.toInt()}K',
+                      '${cafe.priceMin}K - ${cafe.priceMax}K',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -168,10 +168,10 @@ class CafeCardWidget extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    if (cafe.reviewCount != null) ...[
+                    if (cafe.isPromoted != null) ...[
                       const SizedBox(width: 4),
                       Text(
-                        '(${cafe.reviewCount})',
+                        '(Promoted: ${cafe.isPromoted})',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],

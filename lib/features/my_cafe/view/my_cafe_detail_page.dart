@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/core/widgets/navigation_bar.dart';
-import 'package:briewview/features/my_cafe/viewmodel/my_cafe_bloc.dart';
-import 'package:briewview/features/my_cafe/viewmodel/my_cafe_event.dart';
-import 'package:briewview/features/my_cafe/viewmodel/my_cafe_state.dart';
+import 'package:briewview/features/cafe/viewmodel/cafe_bloc.dart';
+import 'package:briewview/features/cafe/viewmodel/cafe_event.dart';
+import 'package:briewview/features/cafe/viewmodel/cafe_sate.dart';
 
 class MyCafeDetailPage extends StatefulWidget {
   final String cafeId;
@@ -20,18 +20,18 @@ class MyCafeDetailPage extends StatefulWidget {
 }
 
 class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
-  late MyCafeBloc _myCafeBloc;
+  late CafeBloc _cafeBloc;
 
   @override
   void initState() {
     super.initState();
-    _myCafeBloc = getIt<MyCafeBloc>();
-    _myCafeBloc.add(LoadCafeById(widget.cafeId));
+    _cafeBloc = getIt<CafeBloc>();
+    _cafeBloc.add(LoadCafeById(widget.cafeId));
   }
 
   @override
   void dispose() {
-    _myCafeBloc.close();
+    _cafeBloc.close();
     super.dispose();
   }
 
@@ -40,10 +40,10 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF8B4513),
       body: BlocProvider(
-        create: (context) => _myCafeBloc,
-        child: BlocListener<MyCafeBloc, MyCafeState>(
+        create: (context) => _cafeBloc,
+        child: BlocListener<CafeBloc, CafeState>(
           listener: (context, state) {
-            if (state is MyCafeError) {
+            if (state is CafeOperationError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
@@ -60,17 +60,17 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
               context.pop();
             }
           },
-          child: BlocBuilder<MyCafeBloc, MyCafeState>(
+          child: BlocBuilder<CafeBloc, CafeState>(
             builder: (context, state) {
-              if (state is MyCafeLoading) {
+              if (state is CafeLoading) {
                 return const Center(
                   child: CircularProgressIndicator(
                     color: Color(0xFFF5F1EB),
                   ),
                 );
-              } else if (state is CafeLoaded) {
+              } else if (state is CafeDetailsLoaded) {
                 return _buildCafeDetail(state.cafe);
-              } else if (state is MyCafeError) {
+              } else if (state is CafeOperationError) {
                 return _buildErrorState(state.message);
               } else {
                 return const Center(
@@ -138,9 +138,9 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
               fit: StackFit.expand,
               children: [
                 // Background image
-                cafe.mediaUrls != null && cafe.mediaUrls!.isNotEmpty
+                cafe.imageUrl != null && cafe.imageUrl!.isNotEmpty
                     ? Image.network(
-                        cafe.mediaUrls!.first,
+                        cafe.imageUrl!,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
@@ -431,7 +431,7 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
           ),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () => _myCafeBloc.add(LoadCafeById(widget.cafeId)),
+            onPressed: () => _cafeBloc.add(LoadCafeById(widget.cafeId)),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFF5F1EB),
               foregroundColor: const Color(0xFF8B4513),
@@ -461,7 +461,7 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              _myCafeBloc.add(DeleteCafe(cafe.id));
+              _cafeBloc.add(DeleteCafe(cafe.id));
             },
             style: TextButton.styleFrom(
               foregroundColor: Colors.red,

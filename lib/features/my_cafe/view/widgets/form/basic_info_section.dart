@@ -1,4 +1,4 @@
-import 'package:briewview/features/my_cafe/model/category_model.dart';
+import 'package:briewview/features/survey/model/category_model.dart';
 import 'package:flutter/material.dart';
 
 class BasicInfoSection extends StatelessWidget {
