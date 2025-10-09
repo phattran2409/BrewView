@@ -55,6 +55,7 @@ class AuthRepositoryImpl implements AuthRepository {
         role: authResp.userJson?.role ?? '',
         identityId: authResp.userJson?.identityId ?? '',
         isSurvey: authResp.userJson?.isSurvey,
+        isPremium: authResp.userJson?.isPremium,
       );
       await _userStorageServices.saveUser(userDataSave);
 
@@ -180,6 +181,7 @@ class AuthRepositoryImpl implements AuthRepository {
           role: 'customer',
           identityId: '',
           isSurvey: serverUserModel.isSurvey,
+          isPremium: serverUserModel.isPremium,
         ),
       );
       print('✅ User data saved locally');

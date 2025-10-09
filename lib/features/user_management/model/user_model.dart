@@ -24,7 +24,7 @@ class UserModel extends User {
     super.isSurvey,
     String? identityId,
     String? role,
-    int? age, // Thêm
+    int? age, // Thêm 
     String? gender, // Thêm
     String? provinceName, // Thêm
     bool? isPremium, // Thêm

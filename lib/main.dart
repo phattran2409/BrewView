@@ -1,5 +1,7 @@
-import 'package:briewview/core/services/deep_link_services.dart';
+import 'package:briewview/core/services/deep_link_handler.dart';
+import 'package:briewview/core/services/deep_link_service.dart';
 import 'package:briewview/features/auth/viewModel/Bloc/Auth_Bloc.dart';
+import 'package:briewview/features/premium/viewmodel/premium_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,16 +9,17 @@ import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/app/router/app_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:get_it/get_it.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Set preferred orientations
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  
+
   try {
     await Firebase.initializeApp();
     print("✅ Firebase initialized successfully");
@@ -29,7 +32,7 @@ void main() async {
     // Configure Firebase for better locale handling
     await _configureFirebase();
     print("✅ Firebase configured for locale");
-    
+
     await configureDependencies();
     print("✅ Dependencies configured");
 
@@ -38,18 +41,19 @@ void main() async {
     print('AuthBloc registered: ${getIt.isRegistered<AuthBloc>()}');
     print('AppRouter registered: ${getIt.isRegistered<AppRouter>()}');
 
-    final  deepLinkServices =  getIt<DeepLinkService>();
-    await deepLinkServices.initialize();  
-    
-    deepLinkServices.onPasswordReset = (token) {
-      print('🔑 Password reset token received: $token');
-      // Navigate to password reset page with token
-      getIt<AppRouter>().router.go('/reset?token=$token');
-    };  
+    // ✅ Khởi tạo Deep Link Service
+    final deepLinkService = getIt<DeepLinkService>();
+    await deepLinkService.initialize();
+    print("✅ DeepLinkService initialized");
+
+    // ✅ Khởi tạo Deep Link Handler
+    final deepLinkHandler = getIt<DeepLinkHandler>();
+    deepLinkHandler.startListening();
+    print("✅ DeepLinkHandler started");
   } catch (error) {
     print("❌ Initialization failed: $error");
   }
-  
+
   runApp(const MyApp());
 }
 
@@ -75,6 +79,11 @@ class MyApp extends StatelessWidget {
           create: (_) => getIt<AuthBloc>(),
           lazy: false, // Create immediately
         ),
+        // ✅ Global PremiumBloc
+        BlocProvider<PremiumBloc>(
+          create: (_) => getIt<PremiumBloc>(),
+          lazy: false, // Create immediately
+        ),
       ],
       child: MaterialApp.router(
         title: 'BrewView',
@@ -82,10 +91,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(primarySwatch: Colors.brown),
         // Fix Firebase locale warning
         locale: const Locale('en', 'US'),
-        supportedLocales: const [
-          Locale('en', 'US'),
-          Locale('vi', 'VN'),
-        ],
+        supportedLocales: const [Locale('en', 'US'), Locale('vi', 'VN')],
         localizationsDelegates: const [
           // Material localization delegates will be added automatically
         ],

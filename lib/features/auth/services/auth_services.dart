@@ -34,7 +34,8 @@ class AuthApi {
             identityId: data['data']['identityId'],
             accessToken: data['data']['accessToken'],
             refreshToken: data['data']['refreshToken'],
-             isSurvey: data['data']['isSurvey'] as bool?,
+             isSurvey: data['data']['isSurvey'] as bool?, 
+            isPremium: data['data']['isPremium'] as bool?
           ),  
         );
       } else {
@@ -198,6 +199,7 @@ class AuthApi {
     );
     print('Refresh token response SERVICES: ${res.data}');
     if (res.statusCode == 200 || res.statusCode == 201) {
+       print('Refresh token response SERVICES: ${res.data}'); 
       return res.data;
     }
     return null;

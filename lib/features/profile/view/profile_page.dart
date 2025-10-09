@@ -170,9 +170,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     onTap: () => _navigateToFavorites(),
                   ),
                   MenuItemWidget(
-                    icon: Icons.history,
-                    title: 'Gần đây',
-                    onTap: () => _navigateToRecent(),
+                    icon: Icons.star,
+                    title: 'Premium',
+                    onTap: () => _navigateToPackgePremium(),
                   ),
                   MenuItemWidget(
                     icon: Icons.rate_review,
@@ -282,9 +282,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _navigateToSettings() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Tính năng cài đặt sẽ được phát triển')),
-    );
+    context.goNamed('premium-demo');
   }
 
   void _navigateToVouchers() {
@@ -299,11 +297,9 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _navigateToRecent() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Tính năng gần đây sẽ được phát triển')),
-    );
-  }
+  void _navigateToPackgePremium() {
+    context.push('/premium-plans');
+  } 
 
   void _navigateToWriteReview() {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -330,127 +326,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
     _profileBloc.add(UpdateProfilePicture(imageFile.path));
   }
-
-  // Widget overlay mở rộng profile
-  // Widget _buildExpandedProfileOverlay() {
-  //   return Container(
-  //     color: Colors.black.withOpacity(0.5), // Background đen mờ
-  //     child: Center(
-  //       child: Container(
-  //         margin: const EdgeInsets.all(20),
-  //         decoration: BoxDecoration(
-  //           color: Color(0xFFEDE4DD),
-  //           borderRadius: BorderRadius.circular(20),
-  //         ),
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             // Header với nút đóng
-  //             Container(
-  //               padding: const EdgeInsets.all(16),
-  //               decoration: const BoxDecoration(
-  //                 color: Color(0xFF8B4513),
-  //                 borderRadius: BorderRadius.only(
-  //                   topLeft: Radius.circular(20),
-  //                   topRight: Radius.circular(20),
-  //                 ),
-  //               ),
-  //               child: Row(
-  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                 children: [
-  //                   const Text(
-  //                     'Thông tin chi tiết',
-  //                     style: TextStyle(
-  //                       color: Colors.white,
-  //                       fontSize: 18,
-  //                       fontWeight: FontWeight.bold,
-  //                     ),
-  //                   ),
-  //                   IconButton(
-  //                     onPressed: _toggleProfileExpanded,
-  //                     icon: const Icon(Icons.close, color: Colors.white),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //             // Content
-  //             Padding(
-  //               padding: const EdgeInsets.all(20),
-  //               child: Column(
-  //                 children: [
-  //                   // Profile picture
-  //                   CircleAvatar(
-  //                     radius: 50,
-  //                     backgroundColor: const Color(0xFF8B4513),
-  //                     backgroundImage: _getProfileImage(),
-  //                     child:
-  //                         _getProfileImage() == null
-  //                             ? const Icon(
-  //                               Icons.person,
-  //                               size: 50,
-  //                               color: Colors.white,
-  //                             )
-  //                             : null,
-  //                   ),
-  //                   const SizedBox(height: 20),
-  //                   // Profile info
-  //                   _buildInfoRow('Tên', 'Nguyễn Văn A'),
-  //                   _buildInfoRow('Email', 'nguyenvana@example.com'),
-  //                   _buildInfoRow('Số điện thoại', '0123456789'),
-  //                   _buildInfoRow('Ngày sinh', '01/01/1990'),
-  //                   _buildInfoRow('Giới tính', 'Nam'),
-  //                   _buildInfoRow('Địa chỉ', '123 Đường ABC, Quận XYZ, TP.HCM'),
-  //                   const SizedBox(height: 20),
-  //                   // Action buttons
-  //                   Row(
-  //                     children: [
-  //                       Expanded(
-  //                         child: ElevatedButton(
-  //                           onPressed: () {
-  //                             _toggleProfileExpanded();
-  //                             _showEditDialog();
-  //                           },
-  //                           style: ElevatedButton.styleFrom(
-  //                             backgroundColor: const Color(0xFF8B4513),
-  //                             foregroundColor: Colors.white,
-  //                             padding: const EdgeInsets.symmetric(vertical: 12),
-  //                             shape: RoundedRectangleBorder(
-  //                               borderRadius: BorderRadius.circular(8),
-  //                             ),
-  //                           ),
-  //                           child: const Text('Chỉnh sửa'),
-  //                         ),
-  //                       ),
-  //                       const SizedBox(width: 12),
-  //                       Expanded(
-  //                         child: ElevatedButton(
-  //                           onPressed: _toggleProfileExpanded,
-  //                           style: ElevatedButton.styleFrom(
-  //                             backgroundColor: const Color(0xFFF5F1EB),
-  //                             foregroundColor: const Color(0xFF8B4513),
-  //                             side: const BorderSide(
-  //                               color: Color(0xFF8B4513),
-  //                               width: 1,
-  //                             ),
-  //                             padding: const EdgeInsets.symmetric(vertical: 12),
-  //                             shape: RoundedRectangleBorder(
-  //                               borderRadius: BorderRadius.circular(8),
-  //                             ),
-  //                           ),
-  //                           child: const Text('Đóng'),
-  //                         ),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   // Helper method để build info row
   Widget _buildInfoRow(String label, String value) {

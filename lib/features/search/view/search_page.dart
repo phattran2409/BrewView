@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/app/theme/app_color.dart';
+import 'package:briewview/core/widgets/navigation_bar.dart';
 import 'package:briewview/features/search/view/widgets/search_cafe_card.dart';
 import 'package:briewview/features/search/view/widgets/search_filter_bottom_sheet.dart';
 import 'package:briewview/features/search/view/widgets/search_header_widget.dart';
@@ -127,6 +128,7 @@ class _SearchPageState extends State<SearchPage> {
                   searchBloc: _searchBloc,
                   scrollController: _scrollController,
                 ),
+                CustomNavigationBar()
               ],
             ),
           ),

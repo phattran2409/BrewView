@@ -20,6 +20,7 @@ class UserStorageServices {
       'role' : user.role,
       'identityId' : user.identityId,
       'isSurvey' : user.isSurvey,
+      'isPremium' : user.isPremium, 
     }; 
     
     await _storage.write(key: _userKey, value: jsonEncode(userJson));
@@ -40,6 +41,7 @@ class UserStorageServices {
         role: userMap['role'] as String?,
         identityId: userMap['identityId'] as String?,
         isSurvey: userMap['isSurvey'] as bool?,
+        isPremium: userMap['isPremium'] as bool?,
       );
     }catch(e) {
       return null;

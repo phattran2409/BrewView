@@ -13,7 +13,8 @@ import 'package:briewview/app/router/app_router.dart' as _i664;
 import 'package:briewview/core/network/network_module.dart' as _i757;
 import 'package:briewview/core/network/token_storage.dart' as _i439;
 import 'package:briewview/core/network/user_storage_services.dart' as _i369;
-import 'package:briewview/core/services/deep_link_services.dart' as _i756;
+import 'package:briewview/core/services/deep_link_handler.dart' as _i42;
+import 'package:briewview/core/services/deep_link_service.dart' as _i145;
 import 'package:briewview/features/auth/repository/auth_repository.dart'
     as _i564;
 import 'package:briewview/features/auth/repository/auth_repository_impl.dart'
@@ -37,6 +38,14 @@ import 'package:briewview/features/cafe/services/cafe_service.dart' as _i762;
 import 'package:briewview/features/cafe/services/review_service.dart' as _i458;
 import 'package:briewview/features/cafe/viewmodel/cafe_bloc.dart' as _i237;
 import 'package:briewview/features/cafe/viewmodel/review_bloc.dart' as _i661;
+import 'package:briewview/features/payment/services/payment_service.dart'
+    as _i714;
+import 'package:briewview/features/premium/services/popUpPreferncesServices.dart'
+    as _i357;
+import 'package:briewview/features/premium/services/premium_service.dart'
+    as _i427;
+import 'package:briewview/features/premium/viewmodel/premium_bloc.dart'
+    as _i484;
 import 'package:briewview/features/profile/repository/profile_repository.dart'
     as _i631;
 import 'package:briewview/features/profile/repository/profile_repository_impl.dart'
@@ -73,8 +82,11 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final networkModule = _$NetworkModule();
+    gh.factory<_i357.PopupPreferencesServices>(
+      () => _i357.PopupPreferencesServices(),
+    );
     gh.singleton<_i664.AppRouter>(() => _i664.AppRouter());
-    gh.singleton<_i756.DeepLinkService>(() => _i756.DeepLinkService());
+    gh.singleton<_i145.DeepLinkService>(() => _i145.DeepLinkService());
     gh.lazySingleton<_i439.TokenStorage>(() => _i439.TokenStorage());
     gh.lazySingleton<_i369.UserStorageServices>(
       () => _i369.UserStorageServices(),
@@ -94,6 +106,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i434.SurveyService>(
       () => _i434.SurveyService(gh<_i361.Dio>()),
     );
+    gh.singleton<_i714.PaymentService>(
+      () => _i714.PaymentService(gh<_i361.Dio>()),
+    );
+    gh.singleton<_i427.PremiumService>(
+      () => _i427.PremiumService(gh<_i361.Dio>()),
+    );
     gh.lazySingleton<_i480.UserService>(
       () => _i480.UserService(gh<_i361.Dio>()),
     );
@@ -104,6 +122,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i476.GoogleSignInService>(),
         gh<_i785.FacebookAuthService>(),
         gh<_i369.UserStorageServices>(),
+      ),
+    );
+    gh.factory<_i484.PremiumBloc>(
+      () => _i484.PremiumBloc(
+        gh<_i427.PremiumService>(),
+        gh<_i357.PopupPreferencesServices>(),
       ),
     );
     gh.singleton<_i46.AuthBloc>(
@@ -128,6 +152,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i689.UserRepository>(
       () => _i595.UserRepositoryImpl(gh<_i480.UserService>()),
+    );
+    gh.factory<_i42.DeepLinkHandler>(
+      () => _i42.DeepLinkHandler(gh<_i145.DeepLinkService>()),
     );
     gh.lazySingleton<_i207.ReviewRepository>(
       () => _i808.ReviewRepositoryImpl(gh<_i458.ReviewService>()),

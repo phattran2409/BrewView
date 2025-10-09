@@ -22,10 +22,8 @@ class AppConstants {
   // Survey
   static const String categoriesEndpoint = '/api/categories';
   static const String featureTagsEndpoint = '/api/feature-tags';
-  static const String userPreferencesEndpoint = '/api/user-preferences/{userId}';
-
-
-
+  static const String userPreferencesEndpoint =
+      '/api/user-preferences/{userId}';
 
   static String updateProfilePicture(String userId) {
     return updatePictureProfileEndpoint.replaceAll('{id}', userId);
@@ -41,13 +39,14 @@ class AppConstants {
 
   // Cafe
   static const String cafeListEndpoint = '/api/cafes';
-  static const String cafePreferenceEndpoint = '/api/cafes/by-user-preferences/{userId}';
+  static const String cafePreferenceEndpoint =
+      '/api/cafes/by-user-preferences/{userId}';
   static String getCafeList({
     int pageSize = 1,
     int pageNumber = 10,
     String sortBy = '',
     String sortDirection = '',
-    String searchTerm = '', 
+    String searchTerm = '',
   }) {
     final uri = Uri.parse(cafeListEndpoint).replace(
       queryParameters: {
@@ -60,12 +59,15 @@ class AppConstants {
     );
     return uri.toString();
   }
+
   static String getCafeByUserPreferences({
-    String userId = '', 
-    int pageSize = 1, 
-    int pageNumber = 10,  
+    String userId = '',
+    int pageSize = 1,
+    int pageNumber = 10,
   }) {
-    final uri = Uri.parse(cafePreferenceEndpoint.replaceAll('{userId}', userId)).replace(
+    final uri = Uri.parse(
+      cafePreferenceEndpoint.replaceAll('{userId}', userId),
+    ).replace(
       queryParameters: {
         'pageSize': pageSize.toString(),
         'pageNumber': pageNumber.toString(),
@@ -75,14 +77,16 @@ class AppConstants {
   }
 
   // Review
-  static const String reviewEndpoint = '/api/reviews/{cafeId}'; 
+  static const String reviewEndpoint = '/api/reviews/{cafeId}';
   static const String reviewCreateEndpoint = '/api/reviews/{cafeId}';
   static String getReviewEndpoint({
-    String cafeId = '', 
-    int pageNumber = 1, 
-    int pageSize = 10,  
+    String cafeId = '',
+    int pageNumber = 1,
+    int pageSize = 10,
   }) {
-    final uri = Uri.parse(reviewEndpoint.replaceAll('{cafeId}', cafeId)).replace(
+    final uri = Uri.parse(
+      reviewEndpoint.replaceAll('{cafeId}', cafeId),
+    ).replace(
       queryParameters: {
         'pageNumber': pageNumber.toString(),
         'pageSize': pageSize.toString(),
@@ -91,8 +95,28 @@ class AppConstants {
     return uri.toString();
   }
 
-
   static String getUserPreferencesEndpoint(String userId) {
     return userPreferencesEndpoint.replaceAll('{userId}', userId);
   }
+
+  // Premium endpoints
+  static const String premiumPlansEndpoint = '/api/premium/plans';
+  static const String currentSubscriptionEndpoint =
+      '/api/premium/subscription/current';
+  static const String createSubscriptionEndpoint =
+      '/api/premium/subscription/create';
+  static const String cancelSubscriptionEndpoint =
+      '/api/premium/subscription/cancel';
+  static const String subscriptionHistoryEndpoint =
+      '/api/premium/subscription/history';
+
+  // Payment endpoints
+  static const String paymentMethodsEndpoint = '/api/payment/methods';
+  static const String addPaymentMethodEndpoint = '/api/payment/methods/add';
+  static const String removePaymentMethodEndpoint =
+      '/api/payment/methods/remove';
+  static const String setDefaultPaymentMethodEndpoint =
+      '/api/payment/methods/set-default';
+  static const String processPaymentEndpoint = '/api/payment/process';
+  static const String paymentHistoryEndpoint = '/api/payment/history';
 }

@@ -27,4 +27,12 @@ class RoutePaths {
   static const String postList = '/posts';
   static const String postDetail = '/posts/:id';
   static String postDetailPath(String id) => '/posts/$id';
+
+  // Premium and Payment routes
+  static const String premiumPlans = '/premium-plans';
+  static const String premiumDemo = '/premium-demo';
+  static const String paymentSuccess = '/payment/success'; 
+  static const String paymentFailure = '/payment/failure';  
+  static const String payment = '/payment';
+  static String paymentWithPlan(String planId) => '/payment/$planId';
 }

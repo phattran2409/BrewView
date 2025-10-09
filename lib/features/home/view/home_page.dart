@@ -2,6 +2,7 @@ import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/app/theme/app_color.dart';
 import 'package:briewview/core/network/user_storage_services.dart';
 import 'package:briewview/core/utils/ShowImage.dart';
+import 'package:briewview/core/utils/premium_helper.dart';
 import 'package:briewview/core/widgets/navigation_bar.dart';
 import 'package:briewview/features/cafe/model/cafeMode.dart';
 import 'package:briewview/features/cafe/viewmodel/cafe_bloc.dart';
@@ -10,9 +11,14 @@ import 'package:briewview/features/cafe/viewmodel/cafe_sate.dart';
 import 'package:briewview/features/home/view/widgets/NearbyCoffeShop_widget.dart';
 import 'package:briewview/features/home/view/widgets/Recomendation_widget.dart';
 import 'package:briewview/features/home/view/widgets/rating_cafe_widget.dart';
+import 'package:briewview/features/premium/view/widgets/premium_popup_widget.dart';
+import 'package:briewview/features/premium/viewmodel/premium_bloc.dart';
+import 'package:briewview/features/premium/viewmodel/premium_event.dart';
+import 'package:briewview/features/premium/viewmodel/premium_state.dart';
 import 'package:briewview/features/user_management/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,31 +27,62 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   late CafeBloc _cafeBloc;
   // late ProfileBloc _profileBloc;
   UserModel? _currentUser;
-
-  List<CafeModel> _recommendations = [];
-  List<CafeModel> _nearbyCoffeeShop = [];
-  List<CafeModel> _cafesRating = [];
+  late PremiumBloc _premiumBloc;
 
   @override
   void initState() {
     super.initState();
     _cafeBloc = getIt<CafeBloc>();
+    _premiumBloc = GetIt.instance<PremiumBloc>();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndShowPopup();
+    });
+
     _loadCurrentUserAndCafes();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    // Khi app resume, check popup
+    if (state == AppLifecycleState.resumed) {
+      Future.delayed(const Duration(seconds: 2), () {
+        _checkAndShowPopup();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  void _checkAndShowPopup() {
+    _premiumBloc.showHomePopupIfAllowed(
+      message: 'Lets explore premium features!  ',
+    );
+  }
+
   Future<void> _loadCurrentUserAndCafes() async {
-    try{
+    try {
       _currentUser = await getIt<UserStorageServices>().getCurrentUser();
-    
-       if  (mounted){
+
+      if (mounted) {
         setState(() {});
         final userId = _currentUser?.id ?? '';
-        _cafeBloc.add(LoadRecommendedCafes(pageNumber: 1, pageSize: 5 ,userId: userId)); // Recommendations
-        _cafeBloc.add(LoadCafesByDistance(pageNumber: 1, pageSize: 5)); // Nearby
+        _cafeBloc.add(
+          LoadRecommendedCafes(pageNumber: 1, pageSize: 5, userId: userId),
+        ); // Recommendations
+        _cafeBloc.add(
+          LoadCafesByDistance(pageNumber: 1, pageSize: 5),
+        ); // Nearby
         _cafeBloc.add(
           LoadCafesRating(
             pageNumber: 1,
@@ -55,23 +92,106 @@ class _HomePageState extends State<HomePage> {
           ),
         ); // Top Rated
       }
-    }catch (e){
+    } catch (e) {
       // Handle error if needed
       print('Error loading user: $e');
-       _cafeBloc.add(LoadCafes(pageNumber: 1, pageSize: 5)); // Load cafes without user context 
+      _cafeBloc.add(
+        LoadCafes(pageNumber: 1, pageSize: 5),
+      ); // Load cafes without user context
       _cafeBloc.add(LoadCafesByDistance(pageNumber: 1, pageSize: 5)); // Nearby
-      _cafeBloc.add(LoadCafesRating(
-            pageNumber: 1,
-            pageSize: 5,
-            sortBy: 'rating',
-            sortDirection: 'Descending',
-          ),
-        ); // Top Rated 
+      _cafeBloc.add(
+        LoadCafesRating(
+          pageNumber: 1,
+          pageSize: 5,
+          sortBy: 'rating',
+          sortDirection: 'Descending',
+        ),
+      ); // Top Rated
     }
   }
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     body: Container(
+  //       decoration: const BoxDecoration(
+  //         gradient: LinearGradient(
+  //           colors: AppColor.primaryGradient,
+  //           begin: Alignment.topCenter,
+  //           end: Alignment.bottomCenter,
+  //         ),
+  //       ),
+  //       child: SafeArea(
+  //         child: Column(
+  //           children: [
+  //             // Header Section with User Info
+  //             _buildHeaderSection(),
+
+  //             // Search and Filters Section
+  //             _buildSearchAndFilters(),
+
+  //             // Recommendations Section
+  //             Expanded(
+  //               child: SingleChildScrollView(
+  //                 child: BlocProvider(
+  //                   create: (context) => _cafeBloc,
+  //                   child: BlocConsumer<CafeBloc, CafeState>(
+  //                     listener: (context, state) {
+  //                       if (state is CafeError) {
+  //                         ScaffoldMessenger.of(context).showSnackBar(
+  //                           SnackBar(content: Text(state.message)),
+  //                         );
+  //                       }
+  //                     },
+  //                     builder: (context, state) {
+  //                       return SingleChildScrollView(
+  //                         child: _buildContent(state),
+  //                       );
+  //                     },
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+
+  //             // Bottom Navigation
+  //             const CustomNavigationBar(),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: _premiumBloc,
+      child: Scaffold(
+        backgroundColor: const Color(0xFF0D0D0D),
+        body: Stack(
+          children: [
+            // Main home content
+            _buildHomeContent(),
+
+            // Premium popup overlay
+            BlocBuilder<PremiumBloc, PremiumState>(
+              builder: (context, state) {
+                if (state is PremiumLoaded && state.showPopup) {
+                  return PremiumPopupWidget(
+                    feature: state.popupFeature!,
+                    message: state.popupMessage!,
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHomeContent() {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -104,22 +224,6 @@ class _HomePageState extends State<HomePage> {
                         }
                       },
                       builder: (context, state) {
-                        //   mainAxisAlignment: MainAxisAlignment.center,
-                        //   children: [
-                        //     RecomendationWidget(
-                        //       recommendations:
-                        //           _recommendations
-                        //               .map((cafe) => cafe.toJson())
-                        //               .toList(),
-                        //     ),
-                        //     NearbyCoffeeShop(
-                        //       coffeeShops:
-                        //           _nearbyCoffeeShop
-                        //               .map((cafe) => cafe.toJson())
-                        //               .toList(),
-                        //     ),
-                        //   ],
-                        // ),
                         return SingleChildScrollView(
                           child: _buildContent(state),
                         );
@@ -128,7 +232,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-
               // Bottom Navigation
               const CustomNavigationBar(),
             ],
@@ -142,47 +245,24 @@ class _HomePageState extends State<HomePage> {
     if (state is CafeLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-
-    // Handle different states and update corresponding lists
-    // if (state is CafesLoaded) {
-    //   _recommendations =  state.cafes;
-    // }
-    // if (state is CafesByDistanceLoaded) {
-    //   _nearbyCoffeeShop = state.cafes;
-    // }
-    // if (state is CafesRatingLoaded) {
-    //   _cafesRating =   state.cafes;
-    // }
-
-    // Show loading indicator if any of the lists are still empty
-    // if (_recommendations.isEmpty ||
-    //     _nearbyCoffeeShop.isEmpty ||
-    //     _cafesRating.isEmpty) {
-    //   return const Center(child: CircularProgressIndicator());
-    // }
     if (state is CombinedCafesLoaded) {
       return Column(
         children: [
-          RecomendationWidget(
-            recommendations: state.recommendations,
+          RecomendationWidget(recommendations: state.recommendations),
+          NearbyCoffeeShop(
+            coffeeShops:
+                state.nearbyCafes.map((cafe) => cafe.toJson()).toList(),
           ),
-          NearbyCoffeeShop( 
-            coffeeShops: state.nearbyCafes.map((cafe) => cafe.toJson()).toList(),
-          ),  
           RatingCafeWidget(cafes: state.topRatedCafes),
         ],
       );
     }
-    return Column (
+    return Column(
       children: [
-          RecomendationWidget(
-            recommendations:  [],
-          ),
-          NearbyCoffeeShop( 
-            coffeeShops: [],
-          ),  
-          RatingCafeWidget(cafes: []),
-        ],
+        RecomendationWidget(recommendations: []),
+        NearbyCoffeeShop(coffeeShops: []),
+        RatingCafeWidget(cafes: []),
+      ],
     );
   }
 
@@ -228,6 +308,42 @@ class _HomePageState extends State<HomePage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                Container(
+                  child: BlocBuilder<PremiumBloc, PremiumState>(
+                  builder: (context, state) {
+                    final hasPremium =
+                        state is PremiumLoaded && state.hasPremiumAccess;
+                    return GestureDetector(
+                      onTap: () {
+                        _premiumBloc.add(const ShowHomePagePopup(
+                          message:
+                              'Explore premium features like unlimited searches, detailed reviews, and more!',
+                        ));
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: hasPremium ? Colors.amber : Colors.grey,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child:
+                            hasPremium
+                                ? PremiumHelper.premiumBadge(text: 'Premium')
+                                : const Text(
+                                  'Free',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                      ),
+                    );
+                  },
+                  ),
+                ),
               ],
             ),
           ),
@@ -245,6 +361,7 @@ class _HomePageState extends State<HomePage> {
                   size: 28,
                 ),
               ),
+
               Positioned(
                 right: 8,
                 top: 8,
@@ -257,6 +374,45 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
+
+              // Positioned(
+              //   right: 10,
+              //   top: 8,
+              //   child: BlocBuilder<PremiumBloc, PremiumState>(
+              //     builder: (context, state) {
+              //       final hasPremium =
+              //           state is PremiumLoaded && state.hasPremiumAccess;
+              //       return GestureDetector(
+              //         onTap: () {
+              //           _premiumBloc.add(const ShowHomePagePopup(
+              //             message:
+              //                 'Explore premium features like unlimited searches, detailed reviews, and more!',
+              //           ));
+              //         },
+              //         child: Container(
+              //           padding: const EdgeInsets.symmetric(
+              //             horizontal: 6,
+              //             vertical: 2,
+              //           ),
+              //           decoration: BoxDecoration(
+              //             color: hasPremium ? Colors.amber : Colors.grey,
+              //             borderRadius: BorderRadius.circular(12),
+              //           ),
+              //           child:
+              //               hasPremium
+              //                   ? PremiumHelper.premiumBadge(text: 'Premium')
+              //                   : const Text(
+              //                     'Free',
+              //                     style: TextStyle(
+              //                       color: Colors.white,
+              //                       fontSize: 10,
+              //                     ),
+              //                   ),
+              //         ),
+              //       );
+              //     },
+              //   ),
+              // ),
             ],
           ),
         ],
