@@ -128,28 +128,33 @@ class AppRouter {
       GoRoute(
           path: RoutePaths.myCafes,
           name: 'my-cafes',
-          builder: (context, state) => const MyCafesListPage()),
-        // GoRoute(
-        //   path: RoutePaths.myCafeDetail,
-        //   name: 'my-cafe-detail',
-        //   builder: (context, state) {
-        //     final cafeId = state.pathParameters['id']!;
-        //     return MyCafeDetailPage(cafeId: cafeId);
-        //   },
-        // ),
-        GoRoute(
-          path: RoutePaths.myCafeCreate,
-          name: 'my-cafe-create',
-          builder: (context, state) => const MyCafeFormPage(),
+          builder: (context, state) => const MyCafesListPage(),
+          routes: [
+            GoRoute(
+              path: 'create',
+              name: 'my-cafe-create',
+              builder: (context, state) => const MyCafeFormPage(),
+            ),
+            GoRoute(
+              path: ':id',
+              name: 'my-cafe-detail',
+              builder: (context, state) {
+                final cafeId = state.pathParameters['id']!;
+                return MyCafeDetailPage(cafeId: cafeId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'edit',
+                  name: 'my-cafe-edit',
+                  builder: (context, state) {
+                    final cafeId = state.pathParameters['id']!;
+                    return MyCafeFormPage(cafeId: cafeId);
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
-        // GoRoute(
-        //   path: RoutePaths.myCafeEdit,
-        //   name: 'my-cafe-edit',
-        //   builder: (context, state) {
-        //     final cafeId = state.pathParameters['id']!;
-        //     return MyCafeFormPage(cafeId: cafeId);
-        //   },
-        // ),
       ],
     );
   }

@@ -10,7 +10,7 @@ class CreateCafeRequest {
   final String openingTime;
   final String closingTime;
   final String? linkPage;
-  final String? hotLine;
+  final String? hotline;
   final List<int> selectedFeatureTagIds;
 
   CreateCafeRequest({
@@ -23,7 +23,7 @@ class CreateCafeRequest {
     required this.openingTime,
     required this.closingTime,
     this.linkPage,
-    this.hotLine,
+    this.hotline,
     this.selectedFeatureTagIds = const [],
   });
 
@@ -38,7 +38,7 @@ class CreateCafeRequest {
       'openingTime': openingTime,
       'closingTime': closingTime,
       'linkPage': linkPage,
-      'hotLine': hotLine,
+      'hotline': hotline,
       'selectedFeatureTagIds': selectedFeatureTagIds,
     };
   }
@@ -54,7 +54,7 @@ class CreateCafeRequest {
       openingTime: cafe.openingTime ?? '',
       closingTime: cafe.closingTime ?? '',
       linkPage: cafe.linkPage,
-      hotLine: cafe.hotLine,
+      hotline: cafe.hotline,
       selectedFeatureTagIds:
           cafe.cafeFeatureTags?.map((tag) => tag.tagId).toList() ?? [],
     );
@@ -72,7 +72,7 @@ class UpdateCafeRequest {
   final String openingTime;
   final String closingTime;
   final String? linkPage;
-  final String? hotLine;
+  final String? hotline;
   final List<String>? mediaIdsToDelete;
   final List<int> cafeFeatureTags;
 
@@ -87,7 +87,7 @@ class UpdateCafeRequest {
     required this.openingTime,
     required this.closingTime,
     this.linkPage,
-    this.hotLine,
+    this.hotline,
     this.mediaIdsToDelete,
     this.cafeFeatureTags = const [],
   });
@@ -104,7 +104,7 @@ Map<String, dynamic> toJson() {
       'openingTime': openingTime,
       'closingTime': closingTime,
       'linkPage': linkPage,
-      'hotLine': hotLine,
+      'hotline': hotline,
       'mediaIdsToDelete': mediaIdsToDelete,
       'cafeFeatureTags': cafeFeatureTags,
     };
@@ -122,7 +122,7 @@ Map<String, dynamic> toJson() {
       openingTime: cafe.openingTime ?? '',
       closingTime: cafe.closingTime ?? '',
       linkPage: cafe.linkPage,
-      hotLine: cafe.hotLine,
+      hotline: cafe.hotline,
       cafeFeatureTags: cafe.cafeFeatureTags?.map((tag) => tag.tagId).toList() ?? [],
     );
   }

@@ -40,7 +40,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
         backgroundColor: const Color(0xFF8B4513),
         elevation: 0,
         title: const Text(
-          'Cafe của tôi',
+          'My Cafes',
           style: TextStyle(
             color: Colors.white,
             fontSize: 20,
@@ -51,18 +51,14 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add, color: Colors.white),
-            onPressed: () => context.pushNamed('my-cafe-create'),
-          ),
-        ],
+        
       ),
       body: BlocProvider(
         create: (context) => _cafeBloc,
         child: BlocListener<CafeBloc, CafeState>(
           listener: (context, state) {
             if (state is CafeOperationError) {
+              print(state.message);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
@@ -110,6 +106,8 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
                       return _buildEmptyState();
                     }
                     return _buildCafesList(state.cafes);
+                  } else if (state is MyCafesEmpty) {
+                    return _buildEmptyState();
                   } else if (state is CafeOperationError) {
                     return _buildErrorState(state.message);
                   } else {
@@ -125,14 +123,20 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.pushNamed('my-cafe-create'),
+     floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result = await context.pushNamed('my-cafe-create');
+
+          // Nếu có thay đổi, refresh data
+          if (result == true) {
+            _cafeBloc.add(LoadMyCafes());
+          }
+        },
         backgroundColor: const Color(0xFFF5F1EB),
-        child: const Icon(
-          Icons.add,
-          color: Color(0xFF8B4513),
-        ),
+        foregroundColor: const Color(0xFF8B4513),
+        child: const Icon(Icons.add),
       ),
+
       bottomNavigationBar: const CustomNavigationBar(),
     );
   }
@@ -166,7 +170,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
           ),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () => context.pushNamed('my-cafe-create'),
+            onPressed: () => context.goNamed('my-cafe-create'),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFF5F1EB),
               foregroundColor: const Color(0xFF8B4513),
@@ -231,12 +235,8 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
   Widget _buildCafesList(List<CafeModel> cafes) {
     return RefreshIndicator(
       onRefresh: () async {
-        // Temporarily simulate refresh with mock data
-        setState(() {
-          // Force rebuild with mock data
-        });
-        // Original refresh code (commented out for mock data)
-        // _myCafeBloc.add(RefreshCafes());
+        _cafeBloc.add(LoadMyCafes());
+        await Future.delayed(const Duration(milliseconds: 500));
       },
       color: const Color(0xFF8B4513),
       child: ListView.builder(
@@ -246,7 +246,17 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
           final cafe = cafes[index];
           return CafeCardWidget(
             cafe: cafe,
-            onTap: () => context.pushNamed('my-cafe-detail', pathParameters: {'id': cafe.cafeId!}),
+            onTap: () async {
+              final result = await context.pushNamed(
+                'my-cafe-detail',
+                pathParameters: {'id': cafe.cafeId!},
+              );
+              
+              // Nếu có thay đổi, refresh data
+              if (result == true) {
+                _cafeBloc.add(LoadMyCafes());
+              }
+            },
           );
         },
       ),

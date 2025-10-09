@@ -37,14 +37,6 @@ import 'package:briewview/features/cafe/services/cafe_service.dart' as _i762;
 import 'package:briewview/features/cafe/services/review_service.dart' as _i458;
 import 'package:briewview/features/cafe/viewmodel/cafe_bloc.dart' as _i237;
 import 'package:briewview/features/cafe/viewmodel/review_bloc.dart' as _i661;
-import 'package:briewview/features/my_cafe/repository/my_cafe_repository.dart'
-    as _i405;
-import 'package:briewview/features/my_cafe/repository/my_cafe_repository_impl.dart'
-    as _i647;
-import 'package:briewview/features/my_cafe/services/my_cafe_service.dart'
-    as _i271;
-import 'package:briewview/features/my_cafe/viewmodel/my_cafe_bloc.dart'
-    as _i998;
 import 'package:briewview/features/profile/repository/profile_repository.dart'
     as _i631;
 import 'package:briewview/features/profile/repository/profile_repository_impl.dart'
@@ -90,11 +82,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i361.Dio>(
       () => networkModule.dio(gh<_i439.TokenStorage>()),
     );
-    gh.singleton<_i271.MyCafeService>(
-      () =>
-          _i271.MyCafeService(gh<_i361.Dio>(), gh<_i369.UserStorageServices>()),
+    gh.factory<_i762.CafeService>(
+      () => _i762.CafeService(gh<_i361.Dio>(), gh<_i369.UserStorageServices>()),
     );
-    gh.factory<_i762.CafeService>(() => _i762.CafeService(gh<_i361.Dio>()));
     gh.factory<_i458.ReviewService>(() => _i458.ReviewService(gh<_i361.Dio>()));
     gh.singleton<_i367.AuthApi>(() => _i367.AuthApi(gh<_i361.Dio>()));
     gh.singleton<_i785.FacebookAuthService>(
@@ -144,9 +134,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i207.ReviewRepository>(
       () => _i808.ReviewRepositoryImpl(gh<_i458.ReviewService>()),
     );
-    gh.lazySingleton<_i405.MyCafeRepository>(
-      () => _i647.MyCafeRepositoryImpl(gh<_i271.MyCafeService>()),
-    );
     gh.factory<_i310.UserBloc>(
       () => _i310.UserBloc(gh<_i689.UserRepository>()),
     );
@@ -155,9 +142,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i237.CafeBloc>(
       () => _i237.CafeBloc(gh<_i994.CafesRepository>()),
-    );
-    gh.factory<_i998.MyCafeBloc>(
-      () => _i998.MyCafeBloc(gh<_i405.MyCafeRepository>()),
     );
     gh.factory<_i557.SearchBloc>(
       () => _i557.SearchBloc(gh<_i994.CafesRepository>()),

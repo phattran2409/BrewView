@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'package:briewview/features/cafe/model/cafeMutation.dart';
 import 'package:briewview/features/my_cafe/view/widgets/feature_tag_widget.dart';
@@ -23,8 +24,10 @@ import 'package:briewview/features/cafe/viewmodel/cafe_sate.dart';
 
 class MyCafeFormPage extends StatefulWidget {
   final String? cafeId; // null for create, non-null for edit
+  final bool isEditing;
 
-  const MyCafeFormPage({super.key, this.cafeId});
+  const MyCafeFormPage({super.key, this.cafeId})
+      : isEditing = cafeId != null;
 
   @override
   State<MyCafeFormPage> createState() => _MyCafeFormPageState();
@@ -52,7 +55,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
   List<File> _selectedVideos = [];
   CafeModel? _editingCafe;
 
-  bool get _isEditing => widget.cafeId != null;
+  bool get _isEditing => widget.isEditing;
 
   @override
   void initState() {
@@ -64,6 +67,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
 
   void _loadData() async {
     try {
+     
       // Load categories and feature tags
       final categories = await _surveyRepository.getCategories();
       final featureTags = await _surveyRepository.getFeatureTags();
@@ -148,7 +152,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
                   backgroundColor: Colors.green,
                 ),
               );
-              context.pop();
+              context.pop(true);
             }
           },
           child: BlocBuilder<CafeBloc, CafeState>(
@@ -174,7 +178,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
         padding: const EdgeInsets.all(16),
         children: [
           FormSectionWrapper(
-            title: 'Hình ảnh Cafe',
+            title: 'Cafe Images',
             icon: Icons.photo_camera,
             child: ImageUploadWidget(
               onImagesChanged: (images) {
@@ -188,7 +192,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
           ),
 
           FormSectionWrapper(
-            title: 'Video Cafe',
+            title: 'Cafe Videos',
             icon: Icons.videocam,
             child: VideoUploadWidget(
               onVideosChanged: (videos) {
@@ -314,7 +318,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
     _openingTimeController.text = cafe.openingTime ?? '';
     _closingTimeController.text = cafe.closingTime ?? '';
     _linkPageController.text = cafe.linkPage ?? '';
-    _hotlineController.text = cafe.hotLine ?? '';
+    _hotlineController.text = cafe.hotline ?? '';
 
     // Set selected category
     if (_categories.isNotEmpty) {
@@ -350,7 +354,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
             _linkPageController.text.trim().isEmpty
                 ? null
                 : _linkPageController.text.trim(),
-        hotLine:
+        hotline:
             _hotlineController.text.trim().isEmpty
                 ? null
                 : _hotlineController.text.trim(),
@@ -377,7 +381,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
             _linkPageController.text.trim().isEmpty
                 ? null
                 : _linkPageController.text.trim(),
-        hotLine:
+        hotline:
             _hotlineController.text.trim().isEmpty
                 ? null
                 : _hotlineController.text.trim(),

@@ -178,12 +178,22 @@ class CafeService {
         throw Exception('User not authenticated');
       }
 
-      final response = await dio.get('/api/cafes');
-      
+      final response = await dio.get(AppConstants.getCafeByOwner(ownerId: user!.id));
+        print('Response data: ${response.data}');
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
-        final cafesData = data['data'] as List<dynamic>;
-        return cafesData.map((json) => CafeModel.fromJson(json)).toList();
+        if (data['isSuccess'] == true && data['data'] != null) {
+        final responseData = data['data'] as Map<String, dynamic>;
+        
+        // Based on your backend structure, data contains 'cafes' array
+        if (responseData['cafes'] != null && responseData['cafes'] is List) {
+          final cafesData = responseData['cafes'] as List<dynamic>;
+          return cafesData.map((json) => CafeModel.fromJson(json)).toList();
+        } else {
+          // If no cafes found, return empty list
+          return [];
+        }
+        }
       } else {
         throw Exception('Failed to fetch cafes');
       }
@@ -192,6 +202,7 @@ class CafeService {
     } catch (e) {
       throw Exception('Error fetching cafes: $e');
     }
+    throw Exception('Unexpected error in getMyCafes');
   }
 
   // Create new cafe
@@ -220,8 +231,8 @@ class CafeService {
       if (request.linkPage != null) {
         formData.fields.add(MapEntry('linkPage', request.linkPage!));
       }
-      if (request.hotLine != null) {
-        formData.fields.add(MapEntry('hotLine', request.hotLine!));
+      if (request.hotline != null) {
+        formData.fields.add(MapEntry('hotLine', request.hotline!));
       }
 
       // Add feature tag IDs
@@ -239,7 +250,7 @@ class CafeService {
         }
       }
 
-      final response = await dio.post('/api/cafes', data: formData);
+      final response = await dio.post(AppConstants.cafeListEndpoint, data: formData);
       
       if (response.statusCode == 201) {
         final data = response.data as Map<String, dynamic>;
@@ -277,8 +288,8 @@ class CafeService {
       if (request.linkPage != null) {
         formData.fields.add(MapEntry('linkPage', request.linkPage!));
       }
-      if (request.hotLine != null) {
-        formData.fields.add(MapEntry('hotLine', request.hotLine!));
+      if (request.hotline != null) {
+        formData.fields.add(MapEntry('hotLine', request.hotline!));
       }
 
       // Add feature tag IDs
@@ -303,7 +314,7 @@ class CafeService {
         }
       }
 
-      final response = await dio.put('/api/cafes/${request.cafeId}', data: formData);
+      final response = await dio.put(AppConstants.cafeListEndpoint, data: formData);
       
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
@@ -321,7 +332,7 @@ class CafeService {
   // Delete cafe
   Future<void> deleteCafe(String cafeId) async {
     try {
-      final response = await dio.delete('/api/cafes/$cafeId');
+      final response = await dio.delete('${AppConstants.cafeListEndpoint}/$cafeId');
       
       if (response.statusCode != 200 && response.statusCode != 204) {
         throw Exception('Failed to delete cafe');

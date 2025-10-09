@@ -6,6 +6,9 @@ import 'package:briewview/core/widgets/navigation_bar.dart';
 import 'package:briewview/features/cafe/viewmodel/cafe_bloc.dart';
 import 'package:briewview/features/cafe/viewmodel/cafe_event.dart';
 import 'package:briewview/features/cafe/viewmodel/cafe_sate.dart';
+import 'package:briewview/features/cafe/view/cafes_detail.dart';
+import 'package:briewview/features/cafe/model/cafeMode.dart';
+import 'package:briewview/core/network/user_storage_services.dart';
 
 class MyCafeDetailPage extends StatefulWidget {
   final String cafeId;
@@ -21,11 +24,15 @@ class MyCafeDetailPage extends StatefulWidget {
 
 class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
   late CafeBloc _cafeBloc;
+  late UserStorageServices _userStorageServices;
+  String? _currentUserId;
 
   @override
   void initState() {
     super.initState();
     _cafeBloc = getIt<CafeBloc>();
+    _userStorageServices = getIt<UserStorageServices>();
+    _loadCurrentUser();
     _cafeBloc.add(LoadCafeById(widget.cafeId));
   }
 
@@ -33,6 +40,17 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
   void dispose() {
     _cafeBloc.close();
     super.dispose();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    try {
+      final user = await _userStorageServices.getCurrentUser();
+      setState(() {
+        _currentUserId = user?.id;
+      });
+    } catch (e) {
+      print('Error loading current user: $e');
+    }
   }
 
   @override
@@ -53,11 +71,11 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
             } else if (state is CafeDeleted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Xóa cafe thành công!'),
+                  content: Text('Remove cafe successfully'),
                   backgroundColor: Colors.green,
                 ),
               );
-              context.pop();
+              context.pop(true);
             }
           },
           child: BlocBuilder<CafeBloc, CafeState>(
@@ -69,7 +87,7 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
                   ),
                 );
               } else if (state is CafeDetailsLoaded) {
-                return _buildCafeDetail(state.cafe);
+                return _buildCafeDetailWithActions(state.cafe);
               } else if (state is CafeOperationError) {
                 return _buildErrorState(state.message);
               } else {
@@ -87,316 +105,81 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
     );
   }
 
-  Widget _buildCafeDetail(cafe) {
-    return CustomScrollView(
-      slivers: [
-        // App bar with image
-        SliverAppBar(
-          expandedHeight: 300,
-          pinned: true,
-          backgroundColor: Colors.transparent,
-          leading: IconButton(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.arrow_back, color: Colors.white),
-            ),
-            onPressed: () => context.pop(),
-          ),
-          actions: [
-            IconButton(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.edit, color: Colors.white),
-              ),
-              onPressed: () => context.pushNamed(
-                'my-cafe-edit',
-                pathParameters: {'id': cafe.id},
-              ),
-            ),
-            IconButton(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.delete, color: Colors.red),
-              ),
-              onPressed: () => _showDeleteDialog(cafe),
-            ),
-          ],
-          flexibleSpace: FlexibleSpaceBar(
-            background: Stack(
-              fit: StackFit.expand,
-              children: [
-                // Background image
-                cafe.imageUrl != null && cafe.imageUrl!.isNotEmpty
-                    ? Image.network(
-                        cafe.imageUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey[800],
-                            child: const Icon(
-                              Icons.local_cafe,
-                              color: Colors.white,
-                              size: 100,
-                            ),
-                          );
-                        },
-                      )
-                    : Container(
-                        color: Colors.grey[800],
-                        child: const Icon(
-                          Icons.local_cafe,
-                          color: Colors.white,
-                          size: 100,
-                        ),
-                      ),
-                // Gradient overlay
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.black.withOpacity(0.3),
-                        Colors.black.withOpacity(0.6),
-                        Colors.black.withOpacity(0.9),
-                      ],
-                      stops: const [0.0, 0.6, 1.0],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        // Content
-        SliverToBoxAdapter(
-          child: Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFF8B4513),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            child: Padding(
+  Widget _buildCafeDetailWithActions(CafeModel cafe) {
+    // Check if current user is the owner
+    final isOwner = _currentUserId != null && cafe.ownerId == _currentUserId;
+    
+    return Stack(
+      children: [
+        // Reuse the existing CafeDetail widget
+        CafeDetail(cafeId: widget.cafeId),
+        
+        // Add action buttons overlay for owners
+        if (isOwner)
+          Positioned(
+            bottom: 20,
+            left: 20,
+            right: 20,
+            child: Container(
               padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              decoration: BoxDecoration(
+                color: const Color(0xFF8B4513),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Row(
                 children: [
-                  // Cafe name
-                  Text(
-                    cafe.name,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  // Address
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on, color: Colors.red, size: 20),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          cafe.address,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 16,
-                          ),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => context.pushNamed('my-cafe-edit', pathParameters: {'id': cafe.cafeId ?? ''}),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFF5F1EB),
+                        foregroundColor: const Color(0xFF8B4513),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  // Opening hours
-                  Row(
-                    children: [
-                      const Icon(Icons.access_time, color: Colors.amber, size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${cafe.openingTime} - ${cafe.closingTime}',
+                      child: const Text(
+                        'Edit',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
                           fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                  const SizedBox(height: 12),
-                  // Price range
-                  Row(
-                    children: [
-                      const Icon(Icons.attach_money, color: Colors.green, size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${cafe.priceMin.toInt()}K - ${cafe.priceMax.toInt()}K',
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => _showDeleteDialog(cafe),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Remove',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
                           fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ],
-                  ),
-                  if (cafe.hotline != null) ...[
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        const Icon(Icons.phone, color: Colors.blue, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          cafe.hotline!,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                  if (cafe.linkPage != null) ...[
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        const Icon(Icons.link, color: Colors.purple, size: 20),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            cafe.linkPage!,
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                  const SizedBox(height: 20),
-                  // Description
-                  const Text(
-                    'Mô tả',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    cafe.description,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
-                      fontSize: 16,
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  // Rating
-                  if (cafe.rating != null) ...[
-                    const Text(
-                      'Đánh giá',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        ...List.generate(5, (index) {
-                          if (index < (cafe.rating! ~/ 1)) {
-                            return const Icon(
-                              Icons.star,
-                              color: Colors.amber,
-                              size: 24,
-                            );
-                          } else {
-                            return const Icon(
-                              Icons.star_border,
-                              color: Colors.amber,
-                              size: 24,
-                            );
-                          }
-                        }),
-                        const SizedBox(width: 8),
-                        Text(
-                          '${cafe.rating!.toStringAsFixed(1)} (${cafe.reviewCount ?? 0} đánh giá)',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                  // Action buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => context.pushNamed(
-                            'my-cafe-edit',
-                            pathParameters: {'id': cafe.id},
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFF5F1EB),
-                            foregroundColor: const Color(0xFF8B4513),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text(
-                            'Chỉnh sửa',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => _showDeleteDialog(cafe),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text(
-                            'Xóa',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 100), // Space for bottom nav
                 ],
               ),
             ),
           ),
-        ),
       ],
     );
   }
@@ -413,7 +196,7 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Có lỗi xảy ra',
+            'An error occurred',
             style: TextStyle(
               color: Colors.white.withOpacity(0.8),
               fontSize: 18,
@@ -440,33 +223,33 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('Thử lại'),
+            child: const Text('Retry'),
           ),
         ],
       ),
     );
   }
 
-  void _showDeleteDialog(cafe) {
+  void _showDeleteDialog(CafeModel cafe) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xác nhận xóa'),
-        content: Text('Bạn có chắc chắn muốn xóa cafe "${cafe.name}"?'),
+        title: const Text('Confirm Deletion'),
+        content: Text('Are you sure you want to delete the cafe "${cafe.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Hủy'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              _cafeBloc.add(DeleteCafe(cafe.id));
+              _cafeBloc.add(DeleteCafe(cafe.cafeId ?? ''));
             },
             style: TextButton.styleFrom(
               foregroundColor: Colors.red,
             ),
-            child: const Text('Xóa'),
+            child: const Text('Remove'),
           ),
         ],
       ),

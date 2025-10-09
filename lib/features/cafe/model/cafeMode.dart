@@ -13,7 +13,7 @@ class CafeModel extends Equatable {
   final int? priceMax;
   final String? openingTime;
   final String? closingTime;
-  final String? hotLine;
+  final String? hotline;
   final String? linkPage;
   final double? rating;
   final String? imageUrl;
@@ -38,7 +38,7 @@ class CafeModel extends Equatable {
     this.priceMax,
     this.openingTime,
     this.closingTime,
-    this.hotLine,
+    this.hotline,
     this.linkPage,
     this.rating,
     this.imageUrl,
@@ -62,7 +62,7 @@ class CafeModel extends Equatable {
       priceMax: _parseInt(json['priceMax']),
       openingTime: json['openingTime'] as String?,
       closingTime: json['closingTime'] as String?,
-      hotLine: json['hotLine'] as String?,
+      hotline: json['hotline'] as String?,
       linkPage: json['linkPage'] as String?,
       rating: _parseDouble(json['rating']),
       imageUrl: json['imageUrl'] as String?,
@@ -102,7 +102,7 @@ class CafeModel extends Equatable {
       'priceMax': priceMax,
       'openingTime': openingTime,
       'closingTime': closingTime,
-      'hotLine': hotLine,
+      'hotline': hotline,
       'linkPage': linkPage,
       'rating': rating,
       'imageUrl': imageUrl,
@@ -146,7 +146,7 @@ class CafeModel extends Equatable {
     priceMax,
     openingTime,
     closingTime,
-    hotLine,
+    hotline,
     linkPage,
     rating,
     imageUrl,

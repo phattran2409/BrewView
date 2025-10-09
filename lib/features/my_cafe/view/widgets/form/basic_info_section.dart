@@ -17,9 +17,7 @@ class BasicInfoSection extends StatelessWidget {
     required this.categories,
     this.selectedCategory,
     required this.onCategoryChanged,
-});
-
-  
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,48 +28,88 @@ class BasicInfoSection extends StatelessWidget {
         _buildTextField(
           controller: nameController,
           label: 'Cafe Name',
-          validator: (value) => value?.isEmpty == true ? 'Please enter cafe name' : null,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Name is required';
+            }
+            if (value.length > 200) {
+              return 'Name must not exceed 200 characters';
+            }
+            return null;
+          },
         ),
         const SizedBox(height: 16),
         _buildTextField(
           controller: addressController,
           label: 'Address',
           maxLines: 2,
-          validator: (value) => value?.isEmpty == true ? 'Please enter address' : null,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Address is required';
+            }
+            if (value.length > 500) {
+              return 'Address must not exceed 500 characters';
+            }
+            return null;
+          },
         ),
         const SizedBox(height: 16),
         _buildTextField(
           controller: descriptionController,
           label: 'Description',
           maxLines: 4,
-          validator: (value) => value?.isEmpty == true ? 'Please enter description' : null,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Description is required';
+            }
+            if (value.length > 2000) {
+              return 'Description must not exceed 2000 characters';
+            }
+            return null;
+          },
         ),
       ],
     );
   }
-  
-  Widget _buildCategorySelector(){
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F1EB),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: DropdownButtonFormField<CategoryModel>(
-        value: selectedCategory,
-        decoration: const InputDecoration(
-          labelText: 'Category',
-          border: OutlineInputBorder(),
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+
+  Widget _buildCategorySelector() {
+    return DropdownButtonFormField<CategoryModel>(
+      value: selectedCategory,
+      decoration: InputDecoration(
+        labelText: 'Category',
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.grey),
         ),
-        items: categories.map((category) {
-          return DropdownMenuItem(
-            value: category,
-            child: Text(category.name),
-          );
-        }).toList(),
-        onChanged: onCategoryChanged,
-        validator: (value) => value == null ? 'Please select a category' : null,
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF8B4513), width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+        fillColor: const Color(0xFFF5F1EB),
+        filled: true,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
       ),
+      items:
+          categories.map((category) {
+            return DropdownMenuItem(
+              value: category,
+              child: Text(category.name),
+            );
+          }).toList(),
+      onChanged: onCategoryChanged,
+      validator: (value) => value == null ? 'Please select a category' : null,
     );
   }
 
@@ -81,21 +119,36 @@ class BasicInfoSection extends StatelessWidget {
     int maxLines = 1,
     String? Function(String?)? validator,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F1EB),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: TextFormField(
-        controller: controller,
-        maxLines: maxLines,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    return TextFormField(
+      controller: controller,
+      maxLines: maxLines,
+      validator: validator,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.grey),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF8B4513), width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+        fillColor: const Color(0xFFF5F1EB),
+        filled: true,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
         ),
       ),
     );
   }
 }
-

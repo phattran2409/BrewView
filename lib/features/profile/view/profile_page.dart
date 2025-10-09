@@ -299,9 +299,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _navigateToCafes() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Tính năng quán cafe sẽ được phát triển')),
-    );
+    context.pushNamed('my-cafes');
   }
   void _navigateToFavorites() {
     ScaffoldMessenger.of(context).showSnackBar(

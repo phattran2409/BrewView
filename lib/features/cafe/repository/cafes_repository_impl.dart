@@ -75,7 +75,6 @@ class CafesRepositoryImpl implements CafesRepository {
     }
   }
 
-  // New CRUD methods implementation
   @override
   Future<Either<Failure, List<CafeModel>>> getMyCafes() async {
     try {

@@ -42,6 +42,7 @@ class AppConstants {
   // Cafe
   static const String cafeListEndpoint = '/api/cafes';
   static const String cafePreferenceEndpoint = '/api/cafes/by-user-preferences/{userId}';
+  static const String cafeByOwnerEndpoint = '/api/cafes/get-cafe/{ownerId}';
   static String getCafeList({
     int pageSize = 1,
     int pageNumber = 10,
@@ -56,6 +57,20 @@ class AppConstants {
         'sortBy': sortBy,
         'sortDirection': sortDirection,
         'searchTerm': searchTerm,
+      },
+    );
+    return uri.toString();
+  }
+  static String getCafeByOwner({
+    String ownerId = '',
+    int pageSize = 20,
+    int pageNumber = 1,
+    String sortBy = '',
+  }) {
+    final uri = Uri.parse(cafeByOwnerEndpoint.replaceAll('{ownerId}', ownerId)).replace(
+      queryParameters: {
+        'pageSize': pageSize.toString(),
+        'pageNumber': pageNumber.toString(),
       },
     );
     return uri.toString();
