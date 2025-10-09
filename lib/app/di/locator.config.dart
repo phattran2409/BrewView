@@ -94,7 +94,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i361.Dio>(
       () => networkModule.dio(gh<_i439.TokenStorage>()),
     );
-    gh.factory<_i762.CafeService>(() => _i762.CafeService(gh<_i361.Dio>()));
+    gh.factory<_i762.CafeService>(
+      () => _i762.CafeService(gh<_i361.Dio>(), gh<_i369.UserStorageServices>()),
+    );
     gh.factory<_i458.ReviewService>(() => _i458.ReviewService(gh<_i361.Dio>()));
     gh.singleton<_i367.AuthApi>(() => _i367.AuthApi(gh<_i361.Dio>()));
     gh.singleton<_i785.FacebookAuthService>(

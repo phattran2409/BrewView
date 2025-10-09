@@ -165,6 +165,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     onTap: () => _navigateToVouchers(),
                   ),
                   MenuItemWidget(
+                    icon: Icons.local_cafe,
+                    title: 'Quán Cafe của tôi',
+                    onTap: () => _navigateToCafes(),
+                  ),
+                  MenuItemWidget(
                     icon: Icons.favorite_border,
                     title: 'Yêu thích',
                     onTap: () => _navigateToFavorites(),
@@ -291,6 +296,9 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  void _navigateToCafes() {
+    context.pushNamed('my-cafes');
+  }
   void _navigateToFavorites() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Tính năng yêu thích sẽ được phát triển')),

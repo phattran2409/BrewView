@@ -19,6 +19,8 @@ class ToggleFeatureTagSelection extends SurveyEvent {
   ToggleFeatureTagSelection(this.featureTag);
 }
 
+
+
 class SubmitSurvey extends SurveyEvent {
    SubmitSurvey();
 

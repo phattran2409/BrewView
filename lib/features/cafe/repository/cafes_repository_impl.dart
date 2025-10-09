@@ -1,9 +1,11 @@
 import 'package:briewview/core/errors/failures.dart';
 import 'package:briewview/features/cafe/model/cafeMode.dart';
+import 'package:briewview/features/cafe/model/cafeMutation.dart';
 import 'package:briewview/features/cafe/repository/cafes_repository.dart';
 import 'package:briewview/features/cafe/services/cafe_service.dart';
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
+import 'dart:io';
 
 @Singleton(as: CafesRepository)
 class CafesRepositoryImpl implements CafesRepository {
@@ -68,6 +70,52 @@ class CafesRepositoryImpl implements CafesRepository {
         return Future.value(Left(ServerFailure('Cafe not found')));
       } 
       return Future.value(Right(result));
+    } catch (e) {
+      return Future.value(Left(ServerFailure(e.toString())));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<CafeModel>>> getMyCafes() async {
+    try {
+      var result = await cafeService.getMyCafes();
+      return Future.value(Right(result));
+    } catch (e) {
+      return Future.value(Left(ServerFailure(e.toString())));
+    }
+  }
+
+  @override
+  Future<Either<Failure, CafeModel>> createCafe(
+    CreateCafeRequest request, 
+    List<File>? mediaFiles
+  ) async {
+    try {
+      var result = await cafeService.createCafe(request, mediaFiles: mediaFiles);
+      return Future.value(Right(result));
+    } catch (e) {
+      return Future.value(Left(ServerFailure(e.toString())));
+    }
+  }
+
+  @override
+  Future<Either<Failure, CafeModel>> updateCafe(
+    UpdateCafeRequest request, 
+    List<File>? mediaFiles
+  ) async {
+    try {
+      var result = await cafeService.updateCafe(request, mediaFiles: mediaFiles);
+      return Future.value(Right(result));
+    } catch (e) {
+      return Future.value(Left(ServerFailure(e.toString())));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteCafe(String cafeId) async {
+    try {
+      await cafeService.deleteCafe(cafeId);
+      return Future.value(Right(null));
     } catch (e) {
       return Future.value(Left(ServerFailure(e.toString())));
     }

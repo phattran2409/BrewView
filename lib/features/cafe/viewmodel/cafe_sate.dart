@@ -89,3 +89,48 @@ class CafeEmpty extends CafeState {
 
   CafeEmpty([this.message = 'No cafes found']);
 }
+
+// New CRUD States for my_cafe feature
+class MyCafesLoading extends CafeState {}
+
+class MyCafesLoaded extends CafeState {
+  final List<CafeModel> cafes;
+
+  MyCafesLoaded(this.cafes);
+}
+
+class MyCafesEmpty extends CafeState {
+  final String message;
+
+  MyCafesEmpty([this.message = 'No cafes found']);
+}
+
+class CafeCreating extends CafeState {}
+
+class CafeCreated extends CafeState {
+  final CafeModel cafe;
+
+  CafeCreated(this.cafe);
+}
+
+class CafeUpdating extends CafeState {}
+
+class CafeUpdated extends CafeState {
+  final CafeModel cafe;
+
+  CafeUpdated(this.cafe);
+}
+
+class CafeDeleting extends CafeState {}
+
+class CafeDeleted extends CafeState {
+  final String cafeId;
+
+  CafeDeleted(this.cafeId);
+}
+
+class CafeOperationError extends CafeState {
+  final String message;
+
+  CafeOperationError(this.message);
+}

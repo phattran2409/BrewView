@@ -1,3 +1,8 @@
+import 'package:briewview/features/cafe/model/cafeMode.dart';
+import 'dart:io';
+
+import 'package:briewview/features/cafe/model/cafeMutation.dart';
+
 abstract class CafeEvent {}
 
 class LoadCafes extends CafeEvent {
@@ -83,4 +88,29 @@ class LoadRecommendedCafes extends CafeEvent {
     this.pageNumber = 1,
     this.pageSize = 10,
   });
-} 
+}
+
+// New CRUD Events for my_cafe feature
+class LoadMyCafes extends CafeEvent {}
+
+class CreateCafe extends CafeEvent {
+  final CreateCafeRequest request;
+  final List<File>? mediaFiles;
+
+  CreateCafe(this.request, {this.mediaFiles});
+}
+
+class UpdateCafe extends CafeEvent {
+  final UpdateCafeRequest request;
+  final List<File>? mediaFiles;
+
+  UpdateCafe(this.request, {this.mediaFiles});
+}
+
+class DeleteCafe extends CafeEvent {
+  final String cafeId;
+
+  DeleteCafe(this.cafeId);
+}
+
+class RefreshMyCafes extends CafeEvent {} 

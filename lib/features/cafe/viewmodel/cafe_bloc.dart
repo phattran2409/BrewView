@@ -29,6 +29,13 @@ class CafeBloc extends Bloc<CafeEvent, CafeState> {
     on<SearchCafes>(_onSearchCafes);
     on<LoadCafeById>(_onLoadCafeById);
     on<RefreshCafes>(_onRefreshCafes);
+    
+    // New CRUD event handlers
+    on<LoadMyCafes>(_onLoadMyCafes);
+    on<CreateCafe>(_onCreateCafe);
+    on<UpdateCafe>(_onUpdateCafe);
+    on<DeleteCafe>(_onDeleteCafe);
+    on<RefreshMyCafes>(_onRefreshMyCafes);
   }
 
   void _emitCombinedState(Emitter<CafeState> emit) {
@@ -199,5 +206,82 @@ class CafeBloc extends Bloc<CafeEvent, CafeState> {
     _hasNextPage = true;
 
     add(LoadCafes(pageNumber: 1, pageSize: 10));
+  }
+
+  // New CRUD event handlers
+  
+  Future<void> _onLoadMyCafes(
+    LoadMyCafes event,
+    Emitter<CafeState> emit,
+  ) async {
+    emit(MyCafesLoading());
+
+    final result = await _cafeRepository.getMyCafes();
+
+    result.fold(
+      (failure) => emit(CafeOperationError(failure.message)),
+      (cafes) {
+        if (cafes.isEmpty) {
+          emit(MyCafesEmpty());
+        } else {
+          emit(MyCafesLoaded(cafes));
+        }
+      },
+    );
+  }
+
+  Future<void> _onCreateCafe(
+    CreateCafe event,
+    Emitter<CafeState> emit,
+  ) async {
+    emit(CafeCreating());
+
+    final result = await _cafeRepository.createCafe(
+      event.request,
+      event.mediaFiles,
+    );
+
+    result.fold(
+      (failure) => emit(CafeOperationError(failure.message)),
+      (cafe) => emit(CafeCreated(cafe)),
+    );
+  }
+
+  Future<void> _onUpdateCafe(
+    UpdateCafe event,
+    Emitter<CafeState> emit,
+  ) async {
+    emit(CafeUpdating());
+
+    final result = await _cafeRepository.updateCafe(
+      event.request,
+      event.mediaFiles,
+    );
+
+    result.fold(
+      (failure) => emit(CafeOperationError(failure.message)),
+      (cafe) => emit(CafeUpdated(cafe)),
+    );
+  }
+
+  Future<void> _onDeleteCafe(
+    DeleteCafe event,
+    Emitter<CafeState> emit,
+  ) async {
+    emit(CafeDeleting());
+
+    final result = await _cafeRepository.deleteCafe(event.cafeId);
+
+    result.fold(
+      (failure) => emit(CafeOperationError(failure.message)),
+      (_) => emit(CafeDeleted(event.cafeId)),
+    );
+  }
+
+  Future<void> _onRefreshMyCafes(
+    RefreshMyCafes event,
+    Emitter<CafeState> emit,
+  ) async {
+    add(LoadMyCafes());
   }
 }

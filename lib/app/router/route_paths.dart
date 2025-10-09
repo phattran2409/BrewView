@@ -35,4 +35,12 @@ class RoutePaths {
   static const String paymentFailure = '/payment/failure';  
   static const String payment = '/payment';
   static String paymentWithPlan(String planId) => '/payment/$planId';
+
+  // My Cafe
+  static const String myCafes = '/my-cafes';
+  static const String myCafeDetail = '/my-cafes/:id';
+  static const String myCafeCreate = '/my-cafes/create';
+  static const String myCafeEdit = '/my-cafes/:id/edit';
+  static String myCafeDetailPath(String id) => '/my-cafes/$id';
+  static String myCafeEditPath(String id) => '/my-cafes/$id/edit';
 }

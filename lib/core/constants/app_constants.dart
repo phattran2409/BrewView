@@ -41,6 +41,7 @@ class AppConstants {
   static const String cafeListEndpoint = '/api/cafes';
   static const String cafePreferenceEndpoint =
       '/api/cafes/by-user-preferences/{userId}';
+  static const String cafeByOwnerEndpoint = '/api/cafes/get-cafe/{ownerId}';
   static String getCafeList({
     int pageSize = 1,
     int pageNumber = 10,
@@ -59,7 +60,6 @@ class AppConstants {
     );
     return uri.toString();
   }
-
   static String getCafeByUserPreferences({
     String userId = '',
     int pageSize = 1,

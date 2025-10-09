@@ -6,11 +6,13 @@ import 'package:permission_handler/permission_handler.dart';
 class ImageUploadWidget extends StatefulWidget {
   final Function(List<File>) onImagesChanged;
   final int maxImages;
+  final bool isPremium;
   // final String contentButton;
   const ImageUploadWidget({
     super.key,
     required this.onImagesChanged,
-    this.maxImages = 5,
+    this.maxImages = 3,
+    this.isPremium = false,
   });
 
   @override
@@ -20,6 +22,10 @@ class ImageUploadWidget extends StatefulWidget {
 class _ImageUploadWidgetState extends State<ImageUploadWidget> {
   final List<File> _selectedImages = [];
   final ImagePicker _picker = ImagePicker();
+
+  int get maxImages {
+    return widget.isPremium ? 10 : 3; // Premium: 10 images, Regular: 3 images
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,21 +59,15 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
               ),
               const Spacer(),
               Text(
-                '${_selectedImages.length}/${widget.maxImages}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
+                '${_selectedImages.length}/${maxImages}',
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],
           ),
           const SizedBox(height: 4),
           Text(
             'Hình ảnh sẽ giúp đánh giá của bạn hữu ích hơn',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
           ),
           const SizedBox(height: 16),
 
@@ -115,7 +115,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
                     ),
                   ),
                 ),
-                
+
                 // Delete button
                 Positioned(
                   top: 4,
@@ -136,13 +136,16 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
                     ),
                   ),
                 ),
-                
+
                 // Image index
                 Positioned(
                   bottom: 4,
                   left: 4,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.7),
                       borderRadius: BorderRadius.circular(8),
@@ -235,7 +238,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
 
   // ✅ Pick image function
   Future<void> _pickImage(ImageSource source) async {
-    if (_selectedImages.length >= widget.maxImages) {
+    if (_selectedImages.length >= maxImages) {
       _showMaxImagesDialog();
       return;
     }
@@ -252,7 +255,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
           maxHeight: 1080,
           imageQuality: 85,
         );
-        
+
         if (images.isNotEmpty) {
           _addImages(images);
         }
@@ -264,7 +267,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
           maxHeight: 1080,
           imageQuality: 85,
         );
-        
+
         if (image != null) {
           _addImages([image]);
         }
@@ -278,7 +281,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
   void _addImages(List<XFile> images) {
     setState(() {
       for (final image in images) {
-        if (_selectedImages.length < widget.maxImages) {
+        if (_selectedImages.length < maxImages) {
           _selectedImages.add(File(image.path));
         }
       }
@@ -309,32 +312,34 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
   void _showMaxImagesDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Giới hạn ảnh'),
-        content: Text('Bạn chỉ có thể chọn tối đa ${widget.maxImages} ảnh.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Giới hạn ảnh'),
+            content: Text('Bạn chỉ có thể chọn tối đa ${maxImages} ảnh.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Lỗi'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Lỗi'),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }

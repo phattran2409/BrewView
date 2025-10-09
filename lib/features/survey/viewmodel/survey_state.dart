@@ -46,6 +46,26 @@ class SurveyLoaded extends SurveyState {
   bool get canSubmitSurvey => selectedFeatureTags.isNotEmpty;
 }
 
+class CategoryLoaded extends SurveyState {
+  final List<CategoryModel> categories;
+  // final List<CategoryModel> selectedCategories;
+
+  CategoryLoaded({
+    required this.categories,
+    // required this.selectedCategories,
+  });
+}
+
+class FeatureTagLoaded extends SurveyState {
+  final List<FeatureTagModel> featureTags;
+  // final List<FeatureTagModel> selectedFeatureTags;
+
+  FeatureTagLoaded({
+    required this.featureTags,
+    // required this.selectedFeatureTags,
+  });
+}
+
 class SurveySubmitting extends SurveyState {
   final List<CategoryModel> categories;
   final List<FeatureTagModel> featureTags;
