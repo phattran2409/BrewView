@@ -27,13 +27,13 @@ class BasicInfoSection extends StatelessWidget {
         const SizedBox(height: 20),
         _buildTextField(
           controller: nameController,
-          label: 'Cafe Name',
+          label: 'Tên quán cà phê',
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Name is required';
+              return 'Tên là bắt buộc';
             }
             if (value.length > 200) {
-              return 'Name must not exceed 200 characters';
+              return 'Tên không được vượt quá 200 ký tự';
             }
             return null;
           },
@@ -41,14 +41,14 @@ class BasicInfoSection extends StatelessWidget {
         const SizedBox(height: 16),
         _buildTextField(
           controller: addressController,
-          label: 'Address',
+          label: 'Địa chỉ',
           maxLines: 2,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Address is required';
+              return 'Địa chỉ là bắt buộc';
             }
             if (value.length > 500) {
-              return 'Address must not exceed 500 characters';
+              return 'Địa chỉ không được vượt quá 500 ký tự';
             }
             return null;
           },
@@ -56,14 +56,14 @@ class BasicInfoSection extends StatelessWidget {
         const SizedBox(height: 16),
         _buildTextField(
           controller: descriptionController,
-          label: 'Description',
+          label: 'Mô tả',
           maxLines: 4,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Description is required';
+              return 'Mô tả là bắt buộc';
             }
             if (value.length > 2000) {
-              return 'Description must not exceed 2000 characters';
+              return 'Mô tả không được vượt quá 2000 ký tự';
             }
             return null;
           },
@@ -76,7 +76,7 @@ class BasicInfoSection extends StatelessWidget {
     return DropdownButtonFormField<CategoryModel>(
       value: selectedCategory,
       decoration: InputDecoration(
-        labelText: 'Category',
+        labelText: 'Danh mục',
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -109,7 +109,7 @@ class BasicInfoSection extends StatelessWidget {
             );
           }).toList(),
       onChanged: onCategoryChanged,
-      validator: (value) => value == null ? 'Please select a category' : null,
+      validator: (value) => value == null ? 'Vui lòng chọn danh mục' : null,
     );
   }
 

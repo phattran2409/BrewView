@@ -31,7 +31,7 @@ class _NearbyCoffeeShopState extends State<NearbyCoffeeShop> {
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.only(left: 20 , bottom: 10),
               child: Text(
-                'Nearby Coffee Shops',
+                'Quán cà phê gần bạn',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -252,7 +252,7 @@ class _NearbyCoffeeShopState extends State<NearbyCoffeeShop> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        coffeeShop['name'] ?? 'Coffee Shop',
+                        coffeeShop['name'] ?? 'Quán cà phê',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
@@ -268,7 +268,7 @@ class _NearbyCoffeeShopState extends State<NearbyCoffeeShop> {
                           // Type or Address
                           Expanded(
                             child: Text(
-                              coffeeShop['type'] ?? 'Coffee',
+                              coffeeShop['type'] ?? 'Cà phê',
                               style: TextStyle(
                                 color: Colors.grey[300],
                                 fontSize: 10,

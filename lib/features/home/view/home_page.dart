@@ -66,7 +66,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void _checkAndShowPopup() {
     _premiumBloc.showHomePopupIfAllowed(
-      message: 'Lets explore premium features!  ',
+      message: 'Hãy khám phá các tính năng cao cấp!  ',
     );
   }
 
@@ -296,7 +296,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Welcome back',
+                  'Chào mừng trở lại,',
                   style: TextStyle(color: Colors.grey[400], fontSize: 14),
                 ),
                 const SizedBox(height: 2),
@@ -317,7 +317,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       onTap: () {
                         _premiumBloc.add(const ShowHomePagePopup(
                           message:
-                              'Explore premium features like unlimited searches, detailed reviews, and more!',
+                              'Khám phá các tính năng cao cấp như không quảng cáo, đánh giá chi tiết và nhiều hơn nữa!',
                         ));
                       },
                       child: Container(
@@ -442,7 +442,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   child: TextField(
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      hintText: 'What did you eat today?',
+                      hintText: 'Bạn muốn tìm quán nào?',
                       hintStyle: TextStyle(color: Colors.grey[400]),
                       border: InputBorder.none,
                     ),

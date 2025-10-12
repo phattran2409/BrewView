@@ -24,7 +24,7 @@ class CategorySelectionWidget extends StatelessWidget {
             children: [
               // Header
               Text(
-                'Choose your Coffee Style',
+                'Chọn phong cách cà phê của bạn',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
@@ -32,7 +32,7 @@ class CategorySelectionWidget extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Get better recommendations',
+                'Nhận gợi ý tốt hơn',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Colors.grey[600],
                 ),
@@ -152,7 +152,7 @@ class CategorySelectionWidget extends StatelessWidget {
                     shadowColor: Colors.black.withOpacity(0.2),
                   ),
                   child: const Text(
-                    'Next',
+                    'Tiếp theo',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

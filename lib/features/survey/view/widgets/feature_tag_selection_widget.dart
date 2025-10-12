@@ -23,7 +23,7 @@ class FeatureTagSelectionWidget extends StatelessWidget {
 
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Survey submitted successfully! Please wait...'),
+              content: Text('Khảo sát đã được gửi thành công! Vui lòng chờ...'),
               backgroundColor: Colors.green,
             ),
           );
@@ -52,7 +52,7 @@ class FeatureTagSelectionWidget extends StatelessWidget {
               children: [
                 // Header
                 Text(
-                  'Choose your interests',
+                  'Chọn sở thích của bạn',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -60,7 +60,7 @@ class FeatureTagSelectionWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Get better recommendations',
+                  'Nhận gợi ý tốt hơn',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Colors.grey[600],
                   ),
@@ -189,7 +189,7 @@ class FeatureTagSelectionWidget extends StatelessWidget {
                             ),
                           )
                         : const Text(
-                            'Submit Survey',
+                            'Gửi khảo sát',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,

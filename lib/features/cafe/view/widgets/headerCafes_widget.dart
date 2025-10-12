@@ -41,7 +41,7 @@ class _CafeHeaderWidgetState extends State<CafeHeaderWidget> {
               Icon(Icons.access_time, color: Colors.white, size: 24),
               SizedBox(width: 8),
               Text(
-                cafeData?.openingTime ?? 'All day',
+                cafeData?.openingTime ?? 'Cả ngày',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 12,
@@ -50,7 +50,7 @@ class _CafeHeaderWidgetState extends State<CafeHeaderWidget> {
               ),
               Text(' - '),
               Text(
-                cafeData?.closingTime ?? 'All day',
+                cafeData?.closingTime ?? 'Cả ngày',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 12,

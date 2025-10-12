@@ -48,7 +48,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'Registration successful! ${state.requiresEmailVerification ? 'Please verify your email.' : 'Welcome!'}',
+                  'Đăng ký thành công! ${state.requiresEmailVerification ? 'Vui lòng xác nhận email của bạn.' : 'Chào mừng bạn!' }',
                 ),
                 backgroundColor: Colors.green,
               ),
@@ -69,7 +69,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
             // Email verification sent, navigate to OTP
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Verification email sent to ${state.email}'),
+                content: Text('Email xác nhận đã được gửi đến ${state.email}'),
                 backgroundColor: Colors.blue,
               ),
             );
@@ -87,7 +87,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
             // User is already authenticated (social login registration)
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Welcome ${state.user.userJson?.name ?? ''}!'),
+                content: Text('Chào mừng ${state.user.userJson?.name ?? ''}!'),
                 backgroundColor: Colors.green,
               ),
             );
@@ -117,16 +117,16 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
             // Customize error message based on error code
             if (state.errorCode == 'EMAIL_ALREADY_EXISTS') {
               errorMessage =
-                  'This email is already registered. Please sign in instead.';
+                  'Email này đã được đăng ký. Vui lòng đăng nhập.';
               errorColor = Colors.orange;
             } else if (state.errorCode == 'WEAK_PASSWORD') {
               errorMessage =
-                  'Password is too weak. Please use a stronger password.';
+                  'Mật khẩu quá yếu. Vui lòng sử dụng mật khẩu mạnh hơn.';
             } else if (state.errorCode == 'INVALID_EMAIL') {
-              errorMessage = 'Please enter a valid email address.';
+              errorMessage = 'Vui lòng nhập địa chỉ email hợp lệ.';
             } else if (state.errorCode == 'NETWORK_ERROR') {
               errorMessage =
-                  'Network error. Please check your connection and try again.';
+                  'Lỗi mạng. Vui lòng kiểm tra kết nối của bạn và thử lại.';
             }
 
             ScaffoldMessenger.of(context).showSnackBar(
@@ -188,7 +188,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                             _buildHeader(),
                             const SizedBox(height: 16),
                             Text(
-                              'Create your account to get started',
+                              'Tạo tài khoản để bắt đầu',
                               style: Theme.of(context).textTheme.bodyLarge
                                   ?.copyWith(color: Colors.white70),
                               textAlign: TextAlign.center,
@@ -209,7 +209,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                                 keyboardType: TextInputType.name,
                                 style: const TextStyle(color: Colors.white),
                                 decoration: InputDecoration(
-                                  labelText: 'Full Name',
+                                  labelText: 'Họ và tên',
                                   labelStyle: TextStyle(color: Colors.white70),
                                   prefixIcon: Icon(
                                     Icons.person_outline,
@@ -217,7 +217,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                                   ),
                                   border: InputBorder.none,
                                   contentPadding: const EdgeInsets.all(16),
-                                  hintText: 'Enter your full name',
+                                  hintText: 'Nhập họ và tên của bạn',
                                   hintStyle: TextStyle(color: Colors.white54),
                                 ),
                                 validator: Validators.validateFullName,
@@ -249,7 +249,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                                   ),
                                   border: InputBorder.none,
                                   contentPadding: const EdgeInsets.all(16),
-                                  hintText: 'Enter your email',
+                                  hintText: 'Nhập email của bạn',
                                   hintStyle: TextStyle(color: Colors.white54),
                                 ),
                                 validator: Validators.validateEmail,
@@ -273,7 +273,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                                 obscureText: _obscurePassword,
                                 style: const TextStyle(color: Colors.white),
                                 decoration: InputDecoration(
-                                  labelText: 'Password',
+                                  labelText: 'Mật khẩu',
                                   labelStyle: TextStyle(color: Colors.white70),
                                   prefixIcon: Icon(
                                     Icons.lock_outline,
@@ -294,7 +294,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                                   ),
                                   border: InputBorder.none,
                                   contentPadding: const EdgeInsets.all(16),
-                                  hintText: 'Create a strong password',
+                                  hintText: 'Tạo mật khẩu mạnh',
                                   hintStyle: TextStyle(color: Colors.white54),
                                 ),
                                 validator: Validators.validatePassword,
@@ -328,7 +328,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                                 obscureText: _obscureConfirmPassword,
                                 style: const TextStyle(color: Colors.white),
                                 decoration: InputDecoration(
-                                  labelText: 'Confirm Password',
+                                  labelText: 'Xác nhận mật khẩu',
                                   labelStyle: TextStyle(color: Colors.white70),
                                   prefixIcon: Icon(
                                     Icons.lock_outline,
@@ -350,7 +350,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                                   ),
                                   border: InputBorder.none,
                                   contentPadding: const EdgeInsets.all(16),
-                                  hintText: 'Confirm your password',
+                                  hintText: 'Xác nhận mật khẩu của bạn',
                                   hintStyle: TextStyle(color: Colors.white54),
                                 ),
                                 validator:
@@ -385,9 +385,9 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                                         fontSize: 14,
                                       ),
                                       children: [
-                                        TextSpan(text: 'I agree to the '),
+                                        TextSpan(text: 'Tôi đồng ý với '),
                                         TextSpan(
-                                          text: 'Terms of Service',
+                                          text: 'Điều khoản dịch vụ',
                                           style: TextStyle(
                                             color: Colors.white,
                                             decoration:
@@ -395,9 +395,9 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        TextSpan(text: ' and '),
+                                        TextSpan(text: ' và '),
                                         TextSpan(
-                                          text: 'Privacy Policy',
+                                          text: 'Chính sách bảo mật',
                                           style: TextStyle(
                                             color: Colors.white,
                                             decoration:
@@ -448,7 +448,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                                         ),
                                       )
                                       : const Text(
-                                        'Create Account',
+                                        'Tạo tài khoản',
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
@@ -463,7 +463,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Already have an account? ",
+                                  "Đã có tài khoản? ",
                                   style: TextStyle(
                                     color: Colors.white70,
                                     fontSize: 14,
@@ -472,7 +472,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                                 TextButton(
                                   onPressed: () => _handleSignIn(),
                                   child: Text(
-                                    'Sign In',
+                                    'Đăng nhập',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 14,
@@ -501,7 +501,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
                                     horizontal: 16,
                                   ),
                                   child: Text(
-                                    'OR',
+                                    'HOẶC',
                                     style: TextStyle(
                                       color: Colors.white70,
                                       fontSize: 14,
@@ -597,7 +597,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Please agree to the Terms of Service and Privacy Policy',
+            'Bạn phải đồng ý với Điều khoản dịch vụ và Chính sách bảo mật để tiếp tục.',
           ),
           backgroundColor: Colors.orange,
         ),

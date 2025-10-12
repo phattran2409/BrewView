@@ -121,7 +121,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         if (result) {
           emit(ProfilePictureUpdatedSuccess());
         } else {
-          emit(ProfileError('Failed to update profile picture'));
+          emit(ProfileError('Cập nhật ảnh đại diện thất bại'));
         }
       } catch (e) {
         emit(ProfileError(e.toString()));

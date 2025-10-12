@@ -90,7 +90,7 @@ class _SearchHeaderWidgetState extends State<SearchHeaderWidget> {
                 controller: widget.searchController,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: 'Search for coffee shops...',
+                  hintText: 'Tìm quán cà phê, địa điểm...',
                   hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
                   border: InputBorder.none,
                 ),

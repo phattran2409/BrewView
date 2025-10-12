@@ -35,7 +35,7 @@ class _RecomendationWidgetState extends State<RecomendationWidget> {
             spacing: 10,
             children: [
               Text(
-                'Recommendation',
+                'Gợi ý cho bạn',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,

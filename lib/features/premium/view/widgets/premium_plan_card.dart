@@ -170,7 +170,7 @@ class PremiumPlanCard extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  isSelected ? 'Selected' : 'Select Plan',
+                  isSelected ? 'Đã chọn' : 'Chọn gói',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

@@ -184,7 +184,7 @@ class _CafeImageWidgetState extends State<CafeImageWidget> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Loading image...',
+                  'Đang tải hình ảnh...',
                   style: TextStyle(
                     color: Colors.grey[400],
                     fontSize: 12,

@@ -40,7 +40,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
         backgroundColor:   Color(0xFF5A2D09),
         foregroundColor: Colors.white,
         elevation: 0,
-        title: const Text('Post Detail', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text('Chi tiết bài viết', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 24),
@@ -179,7 +179,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
                   const SizedBox(height: 24),
 
-                  const Text('Comment', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  const Text('Bình luận', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                   const SizedBox(height: 12),
 
                   ...List.generate(3, (i) => _commentItem(index: i)),

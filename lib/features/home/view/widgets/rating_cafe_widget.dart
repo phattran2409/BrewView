@@ -20,7 +20,7 @@ class RatingCafeWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'Top Rated Cafes',
+                'Quán được đánh giá cao',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -32,7 +32,7 @@ class RatingCafeWidget extends StatelessWidget {
                   // Navigate to all cafes page
                 },
                 child: const Text(
-                  'See All',
+                  'Xem tất cả',
                   style: TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ),
@@ -143,7 +143,7 @@ class RatingCafeWidget extends StatelessWidget {
                     children: [
                       // Cafe name
                       Text(
-                        cafe.name ?? 'Unknown Cafe',
+                        cafe.name ?? 'N/A',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
@@ -157,7 +157,7 @@ class RatingCafeWidget extends StatelessWidget {
                       // Address
                       Expanded(
                         child: Text(
-                          cafe.address ?? 'No address',
+                          cafe.address ?? 'N/A',
                           style: TextStyle(color: Colors.grey[600], fontSize: 11),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,

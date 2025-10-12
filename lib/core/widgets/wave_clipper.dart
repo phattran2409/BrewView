@@ -5,10 +5,8 @@ class WaveClipper extends CustomClipper<Path> {
   Path getClip(Size size) {
     var path = Path();
     
-    // Bắt đầu từ góc trái trên
     path.lineTo(0, size.height * 0.7);
     
-    // Tạo đường cong wave
     var firstControlPoint = Offset(size.width * 0.25, size.height * 0.8);
     var firstEndPoint = Offset(size.width * 0.5, size.height * 0.7);
     path.quadraticBezierTo(
@@ -17,7 +15,7 @@ class WaveClipper extends CustomClipper<Path> {
       firstEndPoint.dx, 
       firstEndPoint.dy
     );
-    
+  
     var secondControlPoint = Offset(size.width * 0.75, size.height * 0.6);
     var secondEndPoint = Offset(size.width, size.height * 0.7);
     path.quadraticBezierTo(

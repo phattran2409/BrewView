@@ -102,7 +102,7 @@ class _SplashPageState extends State<SplashPage> {
             const SizedBox(height: 8),
 
             const Text(
-              'Discover Amazing Coffee',
+              'Khám phá cà phê tuyệt vời',
               style: TextStyle(fontSize: 16, color: Colors.white70),
             ),
 

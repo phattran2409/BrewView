@@ -23,7 +23,7 @@ class SurveyNavigationButton extends StatelessWidget {
         ),
       ),
       child: const Text(
-        'Take Survey',
+        'Khảo sát',
         style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,

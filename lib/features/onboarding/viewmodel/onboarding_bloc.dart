@@ -8,18 +8,18 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   
   final List<OnboardingItem> onboardingItems = [
     const OnboardingItem(
-      title: 'Welcome to BrewView',
-      description: 'Discover amazing coffee experiences and connect with coffee lovers around the world.',
+      title: 'Chào mừng đến với BrewView',
+      description: 'Khám phá những trải nghiệm cà phê tuyệt vời và kết nối với những người yêu thích cà phê trên khắp thế giới.',
       imagePath: 'assets/images/onboarding_1.png',
     ),
     const OnboardingItem(
-      title: 'Explore Coffee',
-      description: 'Find the perfect coffee shops, read reviews, and discover new flavors.',
+      title: 'Khám Phá Các Quán Cà Phê',
+      description: 'Tìm kiếm quán cà phê hoàn hảo, đọc đánh giá và khám phá hương vị mới.',
       imagePath: 'assets/images/onboarding_2.png',
     ),
     const OnboardingItem(
-      title: 'Start Your Journey',
-      description: 'Join our community and start your coffee adventure today!',
+      title: 'Bắt Đầu Hành Trình Của Bạn',
+      description: 'Tham gia cộng đồng của chúng tôi và bắt đầu cuộc phiêu lưu cà phê của bạn ngay hôm nay!',
       imagePath: 'assets/images/onboarding_3.png',
     ),
   ];

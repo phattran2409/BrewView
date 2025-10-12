@@ -47,7 +47,7 @@ class PasswordStrengthIndicator extends StatelessWidget {
         Row(
           children: [
             Text(
-              'Password Strength: ',
+              'Độ mạnh mật khẩu: ',
               style: TextStyle(color: Colors.white70, fontSize: 12),
             ),
             Text(
@@ -69,14 +69,11 @@ class PasswordStrengthIndicator extends StatelessWidget {
         const SizedBox(height: 8),
 
         // Requirements checklist
-        _buildRequirementItem('At least 8 characters', checks['length']!),
-        _buildRequirementItem('Uppercase letter (A-Z)', checks['uppercase']!),
-        _buildRequirementItem('Lowercase letter (a-z)', checks['lowercase']!),
-        _buildRequirementItem('Number (0-9)', checks['numbers']!),
-        _buildRequirementItem(
-          'Special character (!@#\$%^&*)',
-          checks['special']!,
-        ),
+        _buildRequirementItem('Ít nhất 8 ký tự', checks['length']!),
+        _buildRequirementItem('Chữ in hoa (A-Z)', checks['uppercase']!),
+        _buildRequirementItem('Chữ thường (a-z)', checks['lowercase']!),
+        _buildRequirementItem('Số (0-9)', checks['numbers']!),
+        _buildRequirementItem('Ký tự đặc biệt (!@#\$%^&*)', checks['special']!),
       ],
     );
   }
@@ -114,4 +111,3 @@ class PasswordStrengthIndicator extends StatelessWidget {
     return Colors.red.shade900;
   }
 }
-

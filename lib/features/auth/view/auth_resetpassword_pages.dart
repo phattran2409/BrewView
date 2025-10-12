@@ -40,7 +40,7 @@ class _AuthResetPasswordPageState extends State<AuthResetPasswordPage> {
         if (state is AuthPasswordResetSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Password reset successfully!'),
+              content: Text('Đặt lại mật khẩu thành công!'),
               backgroundColor: Colors.green,
             ),
           );
@@ -102,7 +102,7 @@ class _AuthResetPasswordPageState extends State<AuthResetPasswordPage> {
                           ),
 
                           Text(
-                            'Reset Password',
+                            'Đặt lại mật khẩu',
                             style: Theme.of(
                               context,
                             ).textTheme.headlineLarge?.copyWith(
@@ -116,7 +116,7 @@ class _AuthResetPasswordPageState extends State<AuthResetPasswordPage> {
                           const SizedBox(height: 8),
 
                           Text(
-                            'Enter your new password for ${widget.email}',
+                            'Nhập mật khẩu mới cho ${widget.email}',
                             style: Theme.of(context).textTheme.bodyLarge
                                 ?.copyWith(color: Colors.white70),
                             textAlign: TextAlign.center,
@@ -140,7 +140,7 @@ class _AuthResetPasswordPageState extends State<AuthResetPasswordPage> {
                               obscureText: _obscureCurrentPassword,
                               style: const TextStyle(color: Colors.white),
                               decoration: InputDecoration(
-                                labelText: 'Current Password',
+                                labelText: 'Mật khẩu hiện tại',
                                 labelStyle: TextStyle(color: Colors.white70),
                                 prefixIcon: Icon(
                                   Icons.lock_outline,
@@ -162,7 +162,7 @@ class _AuthResetPasswordPageState extends State<AuthResetPasswordPage> {
                                 ),
                                 border: InputBorder.none,
                                 contentPadding: const EdgeInsets.all(16),
-                                hintText: 'Enter your current password',
+                                hintText: 'Nhập mật khẩu hiện tại',
                                 hintStyle: TextStyle(color: Colors.white54),
                               ),
                             ),
@@ -186,7 +186,7 @@ class _AuthResetPasswordPageState extends State<AuthResetPasswordPage> {
                               obscureText: _obscurePassword,
                               style: const TextStyle(color: Colors.white),
                               decoration: InputDecoration(
-                                labelText: 'New Password',
+                                labelText: 'Mật khẩu mới',
                                 labelStyle: TextStyle(color: Colors.white70),
                                 prefixIcon: Icon(
                                   Icons.lock_outline,
@@ -207,7 +207,7 @@ class _AuthResetPasswordPageState extends State<AuthResetPasswordPage> {
                                 ),
                                 border: InputBorder.none,
                                 contentPadding: const EdgeInsets.all(16),
-                                hintText: 'Enter your new password',
+                                hintText: 'Nhập mật khẩu mới của bạn',
                                 hintStyle: TextStyle(color: Colors.white54),
                               ),
                               validator: Validators.validateSimplePassword,
@@ -232,7 +232,7 @@ class _AuthResetPasswordPageState extends State<AuthResetPasswordPage> {
                               obscureText: _obscureConfirmPassword,
                               style: const TextStyle(color: Colors.white),
                               decoration: InputDecoration(
-                                labelText: 'Confirm Password',
+                                labelText: 'Xác nhận mật khẩu',
                                 labelStyle: TextStyle(color: Colors.white70),
                                 prefixIcon: Icon(
                                   Icons.lock_outline,
@@ -254,15 +254,15 @@ class _AuthResetPasswordPageState extends State<AuthResetPasswordPage> {
                                 ),
                                 border: InputBorder.none,
                                 contentPadding: const EdgeInsets.all(16),
-                                hintText: 'Confirm your new password',
+                                hintText: 'Xác nhận mật khẩu mới của bạn',
                                 hintStyle: TextStyle(color: Colors.white54),
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please confirm your password';
+                                  return 'Vui lòng xác nhận mật khẩu của bạn';
                                 }
                                 if (value != _passwordController.text) {
-                                  return 'Passwords do not match';
+                                  return 'Mật khẩu không khớp';
                                 }
                                 return null;
                               },
@@ -302,7 +302,7 @@ class _AuthResetPasswordPageState extends State<AuthResetPasswordPage> {
                                       ),
                                     )
                                     : const Text(
-                                      'Reset Password',
+                                      'Đặt lại mật khẩu',
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
@@ -318,7 +318,7 @@ class _AuthResetPasswordPageState extends State<AuthResetPasswordPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "Remember your password? ",
+                                "Nhớ mật khẩu của bạn? ",
                                 style: TextStyle(
                                   color: Colors.white70,
                                   fontSize: 14,
@@ -327,7 +327,7 @@ class _AuthResetPasswordPageState extends State<AuthResetPasswordPage> {
                               TextButton(
                                 onPressed: () => context.go('/login'),
                                 child: Text(
-                                  'Sign In',
+                                  'Đăng nhập',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 14,

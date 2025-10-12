@@ -40,7 +40,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
         backgroundColor: const Color(0xFF8B4513),
         elevation: 0,
         title: const Text(
-          'My Cafes',
+          'Quán cà phê của tôi',
           style: TextStyle(
             color: Colors.white,
             fontSize: 20,
@@ -68,7 +68,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
             } else if (state is CafeCreated) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Create cafe success!'),
+                  content: Text('Tạo quán cà phê thành công!'),
                   backgroundColor: Colors.green,
                 ),
               );
@@ -76,7 +76,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
             } else if (state is CafeUpdated) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Update cafe success!'),
+                  content: Text('Cập nhật quán cà phê thành công!'),
                   backgroundColor: Colors.green,
                 ),
               );
@@ -84,7 +84,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
             } else if (state is CafeDeleted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Delete cafe success!'),
+                  content: Text('Xóa quán cà phê thành công!'),
                   backgroundColor: Colors.green,
                 ),
               );
@@ -153,7 +153,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            'You have no cafes yet',
+            'Bạn chưa có quán cà phê nào',
             style: TextStyle(
               color: Colors.white.withOpacity(0.8),
               fontSize: 18,
@@ -162,7 +162,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Create your first cafe',
+            'Tạo quán cà phê đầu tiên của bạn',
             style: TextStyle(
               color: Colors.white.withOpacity(0.6),
               fontSize: 14,
@@ -179,7 +179,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('Create new cafe'),
+            child: const Text('Tạo quán cà phê mới'),
           ),
         ],
       ),
@@ -198,7 +198,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            'An error occurred',
+            'Đã xảy ra lỗi',
             style: TextStyle(
               color: Colors.white.withOpacity(0.8),
               fontSize: 18,
@@ -225,7 +225,7 @@ class _MyCafesListPageState extends State<MyCafesListPage> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('Retry'),
+            child: const Text('Thử lại'),
           ),
         ],
       ),

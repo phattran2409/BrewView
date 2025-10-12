@@ -14,7 +14,7 @@ class PremiumPlansPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Premium Plans'),
+        title: const Text('Gói Premium'),
         backgroundColor: Colors.brown,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -98,7 +98,7 @@ class PremiumPlansPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'Upgrade to Premium',
+                  'Nâng cấp lên Premium',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -108,7 +108,7 @@ class PremiumPlansPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Unlock all premium features and enhance your coffee experience',
+                  'Mở khóa tất cả tính năng premium và nâng cao trải nghiệm cà phê của bạn',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white70,
@@ -134,7 +134,7 @@ class PremiumPlansPage extends StatelessWidget {
                         Icon(Icons.check_circle, color: Colors.green, size: 16),
                         SizedBox(width: 8),
                         Text(
-                          'You have Premium Access',
+                          'Bạn đã có quyền truy cập Premium',
                           style: TextStyle(
                             color: Colors.green,
                             fontWeight: FontWeight.bold,
@@ -155,7 +155,7 @@ class PremiumPlansPage extends StatelessWidget {
               const Icon(Icons.workspace_premium, color: Colors.brown),
               const SizedBox(width: 8),
               const Text(
-                'Choose Your Plan',
+                'Chọn gói của bạn',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -166,7 +166,7 @@ class PremiumPlansPage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           const Text(
-            'Select the perfect plan that suits your coffee journey',
+            'Chọn gói hoàn hảo phù hợp với hành trình cà phê của bạn',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey,
@@ -221,23 +221,23 @@ class PremiumPlansPage extends StatelessWidget {
     final features = [
       {
         'icon': Icons.block,
-        'title': 'Ad-Free Experience',
-        'description': 'Enjoy uninterrupted browsing'
+        'title': 'Trải nghiệm không quảng cáo',
+        'description': 'Tận hưởng duyệt web không bị gián đoạn'
       },
       {
         'icon': Icons.star_rate,
-        'title': 'Exclusive Reviews',
-        'description': 'Access premium cafe reviews'
+        'title': 'Đánh giá độc quyền',
+        'description': 'Truy cập đánh giá quán cà phê premium'
       },
       {
         'icon': Icons.location_on,
-        'title': 'Priority Locations',
-        'description': 'Get first access to new cafes'
+        'title': 'Vị trí ưu tiên',
+        'description': 'Nhận quyền truy cập đầu tiên vào các quán cà phê mới'
       },
       {
         'icon': Icons.bookmark,
-        'title': 'Unlimited Bookmarks',
-        'description': 'Save as many cafes as you want'
+        'title': 'Đánh dấu không giới hạn',
+        'description': 'Lưu bao nhiêu quán cà phê tùy thích'
       },
     ];
 
@@ -256,7 +256,7 @@ class PremiumPlansPage extends StatelessWidget {
               const Icon(Icons.featured_play_list, color: Colors.brown),
               const SizedBox(width: 8),
               const Text(
-                'Premium Features',
+                'Tính năng Premium',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -344,7 +344,7 @@ class PremiumPlansPage extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               const Text(
-                'Current Subscription',
+                'Gói đăng ký hiện tại',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -355,14 +355,14 @@ class PremiumPlansPage extends StatelessWidget {
           const SizedBox(height: 16),
           
           _buildSubscriptionDetailRow(
-            'Status',
+            'Trạng thái',
             subscription.statusText,
             statusColor,
           ),
           const SizedBox(height: 8),
           
           _buildSubscriptionDetailRow(
-            'Expires',
+            'Hết hạn',
             subscription.endDate.toString().split(' ')[0],
             Colors.grey[600]!,
           ),
@@ -370,8 +370,8 @@ class PremiumPlansPage extends StatelessWidget {
           if (subscription.daysRemaining > 0) ...[
             const SizedBox(height: 8),
             _buildSubscriptionDetailRow(
-              'Days Remaining',
-              '${subscription.daysRemaining} days',
+              'Ngày còn lại',
+              '${subscription.daysRemaining} ngày',
               subscription.daysRemaining <= 7 ? Colors.orange : Colors.green,
             ),
           ],
@@ -392,7 +392,7 @@ class PremiumPlansPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text('Renew Subscription'),
+                child: const Text('Gia hạn gói đăng ký'),
               ),
             ),
           ],
@@ -446,7 +446,7 @@ class PremiumPlansPage extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Something went wrong',
+              'Đã xảy ra lỗi',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Colors.red,
@@ -466,7 +466,7 @@ class PremiumPlansPage extends StatelessWidget {
                 context.read<PremiumBloc>().add(LoadPremiumPlans());
               },
               icon: const Icon(Icons.refresh),
-              label: const Text('Try Again'),
+              label: const Text('Thử lại'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.brown,
                 foregroundColor: Colors.white,
@@ -498,14 +498,14 @@ class PremiumPlansPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           title: const Text(
-            'Confirm Subscription',
+            'Xác nhận gói đăng ký',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('You are about to subscribe to:'),
+              Text('Bạn sắp đăng ký gói:'),
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(12),
@@ -517,7 +517,7 @@ class PremiumPlansPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      plan.name ?? 'Premium Plan',
+                      plan.name ?? 'Gói Premium',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -525,7 +525,7 @@ class PremiumPlansPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      plan.description ?? 'Premium features',
+                      plan.description ?? 'Tính năng Premium',
                       style: TextStyle(color: Colors.grey[600]),
                     ),
                     const SizedBox(height: 8),
@@ -546,7 +546,7 @@ class PremiumPlansPage extends StatelessWidget {
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
-                'Cancel',
+                'Hủy',
                 style: TextStyle(color: Colors.grey[600]),
               ),
             ),
@@ -562,7 +562,7 @@ class PremiumPlansPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('Subscribe'),
+              child: const Text('Đăng ký'),
             ),
           ],
         );

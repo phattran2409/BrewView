@@ -71,7 +71,7 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
             } else if (state is CafeDeleted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Remove cafe successfully'),
+                  content: Text('Xóa quán cà phê thành công'),
                   backgroundColor: Colors.green,
                 ),
               );
@@ -147,7 +147,7 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
                         ),
                       ),
                       child: const Text(
-                        'Edit',
+                        'Chỉnh sửa',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -168,7 +168,7 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
                         ),
                       ),
                       child: const Text(
-                        'Remove',
+                        'Xóa',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -196,7 +196,7 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            'An error occurred',
+            'Đã xảy ra lỗi',
             style: TextStyle(
               color: Colors.white.withOpacity(0.8),
               fontSize: 18,
@@ -223,7 +223,7 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('Retry'),
+            child: const Text('Thử lại'),
           ),
         ],
       ),
@@ -234,12 +234,12 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirm Deletion'),
-        content: Text('Are you sure you want to delete the cafe "${cafe.name}"?'),
+        title: const Text('Xác nhận xóa'),
+        content: Text('Bạn có chắc chắn muốn xóa quán cà phê "${cafe.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: const Text('Hủy'),
           ),
           TextButton(
             onPressed: () {
@@ -249,7 +249,7 @@ class _MyCafeDetailPageState extends State<MyCafeDetailPage> {
             style: TextButton.styleFrom(
               foregroundColor: Colors.red,
             ),
-            child: const Text('Remove'),
+            child: const Text('Xóa'),
           ),
         ],
       ),

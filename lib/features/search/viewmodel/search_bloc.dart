@@ -139,7 +139,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         );
       });
     } catch (e) {
-      emit(SearchError('Failed to load more results: $e'));
+      emit(SearchError('Lỗi tải thêm kết quả: $e'));
     }
   }
 
@@ -242,7 +242,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         }
       });
     } catch (e) {
-      emit(SearchError('Failed to apply filters: $e'));
+      emit(SearchError('Lỗi tìm kiếm: $e'));
     }
   }
 

@@ -59,10 +59,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         child: BlocListener<ProfileBloc, ProfileState>(
           listener: (context, state) {
             if (state is ProfileUpdated) {
-              _showSnackBar('Information saved successfully!');
+              _showSnackBar('Thông tin đã được lưu thành công!');
               _profileBloc.add(LoadFullProfile());
             } else if (state is ProfileError) {
-              _showSnackBar('Error: ${state.message}');
+              _showSnackBar('Lỗi: ${state.message}');
             }
           },
           child: BlocBuilder<ProfileBloc, ProfileState>(
@@ -175,7 +175,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Personal Information',
+                'Thông tin cá nhân',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -188,7 +188,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               TextField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: 'Full Name',
+                  labelText: 'Họ và tên',
                   prefixIcon: const Icon(
                     Icons.person,
                     color: Color(0xFF8B4513),
@@ -232,7 +232,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 controller: _ageController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: 'Age',
+                  labelText: 'Tuổi',
                   prefixIcon: const Icon(Icons.cake, color: Color(0xFF8B4513)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -252,7 +252,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               DropdownButtonFormField<String>(
                 value: _selectedGender!.isNotEmpty ? _selectedGender : null,
                 decoration: InputDecoration(
-                  labelText: 'Gender',
+                  labelText: 'Giới tính',
                   prefixIcon: const Icon(
                     Icons.person_outline,
                     color: Color(0xFF8B4513),
@@ -269,9 +269,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 ),
                 items: const [
-                  DropdownMenuItem(value: 'Male', child: Text('Male')),
-                  DropdownMenuItem(value: 'Female', child: Text('Female')),
-                  DropdownMenuItem(value: 'Other', child: Text('Other')),
+                  DropdownMenuItem(value: 'Male', child: Text('Nam')),
+                  DropdownMenuItem(value: 'Female', child: Text('Nữ')),
+                  DropdownMenuItem(value: 'Other', child: Text('Khác')),
                 ],
                 onChanged: (value) {
                   setState(() {
@@ -286,7 +286,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 controller: _phoneNumberController,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
-                  labelText: 'Phone Number',
+                  labelText: 'Số điện thoại',
                   prefixIcon: const Icon(Icons.phone, color: Color(0xFF8B4513)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -306,7 +306,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               TextField(
                 controller: _provinceNameController,
                 decoration: InputDecoration(
-                  labelText: 'Province/City',
+                  labelText: 'Tỉnh/Thành phố',
                   prefixIcon: const Icon(
                     Icons.location_city,
                     color: Color(0xFF8B4513),
@@ -341,7 +341,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     elevation: 3,
                   ),
                   child: const Text(
-                    'Save Information',
+                    'Lưu thông tin',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -366,38 +366,38 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
     // Validate inputs
     if (_nameController.text.isEmpty) {
-      _showSnackBar('Please enter your full name');
+      _showSnackBar('Vui lòng nhập họ và tên của bạn');
       return;
     }
 
     if (_emailController.text.isEmpty) {
-      _showSnackBar('Please enter your email');
+      _showSnackBar('Vui lòng nhập email của bạn');
       return;
     }
 
     if (_ageController.text.isEmpty) {
-      _showSnackBar('Please enter your age');
+      _showSnackBar('Vui lòng nhập tuổi của bạn');
       return;
     }
 
     int? age = int.tryParse(_ageController.text);
     if (age == null || age < 0 || age > 150) {
-      _showSnackBar('Invalid age');
+      _showSnackBar('Tuổi không hợp lệ');
       return;
     }
 
     if (_selectedGender == null) {
-      _showSnackBar('Please select your gender');
+      _showSnackBar('Vui lòng chọn giới tính của bạn');
       return;
     }
 
     if (_phoneNumberController.text.isEmpty) {
-      _showSnackBar('Please enter your phone number');
+      _showSnackBar('Vui lòng nhập số điện thoại của bạn');
       return;
     }
 
     if (_provinceNameController.text.isEmpty) {
-      _showSnackBar('Please enter your province/city');
+      _showSnackBar('Vui lòng nhập tỉnh/thành phố của bạn');
       return;
     }
 

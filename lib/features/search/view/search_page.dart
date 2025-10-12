@@ -118,7 +118,7 @@ class _SearchPageState extends State<SearchPage> {
             child: Column(
               children: [
                 SearchHeaderWidget(
-                  title: 'Search Coffee Shops',
+                  title: 'Tìm quán cà phê',
                   // resultCount: 0, // Placeholder, update as needed
                   onFilterPressed: _showFilterBottomSheet,
                   onSearchChanged: _onSearchChanged,

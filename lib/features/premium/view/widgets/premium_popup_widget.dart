@@ -141,7 +141,7 @@ class PremiumPopupWidget extends StatelessWidget {
 
   Widget _buildFeaturesList() {
     final features = [
-      'Không giới hạn lượt tìm kiếm',
+      'Không quảng cáo',
       'Xem đánh giá chi tiết',
       'Lưu danh sách yêu thích',
       'Nhận thông báo ưu đãi',

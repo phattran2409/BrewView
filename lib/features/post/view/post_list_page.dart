@@ -103,7 +103,7 @@ class _PostListPageState extends State<PostListPage> {
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
         elevation: 0,
-        title: const Text('New Post', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text('Bài viết mới', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
            actions: [
           IconButton(
             icon: const Icon(Icons.search, color: Colors.white),

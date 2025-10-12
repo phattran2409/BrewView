@@ -68,7 +68,7 @@ class _SearchBodyWidgetState extends State<SearchBodyWidget> {
           Icon(Icons.search, size: 80, color: Colors.white.withOpacity(0.5)),
           const SizedBox(height: 20),
           Text(
-            'Discover Amazing Coffee Shops',
+            'Khám phá những quán cà phê tuyệt vời',
             style: TextStyle(
               color: Colors.white.withOpacity(0.9),
               fontSize: 24,
@@ -78,7 +78,7 @@ class _SearchBodyWidgetState extends State<SearchBodyWidget> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Search by name, location, or keywords to find your perfect coffee experience',
+            'Tìm kiếm theo tên, địa điểm hoặc từ khóa để tìm trải nghiệm cà phê hoàn hảo của bạn',
             style: TextStyle(
               color: Colors.white.withOpacity(0.7),
               fontSize: 16,
@@ -107,7 +107,7 @@ class _SearchBodyWidgetState extends State<SearchBodyWidget> {
     return Column(
       children: [
         Text(
-          'Popular searches',
+          'Tìm kiếm phổ biến',
           style: TextStyle(
             color: Colors.white.withOpacity(0.8),
             fontSize: 16,
@@ -160,7 +160,7 @@ class _SearchBodyWidgetState extends State<SearchBodyWidget> {
           ),
           SizedBox(height: 16),
           Text(
-            'Searching coffee shops...',
+            'Đang tìm kiếm quán cà phê...',
             style: TextStyle(color: Colors.white, fontSize: 16),
           ),
         ],
@@ -178,7 +178,7 @@ class _SearchBodyWidgetState extends State<SearchBodyWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${state.totalCount} results found',
+                'Tìm thấy ${state.totalCount} kết quả',
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.9),
                   fontSize: 16,
@@ -191,7 +191,7 @@ class _SearchBodyWidgetState extends State<SearchBodyWidget> {
                     _searchBloc.add(SearchCafesEvent(query: state.query));
                   },
                   child: Text(
-                    'Clear filters',
+                    'Xóa bộ lọc',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 14,
@@ -230,7 +230,7 @@ class _SearchBodyWidgetState extends State<SearchBodyWidget> {
         Padding(
           padding: const EdgeInsets.all(20),
           child: Text(
-            '${state.currentResults.length} results',
+            '${state.currentResults.length} kết quả',
             style: TextStyle(
               color: Colors.white.withOpacity(0.9),
               fontSize: 16,
@@ -284,7 +284,7 @@ class _SearchBodyWidgetState extends State<SearchBodyWidget> {
           ),
           const SizedBox(height: 20),
           Text(
-            'No results found',
+            'Không tìm thấy kết quả',
             style: TextStyle(
               color: Colors.white.withOpacity(0.9),
               fontSize: 24,
@@ -293,7 +293,7 @@ class _SearchBodyWidgetState extends State<SearchBodyWidget> {
           ),
           const SizedBox(height: 12),
           Text(
-            'We couldn\'t find any coffee shops matching "${state.query}"',
+            'Chúng tôi không thể tìm thấy quán cà phê nào phù hợp với "${state.query}"',
             style: TextStyle(
               color: Colors.white.withOpacity(0.7),
               fontSize: 16,
@@ -311,7 +311,7 @@ class _SearchBodyWidgetState extends State<SearchBodyWidget> {
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
-            child: const Text('Try different keywords'),
+            child: const Text('Thử từ khóa khác'),
           ),
         ],
       ),
@@ -331,7 +331,7 @@ class _SearchBodyWidgetState extends State<SearchBodyWidget> {
           ),
           const SizedBox(height: 20),
           Text(
-            'Something went wrong',
+            'Đã xảy ra lỗi',
             style: TextStyle(
               color: Colors.white.withOpacity(0.9),
               fontSize: 24,
@@ -357,7 +357,7 @@ class _SearchBodyWidgetState extends State<SearchBodyWidget> {
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
-            child: const Text('Try again'),
+            child: const Text('Thử lại'),
           ),
         ],
       ),

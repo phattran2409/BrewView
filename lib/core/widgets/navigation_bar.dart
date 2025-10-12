@@ -4,10 +4,10 @@ import 'package:go_router/go_router.dart';
 
 class CustomNavigationBar extends StatelessWidget {
   const CustomNavigationBar({super.key});
- 
+
   @override
   Widget build(BuildContext context) {
-    final  currentLocation = GoRouterState.of(context).uri.toString(); 
+    final currentLocation = GoRouterState.of(context).uri.toString();
     return Container(
       decoration: BoxDecoration(
         color: const Color.fromARGB(255, 35, 35, 35),
@@ -22,24 +22,55 @@ class CustomNavigationBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(context, Icons.home, 'Home', RoutePaths.home, currentLocation),
-          _buildNavItem(context, Icons.map, 'Map', RoutePaths.map, currentLocation),
-          _buildNavItem(context, Icons.search, 'Search', RoutePaths.search, currentLocation),
-          _buildNavItem(context, Icons.person, 'Profile', RoutePaths.profile, currentLocation),
+          _buildNavItem(
+            context,
+            Icons.home,
+            'Trang chủ',
+            RoutePaths.home,
+            currentLocation,
+          ),
+          _buildNavItem(
+            context,
+            Icons.map,
+            'Bản đồ',
+            RoutePaths.map,
+            currentLocation,
+          ),
+          _buildNavItem(
+            context,
+            Icons.search,
+            'Tìm kiếm',
+            RoutePaths.search,
+            currentLocation,
+          ),
+          _buildNavItem(
+            context,
+            Icons.person,
+            'Cá nhân',
+            RoutePaths.profile,
+            currentLocation,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(BuildContext context, IconData icon, String label, String route , String currentLocation) {
-    final isSelected = currentLocation == route || currentLocation.startsWith(route);
+  Widget _buildNavItem(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String route,
+    String currentLocation,
+  ) {
+    final isSelected =
+        currentLocation == route || currentLocation.startsWith(route);
     return GestureDetector(
       onTap: () {
         // Handle navigation on tap
-          if (!isSelected) {
-            context.go(route);  
-          }
-        },
+        if (!isSelected) {
+          context.go(route);
+        }
+      },
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -69,4 +100,3 @@ class CustomNavigationBar extends StatelessWidget {
     );
   }
 }
-

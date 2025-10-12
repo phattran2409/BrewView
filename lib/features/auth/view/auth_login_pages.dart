@@ -97,7 +97,6 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
                     ),
                   ),
                 ),
-
                 // Content
                 SafeArea(
                   top: true,
@@ -117,7 +116,6 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
                               height: 150,
                               image: AssetImage('assets/images/logo_app.png'),
                             ),
-
                             Text(
                               'BrewView',
                               style: Theme.of(
@@ -129,16 +127,13 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
                               ),
                               textAlign: TextAlign.center,
                             ),
-
                             const SizedBox(height: 8),
-
                             Text(
-                              'Welcome back! Please sign in to continue',
+                              'Chào mừng! Vui lòng đăng nhập để tiếp tục',
                               style: Theme.of(context).textTheme.bodyLarge
                                   ?.copyWith(color: Colors.white70),
                               textAlign: TextAlign.center,
                             ),
-
                             const SizedBox(height: 48),
 
                             // Email Input
@@ -164,7 +159,7 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
                                   ),
                                   border: InputBorder.none,
                                   contentPadding: const EdgeInsets.all(16),
-                                  hintText: 'Enter your email',
+                                  hintText: 'Nhập email của bạn',
                                   hintStyle: TextStyle(color: Colors.white54),
                                 ),
                                 validator: Validators.validateEmail,
@@ -188,7 +183,7 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
                                 obscureText: _obscurePassword,
                                 style: const TextStyle(color: Colors.white),
                                 decoration: InputDecoration(
-                                  labelText: 'Password',
+                                  labelText: 'Mật khẩu',
                                   labelStyle: TextStyle(color: Colors.white70),
                                   prefixIcon: Icon(
                                     Icons.lock_outline,
@@ -209,7 +204,7 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
                                   ),
                                   border: InputBorder.none,
                                   contentPadding: const EdgeInsets.all(16),
-                                  hintText: 'Enter your password',
+                                  hintText: 'Nhập mật khẩu của bạn',
                                   hintStyle: TextStyle(color: Colors.white54),
                                 ),
                                 validator: Validators.validateSimplePassword,
@@ -255,7 +250,7 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
                                         ),
                                       )
                                       : const Text(
-                                        'Sign In',
+                                        'Đăng nhập',
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
@@ -270,7 +265,7 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Don't have an account? ",
+                                  "Chưa có tài khoản? ",
                                   style: TextStyle(
                                     color: Colors.white70,
                                     fontSize: 14,
@@ -279,7 +274,7 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
                                 TextButton(
                                   onPressed: () => _handleSignUp(),
                                   child: Text(
-                                    'Sign Up',
+                                    'Đăng ký',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 14,
@@ -308,7 +303,7 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
                                     horizontal: 16,
                                   ),
                                   child: Text(
-                                    'OR',
+                                    'HOẶC',
                                     style: TextStyle(
                                       color: Colors.white70,
                                       fontSize: 14,

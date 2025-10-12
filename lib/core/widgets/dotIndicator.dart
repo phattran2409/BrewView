@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class DotIndicator extends StatelessWidget {
@@ -40,21 +39,22 @@ class DotIndicator extends StatelessWidget {
       children: List.generate(dotCount, (index) {
         return GestureDetector(
           onTap: () {
-            // Handle individual dot tap
+            // Xử lý khi nhấn vào chấm
             if (onDotTap != null) {
               onDotTap!(index);
             }
-            
-            // Auto navigate if pageController provided
+
+            // Tự động chuyển trang nếu có pageController
             if (pageController != null) {
               pageController!.animateToPage(
                 index,
-                duration: animationDuration ?? const Duration(milliseconds: 300),
+                duration:
+                    animationDuration ?? const Duration(milliseconds: 300),
                 curve: animationCurve ?? Curves.easeInOut,
               );
             }
-            
-            // General tap callback
+
+            // Callback khi nhấn chung
             if (onTap != null) {
               onTap!();
             }
@@ -62,14 +62,16 @@ class DotIndicator extends StatelessWidget {
           child: AnimatedContainer(
             duration: animationDuration ?? const Duration(milliseconds: 300),
             margin: EdgeInsets.symmetric(horizontal: spacing ?? 4),
-            width: currentIndex == index 
-                ? (activeWidth ?? 24) 
-                : (inactiveWidth ?? 8),
+            width:
+                currentIndex == index
+                    ? (activeWidth ?? 24)
+                    : (inactiveWidth ?? 8),
             height: height ?? 8,
             decoration: BoxDecoration(
-              color: currentIndex == index 
-                  ? (activeColor ?? Colors.white)
-                  : (inactiveColor ?? Colors.grey[600]),
+              color:
+                  currentIndex == index
+                      ? (activeColor ?? Colors.white)
+                      : (inactiveColor ?? Colors.grey[600]),
               borderRadius: BorderRadius.circular((height ?? 8) / 2),
             ),
           ),

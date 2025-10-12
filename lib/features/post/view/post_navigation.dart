@@ -19,7 +19,7 @@ class PostNavigation extends StatelessWidget {
       ),
     ),
     child: const Text(
-      'Navigate to Post',
+      'Xem tất cả bài viết',
       style: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w500,

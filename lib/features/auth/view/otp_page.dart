@@ -82,7 +82,7 @@ class _OtpPageState extends State<OtpPage> {
     } else {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Please enter 6-digit OTP')));
+      ).showSnackBar(const SnackBar(content: Text('Vui lòng nhập OTP 6 chữ số')));
       return;
     }
 
@@ -196,7 +196,7 @@ class _OtpPageState extends State<OtpPage> {
                             children: [
                               const SizedBox(width: 8),
                               const Text(
-                                'Enter OTP',
+                                'Mã OTP',
                                 style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
@@ -226,7 +226,7 @@ class _OtpPageState extends State<OtpPage> {
                                         strokeWidth: 2,
                                       ),
                                     )
-                                    : const Text('Confirm'),
+                                    : const Text('Xác nhận'),
                           ),
                           const SizedBox(height: 12),
                           // Bộ đếm và nút resend
@@ -256,7 +256,7 @@ class _OtpPageState extends State<OtpPage> {
                                           );
                                         },
                                 child: const Text(
-                                  'Resend code',
+                                  'Gửi lại mã',
                                   style: TextStyle(color: Colors.white),
                                 ),
                               ),

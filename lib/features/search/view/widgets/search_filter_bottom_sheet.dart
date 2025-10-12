@@ -74,7 +74,7 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Filter & Sort',
+                  'Lọc và Sắp xếp',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -90,7 +90,7 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
                     });
                   },
                   child: const Text(
-                    'Reset',
+                    'Đặt lại',
                     style: TextStyle(color: Color(0xFFD4A574), fontSize: 14),
                   ),
                 ),
@@ -105,7 +105,7 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
               children: [
                 // Sort by section
                 const Text(
-                  'Sort by',
+                  'Sắp xếp theo',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -167,7 +167,7 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
 
                 // Sort direction
                 const Text(
-                  'Order',
+                  'Thứ tự sắp xếp',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -199,7 +199,7 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
                                     : null,
                           ),
                           child: Text(
-                            'Ascending',
+                            'Tăng dần',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color:
@@ -237,7 +237,7 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
                                     : null,
                           ),
                           child: Text(
-                            'Descending',
+                            'Giảm dần',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color:
@@ -260,7 +260,7 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
 
                 // Price range
                 const Text(
-                  'Price Range',
+                  'Khoảng giá',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -325,7 +325,7 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
                       ),
                     ),
                     child: const Text(
-                      'Apply Filters',
+                      'Áp dụng bộ lọc',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,

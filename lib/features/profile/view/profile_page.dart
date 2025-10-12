@@ -191,7 +191,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   MenuItemWidget(
                     icon: Icons.logout,
-                    title: 'Logout',
+                    title: 'Đăng xuất',
                     onTap: () => _showLogoutDialog(),
                     showDivider: false,
                   ),

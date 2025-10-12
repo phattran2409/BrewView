@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ShowImage {  
-
+class ShowImage {
   static Widget get(String imageUrl) {
     return Image.network(
       imageUrl,
@@ -9,9 +8,16 @@ class ShowImage {
       errorBuilder: (context, error, stackTrace) {
         return Container(
           color: Colors.grey[800],
-          child: const Icon(
-            Icons.broken_image,
-            color: Colors.white,
+          child: const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.broken_image, color: Colors.white),
+              SizedBox(height: 4),
+              Text(
+                'Không thể tải hình ảnh',
+                style: TextStyle(color: Colors.white, fontSize: 12),
+              ),
+            ],
           ),
         );
       },
@@ -19,15 +25,16 @@ class ShowImage {
         if (loadingProgress == null) return child;
         return Center(
           child: CircularProgressIndicator(
-            value: loadingProgress.expectedTotalBytes != null
-                ? loadingProgress.cumulativeBytesLoaded /
-                    loadingProgress.expectedTotalBytes!
-                : null,
+            value:
+                loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded /
+                        loadingProgress.expectedTotalBytes!
+                    : null,
           ),
         );
       },
     );
-  } 
+  }
 
   static Widget asset(String assetPath) {
     return Image.asset(
@@ -36,9 +43,16 @@ class ShowImage {
       errorBuilder: (context, error, stackTrace) {
         return Container(
           color: Colors.grey[800],
-          child: const Icon(
-            Icons.broken_image,
-            color: Colors.white,
+          child: const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.broken_image, color: Colors.white),
+              SizedBox(height: 4),
+              Text(
+                'Không thể tải hình ảnh',
+                style: TextStyle(color: Colors.white, fontSize: 12),
+              ),
+            ],
           ),
         );
       },
@@ -48,6 +62,5 @@ class ShowImage {
   static bool isValidImageUrl(String url) {
     final uri = Uri.tryParse(url);
     return uri != null && (uri.isScheme('http') || uri.isScheme('https'));
-  } 
-
+  }
 }

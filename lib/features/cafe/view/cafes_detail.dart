@@ -75,7 +75,7 @@ class _CafeDetailState extends State<CafeDetail> {
             } else {
               return const Center(
                 child: Text(
-                  'No data available',
+                  'Không có dữ liệu',
                   style: TextStyle(color: Colors.white),
                 ),
               );
@@ -341,7 +341,7 @@ class _CafeDetailState extends State<CafeDetail> {
           const Icon(Icons.error_outline, color: Colors.white, size: 64),
           const SizedBox(height: 16),
           Text(
-            'Failed to load cafe details',
+            'Đã xảy ra lỗi',
             style: const TextStyle(color: Colors.white, fontSize: 18),
           ),
           const SizedBox(height: 8),
@@ -357,7 +357,7 @@ class _CafeDetailState extends State<CafeDetail> {
                 _cafeBloc.add(LoadCafeById(widget.cafeId!));
               }
             },
-            child: const Text('Retry'),
+            child: const Text('Thử lại'),
           ),
         ],
       ),

@@ -97,7 +97,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                 child: GestureDetector(
                                   onTap: () => bloc.add(OnboardingSkipPressed()),
                                   child: Text(
-                                    'Skip',
+                                    'Bỏ qua',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,
@@ -152,7 +152,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                               color: Colors.white,
                                             ),
                                             Text(
-                                              'Previous',
+                                              'Trước',
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.w500,
@@ -207,7 +207,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Text(
-                                            state.isLastPage ? 'Get Started' : 'Next',
+                                            state.isLastPage ? 'Bắt đầu' : 'Tiếp theo',
                                             style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w600,
