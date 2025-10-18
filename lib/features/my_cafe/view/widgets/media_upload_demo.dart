@@ -21,7 +21,7 @@ class _MediaUploadDemoState extends State<MediaUploadDemo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Media Upload Demo'),
+        title: const Text('Tải lên Media Demo'),
         backgroundColor: const Color(0xFF8B4513),
         foregroundColor: Colors.white,
       ),
@@ -33,8 +33,8 @@ class _MediaUploadDemoState extends State<MediaUploadDemo> {
             // Premium toggle
             Card(
               child: SwitchListTile(
-                title: const Text('Premium Mode'),
-                subtitle: Text(_isPremium ? 'Premium features enabled' : 'Basic features only'),
+                title: const Text('Chế độ Premium'),
+                subtitle: Text(_isPremium ? 'Tính năng Premium đã được kích hoạt' : 'Chỉ có tính năng cơ bản'),
                 value: _isPremium,
                 onChanged: (value) {
                   setState(() {
@@ -81,18 +81,18 @@ class _MediaUploadDemoState extends State<MediaUploadDemo> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Upload Summary',
+                      'Tóm tắt Tải lên',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Text('Images: ${_selectedImages.length} files'),
-                    Text('Videos: ${_selectedVideos.length} files'),
+                    Text('Hình ảnh: ${_selectedImages.length} tệp'),
+                    Text('Video: ${_selectedVideos.length} tệp'),
                     const SizedBox(height: 12),
                     Text(
-                      'Total Media Files: ${_selectedImages.length + _selectedVideos.length}',
+                      'Tổng số tệp Media: ${_selectedImages.length + _selectedVideos.length}',
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ],
@@ -114,7 +114,7 @@ class _MediaUploadDemoState extends State<MediaUploadDemo> {
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: const Text('Submit Media (Demo)'),
+                child: const Text('Gửi Media (Demo)'),
               ),
             ),
           ],
@@ -134,9 +134,9 @@ class _MediaUploadDemoState extends State<MediaUploadDemo> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Images: ${_selectedImages.length}'),
-            Text('Videos: ${_selectedVideos.length}'),
-            Text('Total: ${allMediaFiles.length} files'),
+            Text('Hình ảnh: ${_selectedImages.length}'),
+            Text('Video: ${_selectedVideos.length}'),
+            Text('Tổng: ${allMediaFiles.length} tệp'),
             const SizedBox(height: 8),
             const Text('This is just a demo. In real implementation, these files would be uploaded to your server.'),
           ],

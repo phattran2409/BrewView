@@ -19,6 +19,8 @@ import 'package:briewview/features/user_management/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:go_router/go_router.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,13 +31,17 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   late CafeBloc _cafeBloc;
+  late BannerAd _bannerAd;
+  bool _isAdLoaded = false;
   // late ProfileBloc _profileBloc;
   UserModel? _currentUser;
   late PremiumBloc _premiumBloc;
+  
 
   @override
   void initState() {
     super.initState();
+    _loadBannerAd();
     _cafeBloc = getIt<CafeBloc>();
     _premiumBloc = GetIt.instance<PremiumBloc>();
     WidgetsBinding.instance.addObserver(this);
@@ -63,6 +69,28 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
+
+  void _loadBannerAd() {
+    _bannerAd = BannerAd(
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+      size: AdSize.banner,
+      request: AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _isAdLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          print('Ad failed to load: $error');
+          ad.dispose();
+        },
+      ),
+    );
+
+    _bannerAd.load();
+  }
+
 
   void _checkAndShowPopup() {
     _premiumBloc.showHomePopupIfAllowed(
@@ -172,7 +200,19 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           children: [
             // Main home content
             _buildHomeContent(),
-
+            if (_isAdLoaded && _currentUser?.isPremium == false)
+              Positioned(
+                bottom: 60, // Adjust based on your navigation bar height
+                left: 0,
+                right: 0,
+                child: Container(
+                  alignment: Alignment.center,
+                  width: _bannerAd.size.width.toDouble(),
+                  height: _bannerAd.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd),
+                ),
+              ),
+                
             // Premium popup overlay
             BlocBuilder<PremiumBloc, PremiumState>(
               builder: (context, state) {
@@ -346,6 +386,19 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ),
               ],
             ),
+          ),
+
+          // Wishlist Button
+          IconButton(
+            onPressed: () {
+              context.goNamed('wishlist');
+            },
+            icon: const Icon(
+              Icons.favorite_outline,
+              color: Colors.white,
+              size: 28,
+            ),
+            tooltip: 'Danh sách yêu thích',
           ),
 
           // Notification Bell

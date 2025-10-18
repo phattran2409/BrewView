@@ -18,21 +18,21 @@ class PricingSection extends StatelessWidget {
         Expanded(
           child: _buildTextField(
             controller: priceMinController,
-            label: 'Min Price',
+            label: 'Giá nhỏ nhất',
             keyboardType: TextInputType.number,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'required';
+                return 'Bắt buộc';
               }
 
               final price = int.tryParse(value);
               if (price == null) {
-                return 'Invalid number format';
+                return 'Định dạng số không hợp lệ';
               }
 
               // Backend rule: PriceMin >= 0
               if (price < 0) {
-                return 'greater than 0';
+                return 'Phải lớn hơn 0';
               }
 
               return null;
@@ -43,21 +43,21 @@ class PricingSection extends StatelessWidget {
         Expanded(
           child: _buildTextField(
             controller: priceMaxController,
-            label: 'Max Price',
+            label: 'Giá lớn nhất',
             keyboardType: TextInputType.number,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'required';
+                return 'Bắt buộc';
               }
 
               final maxPrice = int.tryParse(value);
               if (maxPrice == null) {
-                return 'Invalid number format';
+                return 'Định dạng số không hợp lệ';
               }
 
               // Backend rule: PriceMax >= 0
               if (maxPrice < 0) {
-                return 'greater than 0';
+                return 'Phải lớn hơn 0';
               }
 
               // Backend rule: PriceMax >= PriceMin
@@ -65,7 +65,7 @@ class PricingSection extends StatelessWidget {
               if (minPriceText.isNotEmpty) {
                 final minPrice = int.tryParse(minPriceText);
                 if (minPrice != null && maxPrice < minPrice) {
-                  return 'greater than min price';
+                  return 'Phải lớn hơn giá nhỏ nhất';
                 }
               }
 

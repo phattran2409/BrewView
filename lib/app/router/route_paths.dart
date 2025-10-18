@@ -43,4 +43,7 @@ class RoutePaths {
   static const String myCafeEdit = '/my-cafes/:id/edit';
   static String myCafeDetailPath(String id) => '/my-cafes/$id';
   static String myCafeEditPath(String id) => '/my-cafes/$id/edit';
+
+  // Wishlist
+  static const String wishlist = '/wishlist';
 }

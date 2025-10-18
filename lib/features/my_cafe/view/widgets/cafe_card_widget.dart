@@ -171,7 +171,7 @@ class CafeCardWidget extends StatelessWidget {
                     if (cafe.isPromoted != null) ...[
                       const SizedBox(width: 4),
                       Text(
-                        '(Promoted: ${cafe.isPromoted})',
+                        '(Quảng cáo: ${cafe.isPromoted})',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],

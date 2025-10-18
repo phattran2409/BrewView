@@ -178,7 +178,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
         padding: const EdgeInsets.all(16),
         children: [
           FormSectionWrapper(
-            title: 'Cafe Images',
+            title: 'Hình ảnh Cafe',
             icon: Icons.photo_camera,
             child: ImageUploadWidget(
               onImagesChanged: (images) {
@@ -192,7 +192,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
           ),
 
           FormSectionWrapper(
-            title: 'Cafe Videos',
+            title: 'Video Cafe',
             icon: Icons.videocam,
             child: VideoUploadWidget(
               onVideosChanged: (videos) {
@@ -207,7 +207,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
           ),
 
           FormSectionWrapper(
-            title: 'Basic Information',
+            title: 'Thông tin cơ bản',
             icon: Icons.info_outline,
             child: BasicInfoSection(
               nameController: _nameController,
@@ -224,7 +224,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
           ),
 
           FormSectionWrapper(
-            title: 'Pricing Information',
+            title: 'Thông tin giá cả',
             icon: Icons.attach_money,
             child: PricingSection(
               priceMinController: _priceMinController,
@@ -233,7 +233,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
           ),
 
           FormSectionWrapper(
-            title: 'Operating Hours',
+            title: 'Giờ Hoạt Động',
             icon: Icons.access_time,
             child: ScheduleSection(
               openingHoursController: _openingTimeController,
@@ -242,7 +242,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
           ),
 
           FormSectionWrapper(
-            title: 'Contact Information',
+            title: 'Thông tin Liên hệ',
             icon: Icons.contact_phone,
             child: ContactInfoSection(
               hotlineController: _hotlineController,
@@ -251,7 +251,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
           ),
 
           FormSectionWrapper(
-            title: 'Feature Tags',
+            title: 'Tính năng Cafe',
             icon: Icons.local_offer,
             child: FeatureTagSelector(
               featureTags: _featureTags,
@@ -298,7 +298,7 @@ class _MyCafeFormPageState extends State<MyCafeFormPage> {
                     ),
                   )
                   : Text(
-                    _isEditing ? 'Update Cafe' : 'Create Cafe',
+                    _isEditing ? 'Cập nhật Cafe' : 'Tạo Cafe',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,

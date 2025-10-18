@@ -135,4 +135,18 @@ class AppConstants {
       '/api/payment/methods/set-default';
   static const String processPaymentEndpoint = '/api/payment/process';
   static const String paymentHistoryEndpoint = '/api/payment/history';
+
+  // Wishlist
+  static const String wishlistEndpoint = '/api/favorite-cafe/{userId}';
+  static String getWishlistEndpoint(String userId) {
+    return wishlistEndpoint.replaceAll('{userId}', userId);
+  }
+  static const String addToWishlistEndpoint = '/api/favorite-cafe/{userId}';
+  static String getAddToWishlistEndpoint(String userId) {
+    return addToWishlistEndpoint.replaceAll('{userId}', userId);
+  }
+  // static const String removeFromWishlistEndpoint = '/api/wishlist/{userId}/remove';
+  // static String getRemoveFromWishlistEndpoint(String userId) {
+  //   return removeFromWishlistEndpoint.replaceAll('{userId}', userId);
+  // }
 }

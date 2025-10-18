@@ -19,22 +19,22 @@ class ScheduleSection extends StatelessWidget {
           child: _buildTimeField(
             context: context,
             controller: openingHoursController,
-            label: 'Opening Hours',
+            label: 'Giờ mở cửa',
             isOpeningTime: true,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Required';
+                return 'Bắt buộc';
               }
 
               if (!_isValidTimeFormat(value)) {
-                return 'Invalid time format (HH:MM)';
+                return 'Định dạng thời gian không hợp lệ (HH:MM)';
               }
 
               // Cross validation: OpeningTime must be less than ClosingTime
               final closingTime = closingHoursController.text;
               if (closingTime.isNotEmpty && _isValidTimeFormat(closingTime)) {
                 if (!_isOpeningBeforeClosing(value, closingTime)) {
-                  return 'before closing time';
+                  return 'Phải trước giờ đóng cửa';
                 }
               }
 
@@ -47,22 +47,22 @@ class ScheduleSection extends StatelessWidget {
           child: _buildTimeField(
             context: context,
             controller: closingHoursController,
-            label: 'Closing Hours',
+            label: 'Giờ đóng cửa',
             isOpeningTime: false,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Required';
+                return 'Bắt buộc';
               }
 
               if (!_isValidTimeFormat(value)) {
-                return 'Invalid time format (HH:MM)';
+                return 'Định dạng thời gian không hợp lệ (HH:MM)';
               }
 
               // Cross validation: OpeningTime must be less than ClosingTime
               final openingTime = openingHoursController.text;
               if (openingTime.isNotEmpty && _isValidTimeFormat(openingTime)) {
                 if (!_isOpeningBeforeClosing(openingTime, value)) {
-                  return 'after opening time';
+                  return 'Phải sau giờ mở cửa';
                 }
               }
 

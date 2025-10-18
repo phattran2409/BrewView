@@ -70,6 +70,16 @@ import 'package:briewview/features/user_management/services/user_service.dart'
     as _i480;
 import 'package:briewview/features/user_management/viewmodel/user_bloc.dart'
     as _i310;
+import 'package:briewview/features/wishlist/repository/wishlist_repository.dart'
+    as _i347;
+import 'package:briewview/features/wishlist/repository/wishlist_repository_impl.dart'
+    as _i1047;
+import 'package:briewview/features/wishlist/services/wishlist_service.dart'
+    as _i290;
+import 'package:briewview/features/wishlist/services/wishlist_service_impl.dart'
+    as _i131;
+import 'package:briewview/features/wishlist/viewmodel/wishlist_bloc.dart'
+    as _i635;
 import 'package:dio/dio.dart' as _i361;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
@@ -97,6 +107,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i762.CafeService>(
       () => _i762.CafeService(gh<_i361.Dio>(), gh<_i369.UserStorageServices>()),
     );
+    gh.factory<_i290.WishlistService>(
+      () => _i131.WishlistServiceImpl(
+        gh<_i361.Dio>(),
+        gh<_i369.UserStorageServices>(),
+      ),
+    );
     gh.factory<_i458.ReviewService>(() => _i458.ReviewService(gh<_i361.Dio>()));
     gh.singleton<_i367.AuthApi>(() => _i367.AuthApi(gh<_i361.Dio>()));
     gh.singleton<_i785.FacebookAuthService>(
@@ -105,14 +121,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i476.GoogleSignInService>(
       () => _i476.GoogleSignInService(gh<_i361.Dio>()),
     );
-    gh.singleton<_i434.SurveyService>(
-      () => _i434.SurveyService(gh<_i361.Dio>()),
-    );
     gh.singleton<_i714.PaymentService>(
       () => _i714.PaymentService(gh<_i361.Dio>()),
     );
     gh.singleton<_i427.PremiumService>(
       () => _i427.PremiumService(gh<_i361.Dio>()),
+    );
+    gh.singleton<_i434.SurveyService>(
+      () => _i434.SurveyService(gh<_i361.Dio>()),
     );
     gh.lazySingleton<_i480.UserService>(
       () => _i480.UserService(gh<_i361.Dio>()),
@@ -138,6 +154,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i785.FacebookAuthService>(),
         gh<_i476.GoogleSignInService>(),
       ),
+    );
+    gh.factory<_i347.WishlistRepository>(
+      () => _i1047.WishlistRepositoryImpl(gh<_i290.WishlistService>()),
+    );
+    gh.factory<_i635.WishlistBloc>(
+      () => _i635.WishlistBloc(gh<_i347.WishlistRepository>()),
     );
     gh.singleton<_i229.SurveyRepository>(
       () => _i546.SurveyRepositoryImpl(gh<_i434.SurveyService>()),

@@ -18,12 +18,12 @@ class ContactInfoSection extends StatelessWidget {
           controller: hotlineController,
             validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Required';
+              return 'Bắt buộc';
             }
             if (value != null && value.isNotEmpty) {
               final phoneRegex = RegExp(r'^\+?\d{7,15}$');
               if (!phoneRegex.hasMatch(value)) {
-                return 'Hotline must be 7-15 digits, may have + at first';
+                return 'Số điện thoại nên bắt đầu với + và có từ 7 đến 15 chữ số';
               }
             }
             return null;
@@ -39,7 +39,7 @@ class ContactInfoSection extends StatelessWidget {
             if (value != null && value.isNotEmpty) {
               final uri = Uri.tryParse(value);
               if (uri == null || !uri.hasAbsolutePath) {
-                return 'LinkPage must be a valid URL';
+                return 'LinkPage phải là một URL hợp lệ';
               }
             }
             return null;

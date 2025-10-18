@@ -23,7 +23,7 @@ import 'package:briewview/features/cafe/view/review_list_page.dart';
 import 'package:briewview/features/my_cafe/view/my_cafes_list_page.dart';
 import 'package:briewview/features/my_cafe/view/my_cafe_form_page.dart';
 import 'package:briewview/features/my_cafe/view/my_cafe_detail_page.dart';
-
+import 'package:briewview/features/wishlist/view/wishlist_page.dart';
 // import 'package:briewview/features/user_management/view/user_list_page.dart';
 
 @singleton
@@ -158,9 +158,8 @@ class AppRouter {
             return PaymentPage(planId: planId ?? '');
           },
         ),
-       
-
-      GoRoute(
+        // My Cafe routes
+        GoRoute(
           path: RoutePaths.myCafes,
           name: 'my-cafes',
           builder: (context, state) => const MyCafesListPage(),
@@ -188,7 +187,13 @@ class AppRouter {
                 ),
               ],
             ),
-          ],
+          ],      
+        ),
+        // Wishlist routes
+        GoRoute(
+          path: RoutePaths.wishlist,
+          name: 'wishlist',
+          builder: (context, state) => const WishlistPage(),
         ),
       ],
     );
