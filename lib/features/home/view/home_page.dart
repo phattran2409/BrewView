@@ -1,6 +1,7 @@
 import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/app/theme/app_color.dart';
 import 'package:briewview/core/network/user_storage_services.dart';
+import 'package:briewview/core/services/location_service.dart';
 import 'package:briewview/core/utils/ShowImage.dart';
 import 'package:briewview/core/utils/premium_helper.dart';
 import 'package:briewview/core/widgets/navigation_bar.dart';
@@ -35,8 +36,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _isAdLoaded = false;
   // late ProfileBloc _profileBloc;
   UserModel? _currentUser;
+  late LocationService _locationService;
   late PremiumBloc _premiumBloc;
-  
+  bool _locationInitialized = false;
 
   @override
   void initState() {
@@ -48,6 +50,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAndShowPopup();
     });
+    _locationService = getIt<LocationService>();
 
     _loadCurrentUserAndCafes();
   }
@@ -101,16 +104,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<void> _loadCurrentUserAndCafes() async {
     try {
       _currentUser = await getIt<UserStorageServices>().getCurrentUser();
-
+      try {
+        _locationInitialized = await _locationService.initialize();
+        print('🗺️ LocationService initialized: $_locationInitialized');
+      } catch (e) {
+        print('❌ LocationService initialization failed: $e');
+        _locationInitialized = false;
+      }
       if (mounted) {
         setState(() {});
         final userId = _currentUser?.id ?? '';
         _cafeBloc.add(
           LoadRecommendedCafes(pageNumber: 1, pageSize: 5, userId: userId),
         ); // Recommendations
-        _cafeBloc.add(
-          LoadCafesByDistance(pageNumber: 1, pageSize: 5),
-        ); // Nearby
+        if (_locationInitialized) {
+          _cafeBloc.add(
+            LoadCafesByDistance(pageNumber: 1, pageSize: 5, maxDistanceKm: 10),
+          ); // Nearby
+        }
         _cafeBloc.add(
           LoadCafesRating(
             pageNumber: 1,
@@ -285,7 +296,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (state is CafeLoading) {
       return const Center(child: CircularProgressIndicator());
     }
+ 
     if (state is CombinedCafesLoaded) {
+    
       return Column(
         children: [
           RecomendationWidget(recommendations: state.recommendations),
@@ -350,38 +363,40 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ),
                 Container(
                   child: BlocBuilder<PremiumBloc, PremiumState>(
-                  builder: (context, state) {
-                    final hasPremium =
-                        state is PremiumLoaded && state.hasPremiumAccess;
-                    return GestureDetector(
-                      onTap: () {
-                        _premiumBloc.add(const ShowHomePagePopup(
-                          message:
-                              'Khám phá các tính năng cao cấp như không quảng cáo, đánh giá chi tiết và nhiều hơn nữa!',
-                        ));
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: hasPremium ? Colors.amber : Colors.grey,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child:
-                            hasPremium
-                                ? PremiumHelper.premiumBadge(text: 'Premium')
-                                : const Text(
-                                  'Free',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
+                    builder: (context, state) {
+                      final hasPremium =
+                          state is PremiumLoaded && state.hasPremiumAccess;
+                      return GestureDetector(
+                        onTap: () {
+                          _premiumBloc.add(
+                            const ShowHomePagePopup(
+                              message:
+                                  'Khám phá các tính năng cao cấp như không quảng cáo, đánh giá chi tiết và nhiều hơn nữa!',
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: hasPremium ? Colors.amber : Colors.grey,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child:
+                              hasPremium
+                                  ? PremiumHelper.premiumBadge(text: 'Premium')
+                                  : const Text(
+                                    'Free',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                    ),
                                   ),
-                                ),
-                      ),
-                    );
-                  },
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -513,51 +528,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
 
           const SizedBox(height: 20),
-
-          // Category Filters
-          // SizedBox(
-          //   height: 40,
-          //   child: ListView.builder(
-          //     scrollDirection: Axis.horizontal,
-          //     itemCount: _categories.length,
-          //     itemBuilder: (context, index) {
-          //       final isSelected = index == _selectedCategoryIndex;
-          //       return Padding(
-          //         padding: EdgeInsets.only(right: 12),
-          //         child: GestureDetector(
-          //           onTap: () {
-          //             setState(() {
-          //               _selectedCategoryIndex = index;
-          //             });
-          //           },
-          //           child: Container(
-          //             padding: const EdgeInsets.symmetric(
-          //               horizontal: 20,
-          //               vertical: 8,
-          //             ),
-          //             decoration: BoxDecoration(
-          //               color: isSelected ? Colors.white : Colors.transparent,
-          //               borderRadius: BorderRadius.circular(20),
-          //               border: Border.all(
-          //                 color:
-          //                     isSelected ? Colors.white : Colors.grey.shade700,
-          //                 width: 1,
-          //               ),
-          //             ),
-          //             child: Text(
-          //               _categories[index],
-          //               style: TextStyle(
-          //                 color: isSelected ? Colors.black : Colors.white,
-          //                 fontWeight:
-          //                     isSelected ? FontWeight.bold : FontWeight.normal,
-          //               ),
-          //             ),
-          //           ),
-          //         ),
-          //       );
-          //     },
-          //   ),
-          // ),
         ],
       ),
     );

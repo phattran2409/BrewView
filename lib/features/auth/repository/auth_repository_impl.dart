@@ -63,21 +63,21 @@ class AuthRepositoryImpl implements AuthRepository {
       final Map<String, dynamic> userMap = authResp.userJson?.toJson() ?? {};
       final userModel = userMap.isNotEmpty ? UserModel.fromJson(userMap) : null;
 
-       if (userModel != null) {
+      if (userModel != null) {
         await _userStorageServices.saveUser(userModel);
-       
       }
 
       return Right(AuthResult(isSuccess: true, userJson: userModel));
     } catch (e) {
-       if (e is DioError) {
-         if(e.response?.statusCode == 400 || e.response?.statusCode == 401) {
-           final errorMessage = e.response?.data['detail'] ?? 'Login error: ${e.message}';
-           return Left(ServerFailure(errorMessage));
-         } else {
-           return Left(NetworkFailure('Network error'));
-         } 
-       }
+      if (e is DioError) {
+        if (e.response?.statusCode == 400 || e.response?.statusCode == 401) {
+          final errorMessage =
+              e.response?.data['detail'] ?? 'Login error: ${e.message}';
+          return Left(ServerFailure(errorMessage));
+        } else {
+          return Left(NetworkFailure('Network error'));
+        }
+      }
       return Left(ServerFailure('Login error'));
     }
   }
@@ -138,7 +138,7 @@ class AuthRepositoryImpl implements AuthRepository {
       if (cred == null || cred.user == null) {
         return Left(ServerFailure('Google Sign-In canceled or failed'));
       }
- 
+
       final userDataFromServer =
           await _googleSignInService.getUserDataFromServer();
 
@@ -201,14 +201,23 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, AuthResult?>> getCurrentUser() async {
-    // try {
-    //   final result = await _api.getCurrentUser(userId);
-    //   return Right(result);
-    // } catch (e) {
-    //   return Left(CacheFailure());
-    // }
-    throw UnimplementedError();
+  Future<Either<Failure, AuthResult?>> getCurrentUser(String userId) async {
+    try {
+      final result = await _api.getCurrentUser(userId);
+      
+      if (result != null) {
+        if (result['isSuccess'] == true && result['data'] != null) {
+          final userJson = result['data'] as Map<String, dynamic>;
+          final userModel = UserModel.fromJson(userJson);
+          await _userStorageServices.saveUser(userModel);
+          return Right(AuthResult(isSuccess: true, userJson: userModel));
+        }
+      }
+      return left(ServerFailure('User not found')); 
+    } catch (e) {
+      print('Error getting current user: $e');
+      return Left(ServerFailure('Error getting current user: $e'));
+    }
   }
 
   @override
@@ -286,7 +295,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, void>> resetPassword({
     required String email,
     required String newPassword,
-    required String currentPassword,  
+    required String currentPassword,
   }) async {
     try {
       final result = await _api.resetPassword(
@@ -294,8 +303,10 @@ class AuthRepositoryImpl implements AuthRepository {
         newPassword: newPassword,
         currentPassword: currentPassword,
       );
-      print('Reset password result: $result');  
-      print('email: $email, newPassword: $newPassword, currentPassword: $currentPassword');
+      print('Reset password result: $result');
+      print(
+        'email: $email, newPassword: $newPassword, currentPassword: $currentPassword',
+      );
       if (result) {
         return const Right(null);
       } else {

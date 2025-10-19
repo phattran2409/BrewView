@@ -38,8 +38,8 @@ class CafesRepositoryImpl implements CafesRepository {
       return Future.value(Left(ServerFailure(e.toString())));
     }
   }
-  
-  @override 
+
+  @override
   Future<Either<Failure, List<CafeModel>>> getRecommendedCafes({
     required String userId,
     int pageNumber = 1,
@@ -51,7 +51,7 @@ class CafesRepositoryImpl implements CafesRepository {
         pageNumber: pageNumber,
         pageSize: pageSize,
       );
-      
+
       var cafeData = result;
       var listCafes = cafeData['cafes'] as List<CafeModel>;
       if (cafeData['isSuccess'] != true) {
@@ -61,14 +61,15 @@ class CafesRepositoryImpl implements CafesRepository {
     } catch (e) {
       return Future.value(Left(ServerFailure(e.toString())));
     }
-  } 
+  }
+
   @override
   Future<Either<Failure, CafeModel>> getCafesById(String cafeId) async {
     try {
       var result = await cafeService.getCafeById(cafeId);
       if (result == null) {
         return Future.value(Left(ServerFailure('Cafe not found')));
-      } 
+      }
       return Future.value(Right(result));
     } catch (e) {
       return Future.value(Left(ServerFailure(e.toString())));
@@ -87,11 +88,14 @@ class CafesRepositoryImpl implements CafesRepository {
 
   @override
   Future<Either<Failure, CafeModel>> createCafe(
-    CreateCafeRequest request, 
-    List<File>? mediaFiles
+    CreateCafeRequest request,
+    List<File>? mediaFiles,
   ) async {
     try {
-      var result = await cafeService.createCafe(request, mediaFiles: mediaFiles);
+      var result = await cafeService.createCafe(
+        request,
+        mediaFiles: mediaFiles,
+      );
       return Future.value(Right(result));
     } catch (e) {
       return Future.value(Left(ServerFailure(e.toString())));
@@ -100,11 +104,14 @@ class CafesRepositoryImpl implements CafesRepository {
 
   @override
   Future<Either<Failure, CafeModel>> updateCafe(
-    UpdateCafeRequest request, 
-    List<File>? mediaFiles
+    UpdateCafeRequest request,
+    List<File>? mediaFiles,
   ) async {
     try {
-      var result = await cafeService.updateCafe(request, mediaFiles: mediaFiles);
+      var result = await cafeService.updateCafe(
+        request,
+        mediaFiles: mediaFiles,
+      );
       return Future.value(Right(result));
     } catch (e) {
       return Future.value(Left(ServerFailure(e.toString())));
@@ -116,6 +123,37 @@ class CafesRepositoryImpl implements CafesRepository {
     try {
       await cafeService.deleteCafe(cafeId);
       return Future.value(Right(null));
+    } catch (e) {
+      return Future.value(Left(ServerFailure(e.toString())));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<CafeModel>>> getCafesByDistance({
+    double latitude = 0.0,
+    double longitude = 0.0,
+    int maxDistanceKm = 10,
+    int pageNumber = 1,
+    int pageSize = 10,
+  }) async {
+    try {
+      var result = await cafeService.getNearbyCafes(
+        latitude: latitude,
+        longitude: longitude,
+        maxDistanceKm: maxDistanceKm,
+        pageNumber: pageNumber,
+        pageSize: pageSize,
+      );
+      var cafeData = result;
+      if (cafeData == null) {
+        return Future.value(Right(<CafeModel>[]));
+      }
+      var listCafes = cafeData['cafes'] as List<CafeModel>; 
+      print("Repository Distance: ${listCafes.map((cafe) => cafe.distance).toList()}");
+      if (cafeData['isSuccess'] != true) {
+        return Future.value(Right(listCafes));
+      }
+      return Future.value(Right(listCafes));
     } catch (e) {
       return Future.value(Left(ServerFailure(e.toString())));
     }

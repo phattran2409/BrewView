@@ -22,7 +22,7 @@ abstract class AuthRepository {
 
   Future<void> logout();
 
-  Future<Either<Failure, AuthResult?>> getCurrentUser();
+  Future<Either<Failure, AuthResult?>> getCurrentUser(String userId);
   Future<Either<Failure, AuthResult>> saveAuthResult(AuthResult authResult);
 
   Future<bool> verifyOtp(String otp, String userId);

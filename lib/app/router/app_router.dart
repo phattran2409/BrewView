@@ -155,8 +155,12 @@ class AppRouter {
           path: RoutePaths.paymentSuccess,
           name: 'payment-success',
           builder: (context, state) {
-            // final queryParams = state.uri.queryParameters;
-            return PaymentSuccessPage();
+            final code = state.uri.queryParameters['code'];
+            final status = state.uri.queryParameters['status'];
+            return PaymentSuccessPage(
+              code: code,
+              status: status,
+            );
           },
         ),
         GoRoute(

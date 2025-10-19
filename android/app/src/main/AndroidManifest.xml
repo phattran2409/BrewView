@@ -4,6 +4,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     
     <!-- For Android 13+ (API level 33+) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
@@ -27,6 +30,14 @@
         <provider android:authorities="com.facebook.katana.provider.PlatformProvider"
             android:name="com.facebook.FacebookContentProvider"
             android:exported="true" />
+         <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
+        </intent>
     </queries>
     <application
         android:label="@string/app_name"

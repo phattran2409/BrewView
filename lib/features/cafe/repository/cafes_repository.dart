@@ -22,6 +22,14 @@ abstract class CafesRepository {
 
   Future<Either<Failure, CafeModel>> getCafesById(String cafeId);
 
+  Future<Either<Failure, List<CafeModel>>> getCafesByDistance({
+    double latitude = 0.0,
+    double longitude = 0.0,
+    int maxDistanceKm = 10,
+    int pageNumber = 1,
+    int pageSize = 10,
+  }); 
+
   // New CRUD methods for my_cafe feature
   Future<Either<Failure, List<CafeModel>>> getMyCafes();
   

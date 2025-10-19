@@ -3,6 +3,7 @@ import 'package:briewview/features/cafe/model/cafeMode.dart';
 import 'package:briewview/core/network/user_storage_services.dart';
 import 'package:briewview/features/cafe/model/cafeMutation.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'dart:io';
 
@@ -16,9 +17,9 @@ class CafeService {
   Future<Map<String, dynamic>> getCafes({
     int pageNumber = 1,
     int pageSize = 10,
-    String? sortBy, 
-    String? searchTerm,  
-    String? sortDirection,  
+    String? sortBy,
+    String? searchTerm,
+    String? sortDirection,
   }) async {
     try {
       final endPoint = AppConstants.getCafeList(
@@ -74,17 +75,17 @@ class CafeService {
     }
   }
 
-  Future<Map<String,dynamic>> getRecommendedCafes({
-    String userId = '', 
-    int pageNumber = 1, 
-    int pageSize = 10,  
+  Future<Map<String, dynamic>> getRecommendedCafes({
+    String userId = '',
+    int pageNumber = 1,
+    int pageSize = 10,
   }) async {
     try {
       final endpoint = AppConstants.getCafeByUserPreferences(
         userId: userId,
         pageNumber: pageNumber,
         pageSize: pageSize,
-      );  
+      );
       final response = await dio.get(endpoint);
       print('Response data layer Services: ${response.data}'); // Debug log
       if (response.statusCode == 200) {
@@ -104,7 +105,9 @@ class CafeService {
             'pageSize': pageSize,
           };
         } else {
-          throw Exception(data['message'] ?? 'Failed to load recommended cafes');
+          throw Exception(
+            data['message'] ?? 'Failed to load recommended cafes',
+          );
         }
       } else {
         throw Exception('Failed to load recommended cafes');
@@ -129,7 +132,7 @@ class CafeService {
       print('Unexpected error in getRecommendedCafes: $e');
       throw Exception('An unexpected error occurred');
     }
-  } 
+  }
 
   Future<CafeModel?> getCafeById(String cafeId) async {
     try {
@@ -168,8 +171,51 @@ class CafeService {
     }
   }
 
+  Future<Map<String, dynamic>?> getNearbyCafes({
+    double latitude = 0.0,
+    double longitude = 0.0,
+    int pageNumber = 1,
+    int pageSize = 10,
+    int maxDistanceKm = 10,
+  }) async {
+    try {
+      final response = await dio.get(
+        AppConstants.getCafeByDistance(
+          latitude: latitude,
+          longitude: longitude,
+          maxDistanceKm: maxDistanceKm,
+          pageNumber: pageNumber,
+          pageSize: pageSize,
+        ),
+      );
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        if (data['isSuccess'] == true && data['data'] != null) {
+          final cafeData = data['data'] as Map<String, dynamic>;
+          final cafes =
+              (cafeData['cafes'] as List)
+                  .map((cafeJson) => cafeJson = CafeModel.fromJson(cafeJson))
+                  .toList();
+          return {
+            'isSuccess': true,
+            'cafes': cafes,
+            'totalCount': cafeData['totalCount'] ?? cafes.length,
+            'pageNumber': pageNumber,
+            'pageSize': pageSize,
+          };
+        } else {
+          throw Exception(data['message'] ?? 'Failed to load nearby cafes');
+        }
+      } else {
+        throw Exception('Failed to load nearby cafes');
+      }
+    } catch (e) {
+      print('Error in getNearbyCafes: $e');
+      throw Exception('An unexpected error occurred');
+    }
+  }
   // New CRUD methods for my_cafe feature
-  
+
   // Get all cafes for current user
   Future<List<CafeModel>> getMyCafes() async {
     try {
@@ -178,21 +224,23 @@ class CafeService {
         throw Exception('User not authenticated');
       }
 
-      final response = await dio.get(AppConstants.getCafeByOwner(ownerId: user!.id));
-        print('Response data: ${response.data}');
+      final response = await dio.get(
+        AppConstants.getCafeByOwner(ownerId: user!.id),
+      );
+      print('Response data: ${response.data}');
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
         if (data['isSuccess'] == true && data['data'] != null) {
-        final responseData = data['data'] as Map<String, dynamic>;
-        
-        // Based on your backend structure, data contains 'cafes' array
-        if (responseData['cafes'] != null && responseData['cafes'] is List) {
-          final cafesData = responseData['cafes'] as List<dynamic>;
-          return cafesData.map((json) => CafeModel.fromJson(json)).toList();
-        } else {
-          // If no cafes found, return empty list
-          return [];
-        }
+          final responseData = data['data'] as Map<String, dynamic>;
+
+          // Based on your backend structure, data contains 'cafes' array
+          if (responseData['cafes'] != null && responseData['cafes'] is List) {
+            final cafesData = responseData['cafes'] as List<dynamic>;
+            return cafesData.map((json) => CafeModel.fromJson(json)).toList();
+          } else {
+            // If no cafes found, return empty list
+            return [];
+          }
         }
       } else {
         throw Exception('Failed to fetch cafes');
@@ -206,7 +254,10 @@ class CafeService {
   }
 
   // Create new cafe
-  Future<CafeModel> createCafe(CreateCafeRequest request, {List<File>? mediaFiles}) async {
+  Future<CafeModel> createCafe(
+    CreateCafeRequest request, {
+    List<File>? mediaFiles,
+  }) async {
     try {
       final user = await userStorageServices.getCurrentUser();
       if (user?.id == null) {
@@ -237,21 +288,25 @@ class CafeService {
 
       // Add feature tag IDs
       for (int tagId in request.selectedFeatureTagIds) {
-        formData.fields.add(MapEntry('selectedFeatureTagIds', tagId.toString()));
+        formData.fields.add(
+          MapEntry('selectedFeatureTagIds', tagId.toString()),
+        );
       }
 
       // Add media files
       if (mediaFiles != null && mediaFiles.isNotEmpty) {
         for (File file in mediaFiles) {
-          formData.files.add(MapEntry(
-            'mediaFiles',
-            await MultipartFile.fromFile(file.path),
-          ));
+          formData.files.add(
+            MapEntry('mediaFiles', await MultipartFile.fromFile(file.path)),
+          );
         }
       }
 
-      final response = await dio.post(AppConstants.cafeListEndpoint, data: formData);
-      
+      final response = await dio.post(
+        AppConstants.cafeListEndpoint,
+        data: formData,
+      );
+
       if (response.statusCode == 201) {
         final data = response.data as Map<String, dynamic>;
         return CafeModel.fromJson(data['data']);
@@ -266,11 +321,14 @@ class CafeService {
   }
 
   // Update cafe
-  Future<CafeModel> updateCafe(UpdateCafeRequest request, {List<File>? mediaFiles}) async {
+  Future<CafeModel> updateCafe(
+    UpdateCafeRequest request, {
+    List<File>? mediaFiles,
+  }) async {
     try {
       // Prepare form data
       final formData = FormData();
-      
+
       // Add request data
       formData.fields.addAll([
         MapEntry('cafeId', request.cafeId),
@@ -307,15 +365,17 @@ class CafeService {
       // Add new media files
       if (mediaFiles != null && mediaFiles.isNotEmpty) {
         for (File file in mediaFiles) {
-          formData.files.add(MapEntry(
-            'mediaFiles',
-            await MultipartFile.fromFile(file.path),
-          ));
+          formData.files.add(
+            MapEntry('mediaFiles', await MultipartFile.fromFile(file.path)),
+          );
         }
       }
 
-      final response = await dio.put(AppConstants.cafeListEndpoint, data: formData);
-      
+      final response = await dio.put(
+        AppConstants.cafeListEndpoint,
+        data: formData,
+      );
+
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
         return CafeModel.fromJson(data['data']);
@@ -332,8 +392,10 @@ class CafeService {
   // Delete cafe
   Future<void> deleteCafe(String cafeId) async {
     try {
-      final response = await dio.delete('${AppConstants.cafeListEndpoint}/$cafeId');
-      
+      final response = await dio.delete(
+        '${AppConstants.cafeListEndpoint}/$cafeId',
+      );
+
       if (response.statusCode != 200 && response.statusCode != 204) {
         throw Exception('Failed to delete cafe');
       }
@@ -343,5 +405,4 @@ class CafeService {
       throw Exception('Error deleting cafe: $e');
     }
   }
-
 }

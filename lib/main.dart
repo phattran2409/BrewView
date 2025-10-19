@@ -1,5 +1,7 @@
 import 'package:briewview/core/services/deep_link_handler.dart';
 import 'package:briewview/core/services/deep_link_service.dart';
+import 'package:briewview/features/auth/repository/auth_repository.dart';
+import 'package:briewview/features/auth/repository/auth_repository_impl.dart';
 import 'package:briewview/features/auth/viewModel/Bloc/Auth_Bloc.dart';
 import 'package:briewview/features/premium/viewmodel/premium_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -80,6 +82,7 @@ class MyApp extends StatelessWidget {
           create: (_) => getIt<AuthBloc>(),
           lazy: false, // Create immediately
         ),
+        
         // ✅ Global PremiumBloc
         BlocProvider<PremiumBloc>(
           create: (_) => getIt<PremiumBloc>(),

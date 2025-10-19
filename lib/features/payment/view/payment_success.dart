@@ -1,20 +1,40 @@
+import 'package:briewview/app/di/locator.dart';
+import 'package:briewview/core/network/user_storage_services.dart';
+import 'package:briewview/features/auth/services/auth_services.dart';
+import 'package:briewview/features/auth/viewModel/Bloc/Auth_Bloc.dart';
+import 'package:briewview/features/auth/viewModel/Bloc/Auth_event.dart';
+import 'package:briewview/features/user_management/model/user_model.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:briewview/app/theme/app_color.dart';
 
-class PaymentSuccessPage extends StatelessWidget {
-  final String? transactionId;
-  final String? amount;
-  final String? planId;
-  final String? subscriptionId;
+class PaymentSuccessPage extends StatefulWidget {
+  final String? code;
+  final String? status;
+  const PaymentSuccessPage({super.key, this.code, this.status});
+  @override
+  State<PaymentSuccessPage> createState() => _PaymentSuccessPageState();
+}
 
-  const PaymentSuccessPage({
-    super.key,
-    this.transactionId,
-    this.amount,
-    this.planId,
-    this.subscriptionId,
-  });
+class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
+  late final AuthBloc authBloc;
+  @override
+  void initState() {
+    super.initState();
+    authBloc = getIt<AuthBloc>(); 
+    _handlePaymentResult();
+  }
+
+  final userStorage = UserStorageServices();
+  void _handlePaymentResult() async {
+    final user = await userStorage.getCurrentUser();
+    if (user != null) {
+      authBloc.add(GetCurrentUserEvent(userId: user.id));
+    }
+  }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -131,47 +151,9 @@ class PaymentSuccessPage extends StatelessWidget {
         const SizedBox(height: 32),
 
         // Payment details
-        if (transactionId != null || amount != null || planId != null)
-          _buildPaymentDetailsCard(),
-      ],
-    );
-  }
 
-  Widget _buildPaymentDetailsCard() {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Payment Details',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 16),
-          if (transactionId != null) ...[
-            _buildDetailRow('Transaction ID', transactionId!),
-            const SizedBox(height: 12),
-          ],
-          if (amount != null) ...[
-            _buildDetailRow('Amount', '${amount!} VND'),
-            const SizedBox(height: 12),
-          ],
-          if (planId != null) ...[
-            _buildDetailRow('Plan', _formatPlanName(planId!)),
-          ],
-        ],
-      ),
+        // _buildPaymentDetailsCard(),
+      ],
     );
   }
 

@@ -63,17 +63,27 @@ class LoadCafeById extends CafeEvent {
 }
 
 class LoadCafesByDistance extends CafeEvent {
+  final int maxDistanceKm;
   final int pageNumber;
   final int pageSize;
-  final String? sortBy;
-  final String? sortDirection;
 
   LoadCafesByDistance({
+    this.maxDistanceKm = 10,
     this.pageNumber = 1,
-    this.pageSize = 10,
-    this.sortBy,
-    this.sortDirection,
+    this.pageSize = 10
   });
+  @override
+  List<Object?> get props => [maxDistanceKm, pageNumber, pageSize];
+}
+
+class LocationUpdated extends CafeEvent {
+  final double latitude;
+  final double longitude;
+
+  LocationUpdated({required this.latitude, required this.longitude});
+  
+  @override
+  List<Object?> get props => [latitude, longitude];
 }
 
 class RefreshCafes extends CafeEvent {}

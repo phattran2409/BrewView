@@ -4,28 +4,16 @@ part 'payment_result_model.g.dart';
 
 @JsonSerializable()
 class PaymentResultModel {
-  final String id;
   final String subscriptionId;
-  final String status; // pending, completed, failed, cancelled
-  final double amount;
-  final String currency;
-  final String paymentMethod;
-  final DateTime createdAt;
-  final DateTime? completedAt;
-  final String? transactionId;
-  final String? failureReason;
+  final int orderCode;
+  final String paymentUrl;
+  final String qrCode;
 
   const PaymentResultModel({
-    required this.id,
     required this.subscriptionId,
-    required this.status,
-    required this.amount,
-    required this.currency,
-    required this.paymentMethod,
-    required this.createdAt,
-    this.completedAt,
-    this.transactionId,
-    this.failureReason,
+    required this.orderCode,
+    required this.paymentUrl,
+    required this.qrCode,
   });
 
   factory PaymentResultModel.fromJson(Map<String, dynamic> json) =>
@@ -34,26 +22,48 @@ class PaymentResultModel {
   Map<String, dynamic> toJson() => _$PaymentResultModelToJson(this);
 
   // Helper methods
-  bool get isSuccess => status == 'completed';
-  bool get isPending => status == 'pending';
-  bool get isFailed => status == 'failed';
-  bool get isCancelled => status == 'cancelled';
-
-  String get statusText {
-    switch (status) {
-      case 'pending':
-        return 'Đang xử lý';
-      case 'completed':
-        return 'Thành công';
-      case 'failed':
-        return 'Thất bại';
-      case 'cancelled':
-        return 'Đã hủy';
-      default:
-        return 'Không xác định';
-    }
+  bool get hasQrCode => qrCode.isNotEmpty;
+  
+  bool get hasPaymentUrl => paymentUrl.isNotEmpty;
+  
+  String get displayOrderCode => '#$orderCode';
+  
+  // Copy with method for state management
+  PaymentResultModel copyWith({
+    String? subscriptionId,
+    int? orderCode,
+    String? paymentUrl,
+    String? qrCode,
+  }) {
+    return PaymentResultModel(
+      subscriptionId: subscriptionId ?? this.subscriptionId,
+      orderCode: orderCode ?? this.orderCode,
+      paymentUrl: paymentUrl ?? this.paymentUrl,
+      qrCode: qrCode ?? this.qrCode,
+    );
   }
 
-  String get formattedAmount => '${amount.toStringAsFixed(0)} $currency';
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is PaymentResultModel &&
+        other.subscriptionId == subscriptionId &&
+        other.orderCode == orderCode &&
+        other.paymentUrl == paymentUrl &&
+        other.qrCode == qrCode;
+  }
+
+  @override
+  int get hashCode {
+    return subscriptionId.hashCode ^
+        orderCode.hashCode ^
+        paymentUrl.hashCode ^
+        qrCode.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'PaymentResultModel(subscriptionId: $subscriptionId, orderCode: $orderCode, paymentUrl: $paymentUrl, qrCode: $qrCode)';
+  }
 }
 
