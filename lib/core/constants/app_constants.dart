@@ -40,6 +40,7 @@ class AppConstants {
 
   // Cafe
   static const String cafeListEndpoint = '/api/cafes';
+  static const String cafeByDistanceEndpoint = '/api/cafes/by-distance';
   static const String cafePreferenceEndpoint =
       '/api/cafes/by-user-preferences/{userId}';
  static const String cafeByOwnerEndpoint = '/api/cafes/get-cafe/{ownerId}';
@@ -90,7 +91,25 @@ class AppConstants {
       },
     );
     return uri.toString();
-  }
+  } 
+  static String getCafeByDistance({
+    double latitude = 0.0,
+    double longitude = 0.0,
+    int maxDistanceKm = 10,
+    int pageSize = 10,
+    int pageNumber = 1,
+  }) {
+    final uri = Uri.parse(cafeByDistanceEndpoint).replace(
+      queryParameters: {
+        'latitude': latitude.toString(),
+        'longitude': longitude.toString(),
+        'maxDistanceKm': maxDistanceKm.toString(),
+        'pageSize': pageSize.toString(),
+        'pageNumber': pageNumber.toString(),
+      },
+    );
+    return uri.toString();
+  } 
 
   // Review
   static const String reviewEndpoint = '/api/reviews/{cafeId}';
@@ -127,12 +146,20 @@ class AppConstants {
       '/api/premium/subscription/history';
 
   // Payment endpoints
-  static const String paymentMethodsEndpoint = '/api/payment/methods';
-  static const String addPaymentMethodEndpoint = '/api/payment/methods/add';
-  static const String removePaymentMethodEndpoint =
-      '/api/payment/methods/remove';
-  static const String setDefaultPaymentMethodEndpoint =
-      '/api/payment/methods/set-default';
-  static const String processPaymentEndpoint = '/api/payment/process';
-  static const String paymentHistoryEndpoint = '/api/payment/history';
+  static const String createPaymentLink =
+      '/api/subscriptions/create-payment-link/{userId}';
+  static const String paymentStatusEndpoint = '/api/payment/status/{orderCode}';
+  static const String verifyPaymentEndpoint = '/api/payment/verify';
+  static const String cancelPaymentEndpoint = '/api/payment/cancel';
+  
+  static String getCreatePaymentLink(String userId) { 
+    return createPaymentLink.replaceAll('{userId}', userId);
+  }
+  
+  static String getPaymentStatus(int orderCode) {
+    return paymentStatusEndpoint.replaceAll('{orderCode}', orderCode.toString());
+  }
+  
+  static String get verifyPayment => verifyPaymentEndpoint;
+  static String get cancelPayment => cancelPaymentEndpoint; 
 }

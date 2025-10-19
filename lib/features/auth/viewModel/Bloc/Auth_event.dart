@@ -57,8 +57,18 @@ class AuthStatusChecked extends AuthEvent {
 }
 
 class AuthInitialized extends AuthEvent {
+
   const AuthInitialized();
 }
+
+class GetCurrentUserEvent extends AuthEvent {
+  final String userId;
+
+  const GetCurrentUserEvent({required this.userId});
+
+  @override
+  List<Object?> get props => [userId];
+} 
 
 class AuthPasswordResetRequested extends AuthEvent {
   final String email;

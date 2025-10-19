@@ -178,6 +178,7 @@ class _NearbyCoffeeShopState extends State<NearbyCoffeeShop> {
                   ),
                 ),
               ),
+              
 
               // Rating Badge (Top Right)
               if (coffeeShop['rating'] != null)

@@ -1,6 +1,7 @@
 import 'package:briewview/core/constants/app_constants.dart';
 import 'package:briewview/features/payment/model/payment_method_model.dart';
 import 'package:briewview/features/payment/model/payment_result_model.dart';
+import 'package:briewview/features/payment/model/payment_error_model.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
@@ -10,152 +11,147 @@ class PaymentService {
 
   PaymentService(this._dio);
 
-  // Get user's payment methods
-  Future<List<PaymentMethodModel>> getPaymentMethods() async {
+  /// Tạo payment link cho subscription
+  Future<PaymentResultModel?> createPaymentLink({
+    required String userId,
+  }) async {
     try {
-      final response = await _dio.get(AppConstants.paymentMethodsEndpoint);
-
+      var response = await _dio.post(AppConstants.getCreatePaymentLink(userId));
       if (response.statusCode == 200) {
-        final data = response.data as Map<String, dynamic>;
-        if (data['isSuccess'] == true && data['data'] != null) {
-          final methods =
-              (data['data'] as List)
-                  .map((methodJson) => PaymentMethodModel.fromJson(methodJson))
-                  .toList();
-          return methods;
+        var responseData = response.data['data'] as Map<String, dynamic>;
+        print('Response Data: $responseData');  
+        if (responseData != null ) {
+          var dataResult = PaymentResultModel.fromJson(responseData); 
+          return dataResult;
         }
       }
-      return [];
+      return null;
     } catch (e) {
-      print('Error loading payment methods: $e');
-      return [];
+      print('Error creating payment link: $e');
+      throw Exception(e);
     }
   }
 
-  // Add new payment method
-  Future<PaymentMethodModel?> addPaymentMethod({
-    required String type,
-    required String name,
-    String? cardNumber,
-    String? expiryDate,
-    String? cvv,
-    String? bankCode,
+  /// Kiểm tra trạng thái thanh toán
+  Future<Map<String, dynamic>?> checkPaymentStatus({
+    required int orderCode,
   }) async {
     try {
-      final response = await _dio.post(
-        AppConstants.addPaymentMethodEndpoint,
-        data: {
-          'type': type,
-          'name': name,
-          'cardNumber': cardNumber,
-          'expiryDate': expiryDate,
-          'cvv': cvv,
-          'bankCode': bankCode,
-        },
+      final response = await _dio.get(
+        AppConstants.getPaymentStatus(orderCode),
       );
 
       if (response.statusCode == 200) {
-        final data = response.data as Map<String, dynamic>;
-        if (data['isSuccess'] == true && data['data'] != null) {
-          return PaymentMethodModel.fromJson(data['data']);
-        }
+        return response.data;
       }
       return null;
+    } on DioException catch (e) {
+      print('Error checking payment status: $e');
+      throw _handleDioError(e);
     } catch (e) {
-      print('Error adding payment method: $e');
-      return null;
+      print('Unexpected error: $e');
+      throw Exception('Unexpected error: $e');
     }
   }
 
-  // Process payment
-  Future<PaymentResultModel?> processPayment({
+  /// Verify payment sau khi thanh toán thành công
+  Future<bool> verifyPayment({
+    required int orderCode,
     required String subscriptionId,
-    required String paymentMethodId,
-    required double amount,
-    required String currency,
   }) async {
     try {
       final response = await _dio.post(
-        AppConstants.processPaymentEndpoint,
+        AppConstants.verifyPayment,
         data: {
+          'orderCode': orderCode,
           'subscriptionId': subscriptionId,
-          'paymentMethodId': paymentMethodId,
-          'amount': amount,
-          'currency': currency,
         },
       );
 
       if (response.statusCode == 200) {
-        final data = response.data as Map<String, dynamic>;
-        if (data['isSuccess'] == true && data['data'] != null) {
-          return PaymentResultModel.fromJson(data['data']);
-        }
-      }
-      return null;
-    } catch (e) {
-      print('Error processing payment: $e');
-      return null;
-    }
-  }
-
-  // Get payment history
-  Future<List<PaymentResultModel>> getPaymentHistory() async {
-    try {
-      final response = await _dio.get(AppConstants.paymentHistoryEndpoint);
-
-      if (response.statusCode == 200) {
-        final data = response.data as Map<String, dynamic>;
-        if (data['isSuccess'] == true && data['data'] != null) {
-          final payments =
-              (data['data'] as List)
-                  .map(
-                    (paymentJson) => PaymentResultModel.fromJson(paymentJson),
-                  )
-                  .toList();
-          return payments;
-        }
-      }
-      return [];
-    } catch (e) {
-      print('Error loading payment history: $e');
-      return [];
-    }
-  }
-
-  // Remove payment method
-  Future<bool> removePaymentMethod(String paymentMethodId) async {
-    try {
-      final response = await _dio.delete(
-        '${AppConstants.removePaymentMethodEndpoint}/$paymentMethodId',
-      );
-
-      if (response.statusCode == 200) {
-        final data = response.data as Map<String, dynamic>;
-        return data['isSuccess'] == true;
+        var responseData = response.data;
+        return responseData['success'] ?? false;
       }
       return false;
+    } on DioException catch (e) {
+      print('Error verifying payment: $e');
+      throw _handleDioError(e);
     } catch (e) {
-      print('Error removing payment method: $e');
-      return false;
+      print('Unexpected error: $e');
+      throw Exception('Unexpected error: $e');
     }
   }
 
-  // Set default payment method
-  Future<bool> setDefaultPaymentMethod(String paymentMethodId) async {
+  /// Cancel payment
+  Future<bool> cancelPayment({
+    required int orderCode,
+  }) async {
     try {
       final response = await _dio.post(
-        '${AppConstants.setDefaultPaymentMethodEndpoint}/$paymentMethodId',
+        AppConstants.cancelPayment,
+        data: {'orderCode': orderCode},
       );
 
       if (response.statusCode == 200) {
-        final data = response.data as Map<String, dynamic>;
-        return data['isSuccess'] == true;
+        return response.data['success'] ?? false;
       }
       return false;
+    } on DioException catch (e) {
+      print('Error cancelling payment: $e');
+      throw _handleDioError(e);
     } catch (e) {
-      print('Error setting default payment method: $e');
-      return false;
+      print('Unexpected error: $e');
+      throw Exception('Unexpected error: $e');
+    }
+  }
+
+  /// Handle Dio errors với PaymentErrorModel
+  Exception _handleDioError(DioException e) {
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+        return PaymentServiceException('Kết nối timeout', null);
+      case DioExceptionType.sendTimeout:
+        return PaymentServiceException('Gửi request timeout', null);
+      case DioExceptionType.receiveTimeout:
+        return PaymentServiceException('Nhận phản hồi timeout', null);
+      case DioExceptionType.badResponse:
+        // Parse API error response
+        try {
+          if (e.response?.data != null && e.response?.data is Map<String, dynamic>) {
+            final errorData = e.response!.data as Map<String, dynamic>;
+            final paymentError = PaymentErrorModel.fromJson(errorData);
+            return PaymentServiceException(
+              paymentError.userFriendlyMessage,
+              paymentError,
+            );
+          }
+        } catch (parseError) {
+          print('Error parsing PaymentErrorModel: $parseError');
+        }
+        
+        // Fallback cho các lỗi không parse được
+        final statusCode = e.response?.statusCode;
+        final message = e.response?.data?['message'] ?? 
+                       e.response?.data?['detail'] ?? 
+                       'Lỗi không xác định';
+        return PaymentServiceException('Lỗi server [$statusCode]: $message', null);
+      case DioExceptionType.cancel:
+        return PaymentServiceException('Request bị hủy', null);
+      case DioExceptionType.connectionError:
+        return PaymentServiceException('Lỗi kết nối', null);
+      default:
+        return PaymentServiceException('Lỗi mạng: ${e.message}', null);
     }
   }
 }
 
+/// Custom exception để chứa PaymentErrorModel
+class PaymentServiceException implements Exception {
+  final String message;
+  final PaymentErrorModel? paymentError;
+
+  PaymentServiceException(this.message, this.paymentError);
+
+  @override
+  String toString() => message;
+}

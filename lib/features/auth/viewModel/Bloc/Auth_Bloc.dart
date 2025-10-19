@@ -27,6 +27,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLogoutRequested>(_onAuthLogoutRequested);
     on<AuthForgotPasswordRequested>(_onAuthForgotPasswordRequested);
     on<AuthPasswordResetRequested>(_onAuthPasswordResetRequested);
+    on<GetCurrentUserEvent>(_onGetCurrentUser); 
   }
 
   /// Khởi tạo auth state khi app start
@@ -39,7 +40,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final isLoggedIn = await _authRepository.isLoggedIn();
 
       if (isLoggedIn) {
-        final userResult = await _authRepository.getCurrentUser();
+        final userResult = await _authRepository.getCurrentUser("");
         userResult.fold(
           (failure) => emit(const AuthUnauthenticated()),
           (user) =>
@@ -54,7 +55,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthError(message: e.toString()));
     }
   }
-
+ 
+  Future<void> _onGetCurrentUser(
+    GetCurrentUserEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthLoading());
+    try {
+      final userResult = await _authRepository.getCurrentUser(event.userId);
+      userResult.fold(
+        (failure) => emit(const AuthUnauthenticated()),
+        (user) =>
+            user != null
+                ? emit(AuthAuthenticated(user: user))
+                : emit(const AuthUnauthenticated()),
+      );
+    } catch (e) {
+      emit(AuthError(message: e.toString()));
+    }
+  }
   /// Kiểm tra auth status
   Future<void> _onAuthStatusChecked(
     AuthStatusChecked event,
