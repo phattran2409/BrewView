@@ -44,7 +44,7 @@ class _WishlistPageState extends State<WishlistPage> {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => context.pop(),
+          onPressed: () => context.goNamed('home'),
         ),
       ),
       body: BlocProvider.value(

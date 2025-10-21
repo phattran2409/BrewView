@@ -4,6 +4,7 @@ import 'package:briewview/features/home/view/home_page.dart';
 import 'package:briewview/features/payment/view/payment_success.dart';
 import 'package:briewview/features/post/view/post_detail.dart';
 import 'package:briewview/features/post/view/post_list_page.dart';
+import 'package:briewview/features/post/viewmodel/post_bloc.dart';
 import 'package:briewview/features/profile/view/edit_profile_page.dart';
 import 'package:briewview/features/search/view/search_page.dart';
 import 'package:briewview/features/profile/view/profile_page.dart';
@@ -13,8 +14,10 @@ import 'package:briewview/features/premium/view/premium_plans_page.dart';
 import 'package:briewview/features/premium/view/premium_demo_page.dart';
 import 'package:briewview/features/payment/view/payment_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
+import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/app/router/route_paths.dart';
 import 'package:briewview/features/onboarding/view/onboarding_page.dart';
 import 'package:briewview/features/auth/view/auth_login_pages.dart';
@@ -119,7 +122,10 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.postList,
           name: 'post-list',
-          builder: (context, state) => const PostListPage(),
+          builder: (context, state) => BlocProvider(
+            create: (context) => getIt<PostBloc>(),
+            child: const PostListPage(),
+          ),
         ),
 
         GoRoute(
@@ -127,7 +133,10 @@ class AppRouter {
           name: 'post-detail',
           builder: (context, state) {
             final postId = state.pathParameters['id'];
-            return PostDetailPage(postId: postId);
+            return BlocProvider(
+              create: (context) => getIt<PostBloc>(),
+              child: PostDetailPage(postId: postId),
+            );
           },
         ),
 

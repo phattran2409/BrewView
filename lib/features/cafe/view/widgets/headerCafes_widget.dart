@@ -261,12 +261,11 @@ class _CafeHeaderWidgetState extends State<CafeHeaderWidget> {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Quán cà phê đã có trong danh sách yêu thích'),
-                  backgroundColor: Colors.orange,
                 ),
               );
             } else {
               // Add to wishlist
-              _wishlistBloc.add(AddToWishlist(widget.cafe.cafeId ?? ''));
+              _wishlistBloc.add(AddToWishlist(cafeData?.cafeId ?? ''));
             }
           },
           child: Container(

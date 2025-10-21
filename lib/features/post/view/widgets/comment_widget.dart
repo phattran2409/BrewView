@@ -1,0 +1,505 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:briewview/features/post/model/comment_mutation/post_comment.dart';
+import 'package:briewview/features/post/viewmodel/comment_bloc.dart';
+import 'package:briewview/features/post/viewmodel/comment_event.dart';
+import 'package:briewview/features/post/viewmodel/comment_state.dart';
+import 'package:briewview/core/network/user_storage_services.dart';
+
+class CommentWidget extends StatefulWidget {
+  final PostComment comment;
+  final String postId;
+  final bool isReply;
+  final VoidCallback? onReplyPressed;
+
+  const CommentWidget({
+    super.key,
+    required this.comment,
+    required this.postId,
+    this.isReply = false,
+    this.onReplyPressed,
+  });
+
+  @override
+  State<CommentWidget> createState() => _CommentWidgetState();
+}
+
+class _CommentWidgetState extends State<CommentWidget> {
+  bool _isEditing = false;
+  bool _isReplying = false;
+  bool _showReplies = false;
+  final TextEditingController _editController = TextEditingController();
+  final TextEditingController _replyController = TextEditingController();
+  String? _currentUserId;
+  PostComment? _currentComment;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentComment = widget.comment;
+    _getCurrentUserId();
+  }
+
+  @override
+  void didUpdateWidget(CommentWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    _editController.dispose();
+    _replyController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _getCurrentUserId() async {
+    final userStorageServices = UserStorageServices();
+    final user = await userStorageServices.getCurrentUser();
+    if (user != null) {
+      setState(() {
+        _currentUserId = user.id;
+      });
+    }
+  }
+
+  String _timeAgo(DateTime dt) {
+    return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}';
+  }
+
+  bool get _isCurrentUserComment => _currentUserId == _currentComment?.userId;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<CommentBloc, CommentState>(
+      listener: (context, state) {
+        if (state is CommentUpdateSuccessState) {
+          setState(() {
+            _isEditing = false;
+            _editController.clear();
+            // Update local comment state with new content
+            _currentComment = _currentComment?.copyWith(
+              content: state.comment.content,
+            );
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Cập nhật bình luận thành công!')),
+          );
+        } else if (state is CommentDeleteSuccessState) {
+          // Check if this delete event is for current comment
+          if (state.commentId == _currentComment?.commentId) {
+            setState(() {
+              // Mark comment as deleted using deletedAt field
+              _currentComment = _currentComment?.copyWith(
+                content: '[Bình luận đã bị xóa]',
+                deletedAt: DateTime.now(),
+              );
+            });
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Xóa bình luận thành công!')),
+          );
+        } else if (state is CommentCreateSuccessState) {
+          setState(() {
+            _isReplying = false;
+            _replyController.clear();
+            // Automatically show replies when a new reply is added
+            if (!widget.isReply) {
+              _showReplies = true;
+            }
+          });
+          // Don't show snackbar here as it will be handled by CommentInputWidget
+        } else if (state is CommentToggleLikeSuccessState) {
+          
+          // Update the current comment with new like status
+          if (state.toggleResult.commentId == _currentComment?.commentId) {
+            print('🔍 IDs match, updating comment state');
+            setState(() {
+              _currentComment = _currentComment?.copyWith(
+                isLikedByCurrentUser: state.toggleResult.isLiked,
+                likeCount: state.toggleResult.commentTotalLikes ?? _currentComment!.likeCount,
+              );
+            });
+            print('🔍 After update - like status: ${_currentComment?.isLikedByCurrentUser}, count: ${_currentComment?.likeCount}');
+          } else {
+            print('🔍 IDs do not match, not updating');
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                state.toggleResult.isLiked == true
+                    ? 'Đã thích bình luận!'
+                    : 'Đã bỏ thích bình luận!',
+              ),
+            ),
+          );
+        }
+      },
+      child: Container(
+        margin: EdgeInsets.only(left: widget.isReply ? 24 : 0, bottom: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color:
+              widget.isReply
+                  ? const Color(0xFF5A2D09).withOpacity(0.2)
+                  : const Color(0xFF5A2D09).withOpacity(0.4),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color:
+                widget.isReply
+                    ? const Color(0xFF8B4513).withOpacity(0.2)
+                    : const Color(0xFF8B4513).withOpacity(0.4),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Comment header
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 16,
+                  backgroundColor: const Color(0xFF8B4513),
+                  child: Text(
+                    ((_currentComment?.userName ?? 'Người dùng').isNotEmpty
+                            ? (_currentComment?.userName ?? 'Người dùng')[0]
+                            : 'U')
+                        .toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _currentComment?.userName ?? 'Người dùng',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Text(
+                        _timeAgo(_currentComment?.createdAt ?? DateTime.now()),
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (_isCurrentUserComment)
+                  PopupMenuButton<String>(
+                    icon: const Icon(
+                      Icons.more_vert,
+                      color: Colors.white70,
+                      size: 18,
+                    ),
+                    onSelected: (value) {
+                      switch (value) {
+                        case 'edit':
+                          _editController.text = _currentComment?.content ?? '';
+                          setState(() {
+                            _isEditing = true;
+                          });
+                          break;
+                        case 'delete':
+                          _showDeleteDialog();
+                          break;
+                      }
+                    },
+                    itemBuilder:
+                        (context) => [
+                          const PopupMenuItem(
+                            value: 'edit',
+                            child: Text('Chỉnh sửa'),
+                          ),
+                          const PopupMenuItem(
+                            value: 'delete',
+                            child: Text('Xóa'),
+                          ),
+                        ],
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+
+            // Comment content
+            if (_isEditing)
+              _buildEditForm()
+            else
+              Text(
+                _currentComment?.content ?? '',
+                style: const TextStyle(color: Colors.white, height: 1.4),
+              ),
+
+            const SizedBox(height: 8),
+
+            // Comment actions
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    context.read<CommentBloc>().add(
+                      ToggleCommentLikeEvent(_currentComment?.commentId ?? ''),
+                    );
+                  },
+                  child: Row(
+                    children: [
+                      Icon(
+                        _currentComment?.isLikedByCurrentUser == true
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color:
+                            _currentComment?.isLikedByCurrentUser == true
+                                ? Colors.red
+                                : Colors.white70,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        (_currentComment?.likeCount ?? 0).toString(),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                if (!widget.isReply)
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isReplying = true;
+                      });
+                    },
+                    child: const Row(
+                      children: [
+                        Icon(Icons.reply, color: Colors.white70, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'Trả lời',
+                          style: TextStyle(color: Colors.white70, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                if (!widget.isReply && (_currentComment?.replyCount ?? 0) > 0)
+                  const SizedBox(width: 16),
+                if (!widget.isReply && (_currentComment?.replyCount ?? 0) > 0)
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _showReplies = !_showReplies;
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        Icon(
+                          _showReplies ? Icons.expand_less : Icons.expand_more,
+                          color: Colors.white70,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          _showReplies
+                              ? 'Ẩn trả lời'
+                              : '${_currentComment?.replyCount ?? 0} trả lời',
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+
+            // Reply form
+            if (_isReplying) _buildReplyForm(),
+
+            // Replies
+            if ((_currentComment?.replies.isNotEmpty ?? false) && _showReplies)
+              Column(
+                children:
+                    (_currentComment?.replies ?? []).map((reply) {
+                      return BlocProvider.value(
+                        value: context.read<CommentBloc>(),
+                        child: CommentWidget(
+                          comment: reply,
+                          postId: widget.postId,
+                          isReply: true,
+                        ),
+                      );
+                    }).toList(),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEditForm() {
+    return Column(
+      children: [
+        TextField(
+          controller: _editController,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            hintText: 'Chỉnh sửa bình luận...',
+            hintStyle: TextStyle(color: Colors.white54),
+            border: OutlineInputBorder(),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.white54),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.amber),
+            ),
+          ),
+          maxLines: 3,
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _isEditing = false;
+                  _editController.clear();
+                });
+              },
+              child: const Text('Hủy', style: TextStyle(color: Colors.white70)),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton(
+              onPressed: () {
+                if (_editController.text.trim().isNotEmpty) {
+                  context.read<CommentBloc>().add(
+                    UpdateCommentEvent(
+                      commentId: _currentComment?.commentId ?? '',
+                      content: _editController.text.trim(),
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF8B4513),
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Cập nhật'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReplyForm() {
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      child: Column(
+        children: [
+          TextField(
+            controller: _replyController,
+            style: const TextStyle(color: Colors.white),
+            decoration: const InputDecoration(
+              hintText: 'Viết trả lời...',
+              hintStyle: TextStyle(color: Colors.white54),
+              border: OutlineInputBorder(),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white54),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.amber),
+              ),
+            ),
+            maxLines: 3,
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    _isReplying = false;
+                    _replyController.clear();
+                  });
+                },
+                child: const Text(
+                  'Hủy',
+                  style: TextStyle(color: Colors.white70),
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () {
+                  if (_replyController.text.trim().isNotEmpty &&
+                      _currentUserId != null) {
+                    context.read<CommentBloc>().add(
+                      CreateCommentEvent(
+                        postId: widget.postId,
+                        userId: _currentUserId!,
+                        content: _replyController.text.trim(),
+                        parentCommentId: _currentComment?.commentId ?? '',
+                      ),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF8B4513),
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Trả lời'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteDialog() {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Xóa bình luận'),
+            content: const Text('Bạn có chắc chắn muốn xóa bình luận này?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Hủy'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  context.read<CommentBloc>().add(
+                    DeleteCommentEvent(_currentComment?.commentId ?? ''),
+                  );
+                },
+                child: const Text('Xóa', style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          ),
+    );
+  }
+}

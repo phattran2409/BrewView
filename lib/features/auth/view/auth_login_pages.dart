@@ -325,7 +325,6 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
 
                             const SizedBox(height: 24),
 
-                            PostNavigation(),
                           ],
                         ),
                       ),

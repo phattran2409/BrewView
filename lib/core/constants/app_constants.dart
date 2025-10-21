@@ -1,6 +1,6 @@
-
 class AppConstants {
   static const String appName = 'BrewView';
+  // static const String apiBaseUrl = 'https://10.0.2.2:7117';
   static const String apiBaseUrl = 'https://10.0.2.2:7117';
   static const int timeoutDuration = 30000; // milliseconds
 
@@ -42,7 +42,7 @@ class AppConstants {
   static const String cafeListEndpoint = '/api/cafes';
   static const String cafePreferenceEndpoint =
       '/api/cafes/by-user-preferences/{userId}';
- static const String cafeByOwnerEndpoint = '/api/cafes/get-cafe/{ownerId}';
+  static const String cafeByOwnerEndpoint = '/api/cafes/get-cafe/{ownerId}';
   static String getCafeList({
     int pageSize = 1,
     int pageNumber = 10,
@@ -61,13 +61,16 @@ class AppConstants {
     );
     return uri.toString();
   }
-    static String getCafeByOwner({
+
+  static String getCafeByOwner({
     String ownerId = '',
     int pageSize = 20,
     int pageNumber = 1,
     String sortBy = '',
   }) {
-    final uri = Uri.parse(cafeByOwnerEndpoint.replaceAll('{ownerId}', ownerId)).replace(
+    final uri = Uri.parse(
+      cafeByOwnerEndpoint.replaceAll('{ownerId}', ownerId),
+    ).replace(
       queryParameters: {
         'pageSize': pageSize.toString(),
         'pageNumber': pageNumber.toString(),
@@ -141,6 +144,7 @@ class AppConstants {
   static String getWishlistEndpoint(String userId) {
     return wishlistEndpoint.replaceAll('{userId}', userId);
   }
+
   static const String addToWishlistEndpoint = '/api/favorite-cafe/{userId}';
   static String getAddToWishlistEndpoint(String userId) {
     return addToWishlistEndpoint.replaceAll('{userId}', userId);
@@ -149,4 +153,54 @@ class AppConstants {
   // static String getRemoveFromWishlistEndpoint(String userId) {
   //   return removeFromWishlistEndpoint.replaceAll('{userId}', userId);
   // }
+
+  // Post
+  static const String postsEndpoint = '/api/posts';
+  static const String postByIdEndpoint = '/api/posts/{postId}';
+  static const String createPostEndpoint = '/api/posts';
+  static const String updatePostEndpoint = '/api/posts/{postId}';
+  static const String deletePostEndpoint = '/api/posts/{postId}';
+  static const String likePostEndpoint = '/api/posts/like/{postId}';
+
+  static String getPostByIdEndpoint(String postId) {
+    return postByIdEndpoint.replaceAll('{postId}', postId);
+  }
+
+  static String getUpdatePostEndpoint(String postId) {
+    return updatePostEndpoint.replaceAll('{postId}', postId);
+  }
+
+  static String getDeletePostEndpoint(String postId) {
+    return deletePostEndpoint.replaceAll('{postId}', postId);
+  }
+
+  static String getLikePostEndpoint(String postId) {
+    return likePostEndpoint.replaceAll('{postId}', postId);
+  }
+
+  static String getPostsEndpoint({int pageNumber = 1, int pageSize = 50}) {
+    final uri = Uri.parse(postsEndpoint).replace(
+      queryParameters: {
+        'pageNumber': pageNumber.toString(),
+        'pageSize': pageSize.toString(),
+      },
+    );
+    return uri.toString();
+  }
+
+  // Comment
+  static const String commentsEndpoint = '/api/comments/{postId}';
+  static const String mutationCommentEndpoint = '/api/comments/{commentId}';
+  static const String likeCommentEndpoint = '/api/comments/like/{commentId}';
+
+   static String getCommentsEndpoint(String postId) {
+     return commentsEndpoint.replaceAll('{postId}', postId);
+   }
+  static String getMutationCommentEndpoint(String commentId) {
+    return mutationCommentEndpoint.replaceAll('{commentId}', commentId);
+  }
+  static String getLikeCommentEndpoint(String commentId) {
+    return likeCommentEndpoint.replaceAll('{commentId}', commentId);
+  }
+  
 }

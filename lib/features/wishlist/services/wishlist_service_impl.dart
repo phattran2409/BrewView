@@ -57,13 +57,10 @@ class WishlistServiceImpl implements WishlistService {
         throw Exception('User not authenticated');
       }
 
-      final response = await dio.post(AppConstants.getAddToWishlistEndpoint(user.id), data: {'cafeIds': cafeId});
+      final response = await dio.post(AppConstants.getAddToWishlistEndpoint(user.id), data: {'cafeIds': [cafeId]});
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return WishlistResponse.fromJson(response.data);
-      }
-      else if (response.statusCode == 409) {
-        throw Exception('Cafe already in wishlist');
       }
        else {
         throw Exception('Failed to add to wishlist');

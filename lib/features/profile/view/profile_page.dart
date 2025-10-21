@@ -175,6 +175,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     onTap: () => _navigateToFavorites(),
                   ),
                   MenuItemWidget(
+                    icon: Icons.post_add,
+                    title: 'Bài Viết',
+                    onTap: () => _navigateToPosts(),
+                  ),
+                  MenuItemWidget(
                     icon: Icons.star,
                     title: 'Premium',
                     onTap: () => _navigateToPackgePremium(),
@@ -298,6 +303,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _navigateToCafes() {
     context.pushNamed('my-cafes');
+  }
+  void _navigateToPosts() {
+    context.pushNamed('post-list');
   }
   void _navigateToFavorites() {
     context.pushNamed('wishlist');

@@ -13,7 +13,7 @@ class WishlistModel extends Equatable {
   factory WishlistModel.fromJson(Map<String, dynamic> json) {
     return WishlistModel(
       userId: json['userId'] as String,
-      favoriteCafes: (json['favoriteCafes'] as List<dynamic>)
+      favoriteCafes: (json['favoriteCafes'] as List<dynamic> ? ?? [])
           .map((cafe) => CafeModel.fromJson(cafe))
           .toList(),
     );

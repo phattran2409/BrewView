@@ -40,6 +40,13 @@ import 'package:briewview/features/cafe/viewmodel/cafe_bloc.dart' as _i237;
 import 'package:briewview/features/cafe/viewmodel/review_bloc.dart' as _i661;
 import 'package:briewview/features/payment/services/payment_service.dart'
     as _i714;
+import 'package:briewview/features/post/repository/post_repository.dart'
+    as _i909;
+import 'package:briewview/features/post/repository/post_repository_impl.dart'
+    as _i997;
+import 'package:briewview/features/post/services/post_service.dart' as _i231;
+import 'package:briewview/features/post/viewmodel/comment_bloc.dart' as _i838;
+import 'package:briewview/features/post/viewmodel/post_bloc.dart' as _i642;
 import 'package:briewview/features/premium/services/popUpPreferncesServices.dart'
     as _i357;
 import 'package:briewview/features/premium/services/premium_service.dart'
@@ -107,6 +114,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i762.CafeService>(
       () => _i762.CafeService(gh<_i361.Dio>(), gh<_i369.UserStorageServices>()),
     );
+    gh.factory<_i231.PostService>(
+      () => _i231.PostService(gh<_i361.Dio>(), gh<_i369.UserStorageServices>()),
+    );
     gh.factory<_i290.WishlistService>(
       () => _i131.WishlistServiceImpl(
         gh<_i361.Dio>(),
@@ -167,6 +177,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i994.CafesRepository>(
       () => _i47.CafesRepositoryImpl(gh<_i762.CafeService>()),
     );
+    gh.singleton<_i909.PostRepository>(
+      () => _i997.PostRepositoryImpl(gh<_i231.PostService>()),
+    );
     gh.factory<_i940.OtpBloc>(() => _i940.OtpBloc(gh<_i564.AuthRepository>()));
     gh.singleton<_i392.ProfileService>(
       () => _i392.ProfileService(
@@ -207,6 +220,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i367.AuthApi>(),
         gh<_i369.UserStorageServices>(),
       ),
+    );
+    gh.factory<_i642.PostBloc>(
+      () => _i642.PostBloc(postRepository: gh<_i909.PostRepository>()),
+    );
+    gh.factory<_i838.CommentBloc>(
+      () => _i838.CommentBloc(postRepository: gh<_i909.PostRepository>()),
     );
     gh.factory<_i654.ProfileBloc>(
       () => _i654.ProfileBloc(
