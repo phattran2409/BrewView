@@ -23,6 +23,7 @@ import 'package:briewview/features/cafe/view/review_list_page.dart';
 import 'package:briewview/features/my_cafe/view/my_cafes_list_page.dart';
 import 'package:briewview/features/my_cafe/view/my_cafe_form_page.dart';
 import 'package:briewview/features/my_cafe/view/my_cafe_detail_page.dart';
+import 'package:briewview/features/nearby_map/view/map_page.dart';
 
 // import 'package:briewview/features/user_management/view/user_list_page.dart';
 
@@ -61,6 +62,11 @@ class AppRouter {
           path: RoutePaths.home,
           name: 'home',
           builder: (context, state) => const HomePage(),
+        ),
+        GoRoute(
+          path: RoutePaths.map,
+          name: 'map',
+          builder: (context, state) => const MapPage(),
         ),
         GoRoute(
           path: RoutePaths.search,
@@ -142,16 +148,13 @@ class AppRouter {
           name: 'premium-demo',
           builder: (context, state) => const PremiumDemoPage(),
         ),
-         GoRoute(
+        GoRoute(
           path: RoutePaths.paymentSuccess,
           name: 'payment-success',
           builder: (context, state) {
             final code = state.uri.queryParameters['code'];
             final status = state.uri.queryParameters['status'];
-            return PaymentSuccessPage(
-              code: code,
-              status: status,
-            );
+            return PaymentSuccessPage(code: code, status: status);
           },
         ),
         GoRoute(
@@ -162,9 +165,8 @@ class AppRouter {
             return PaymentPage(planId: planId ?? '');
           },
         ),
-       
 
-      GoRoute(
+        GoRoute(
           path: RoutePaths.myCafes,
           name: 'my-cafes',
           builder: (context, state) => const MyCafesListPage(),

@@ -231,7 +231,7 @@ class _NearbyCoffeeShopState extends State<NearbyCoffeeShop> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      '${coffeeShop['distance']}',
+                      '${coffeeShop['distance']} Km',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 9,

@@ -1,4 +1,5 @@
 import 'package:briewview/core/utils/priceFormatter.dart';
+import 'package:briewview/features/home/view/widgets/rating_cafe_list_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:briewview/features/cafe/model/cafeMode.dart';
 import 'package:go_router/go_router.dart';
@@ -29,7 +30,11 @@ class RatingCafeWidget extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  // Navigate to all cafes page
+                  Navigator.push(context,
+                    MaterialPageRoute(
+                      builder: (context) => RatingCafeListWidget(),
+                    ),
+                  );
                 },
                 child: const Text(
                   'Xem tất cả',

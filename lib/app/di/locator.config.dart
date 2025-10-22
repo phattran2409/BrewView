@@ -39,6 +39,7 @@ import 'package:briewview/features/cafe/services/cafe_service.dart' as _i762;
 import 'package:briewview/features/cafe/services/review_service.dart' as _i458;
 import 'package:briewview/features/cafe/viewmodel/cafe_bloc.dart' as _i237;
 import 'package:briewview/features/cafe/viewmodel/review_bloc.dart' as _i661;
+import 'package:briewview/features/nearby_map/viewmodel/map_bloc.dart' as _i564;
 import 'package:briewview/features/payment/repository/payment_repository.dart'
     as _i572;
 import 'package:briewview/features/payment/repository/payment_repository_impl.dart'
@@ -155,6 +156,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.singleton<_i994.CafesRepository>(
       () => _i47.CafesRepositoryImpl(gh<_i762.CafeService>()),
+    );
+    gh.factory<_i564.MapBloc>(
+      () => _i564.MapBloc(
+        cafesRepository: gh<_i994.CafesRepository>(),
+        locationService: gh<_i794.LocationService>(),
+      ),
     );
     gh.factory<_i940.OtpBloc>(() => _i940.OtpBloc(gh<_i564.AuthRepository>()));
     gh.singleton<_i392.ProfileService>(
