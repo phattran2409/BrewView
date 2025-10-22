@@ -7,6 +7,7 @@ import 'package:briewview/features/post/model/comment_mutation/post_comment_muta
 import 'package:briewview/features/post/model/comment_mutation/toogle_comment_like.dart';
 import 'package:briewview/features/post/model/comment_mutation/toogle_post_like.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'dart:io';
 
@@ -148,7 +149,7 @@ class PostService {
         final data = response.data as Map<String, dynamic>;
         print("✅ Create Post Response Data: $data");
         print("✅ Response Status Code: ${response.statusCode}");
-        
+
         if (data['isSuccess'] == true && data['data'] != null) {
           print("✅ Parsing post data: ${data['data']}");
           try {
@@ -273,29 +274,41 @@ class PostService {
         AppConstants.getLikeCommentEndpoint(commentId),
         queryParameters: {'userId': currentUser.id},
       );
-
       if (response.statusCode == 200) {
         final data = response.data;
 
         // Handle different response formats
         if (data is Map<String, dynamic>) {
+
           if (data['isSuccess'] == true && data['data'] != null) {
-            return ToogleCommentLike.fromJson(data['data']);
+            print('✅ PostService: Using data["data"] format');
+            final result = ToogleCommentLike.fromJson(data['data']);
+            print(
+              '🔍 PostService: Parsed result - commentId: ${result.commentId}, isLiked: ${result.isLiked}, totalLikes: ${result.commentTotalLikes}',
+            );
+            return result;
           } else if (data['commentId'] != null) {
             // Direct toggle result
-            return ToogleCommentLike.fromJson(data);
+            print('✅ PostService: Using direct format');
+            final result = ToogleCommentLike.fromJson(data);
+            print(
+              '🔍 PostService: Parsed result - commentId: ${result.commentId}, isLiked: ${result.isLiked}, totalLikes: ${result.commentTotalLikes}',
+            );
+            return result;
           } else {
+            print('❌ PostService: Invalid response structure');
             throw Exception(data['message'] ?? 'Failed to toggle comment like');
           }
         } else {
+          print('❌ PostService: Data is not Map, type: ${data.runtimeType}');
           throw Exception('Invalid response format');
         }
       } else {
+        print('❌ PostService: Bad status code: ${response.statusCode}');
         throw Exception('Failed to toggle comment like');
       }
-    } on DioException catch (e) {
-      throw Exception('Failed to toggle comment like: ${e.message}');
     } catch (e) {
+      print('❌ PostService: Exception - $e');
       throw Exception('Failed to toggle comment like: $e');
     }
   }

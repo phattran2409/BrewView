@@ -148,9 +148,12 @@ class PostRepositoryImpl implements PostRepository {
   @override
   Future<Either<Failure, ToogleCommentLike>> toggleCommentLike(String commentId) async {
     try {
+      print('🔍 PostRepositoryImpl: Calling toggleCommentLike for commentId: $commentId');
       final result = await postService.toggleCommentLike(commentId);
+      print('🔍 PostRepositoryImpl: Got result - commentId: ${result.commentId}, isLiked: ${result.isLiked}');
       return Right(result);
     } catch (e) {
+      print('❌ PostRepositoryImpl: Error - $e');
       return Left(ServerFailure(e.toString()));
     }
   }

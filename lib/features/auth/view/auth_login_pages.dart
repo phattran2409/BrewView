@@ -3,7 +3,7 @@ import 'package:briewview/features/auth/view/widgets/social_login_buttons.dart';
 import 'package:briewview/features/auth/viewModel/Bloc/Auth_Bloc.dart';
 import 'package:briewview/features/auth/viewModel/Bloc/Auth_event.dart';
 import 'package:briewview/features/auth/viewModel/Bloc/Auth_state.dart';
-import 'package:briewview/features/post/view/post_navigation.dart';
+// import 'package:briewview/features/post/view/post_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:briewview/features/auth/view/widgets/auth_forgotpassword_widget.dart';

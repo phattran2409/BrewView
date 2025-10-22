@@ -12,7 +12,6 @@ import 'package:briewview/features/post/view/post_edit_form.dart';
 import 'package:briewview/features/post/view/widgets/comment_list_widget.dart';
 import 'package:briewview/features/post/view/widgets/comment_input_widget.dart';
 import 'package:briewview/core/network/user_storage_services.dart';
-import 'package:briewview/features/post/model/comment_mutation/post_comment.dart';
 import 'package:briewview/app/di/locator.dart';
 
 class PostDetailPage extends StatefulWidget {
@@ -29,6 +28,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   int _currentMedia = 0;
   String? _currentUserId;
   PostModel? _currentPost;
+  bool _isPressFavorite = false;
 
   @override
   void initState() {
@@ -90,7 +90,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
           // Reload post details after toggling like
           final postId = widget.postId;
           if (postId != null) {
-            context.read<PostBloc>().add(GetPostByIdEvent(postId));
+           context.read<PostBloc>().add(GetPostByIdEvent(postId)); 
+            
           }
         }
       },
@@ -99,6 +100,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
           // Handle different states and update _currentPost
           if (state is PostDetailSuccessState) {
             _currentPost = state.post;
+            _isPressFavorite = _currentPost?.isLikedByCurrentUser ?? false;
           } else if (state is PostDetailLoadingState && _currentPost == null) {
             return const Scaffold(
               backgroundColor: Color(0xFF763C0C),
@@ -362,7 +364,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       const Spacer(),
                       IconButton(
                         icon: Icon(
-                          post.isLikedByCurrentUser == true
+                          _isPressFavorite
                               ? Icons.favorite
                               : Icons.favorite_border,
                           color:
@@ -510,6 +512,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   void _toggleLike(PostModel post) {
+    _isPressFavorite = !_isPressFavorite;
     context.read<PostBloc>().add(TogglePostLikeEvent(post.postId));
   }
 

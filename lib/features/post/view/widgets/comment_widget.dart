@@ -33,6 +33,7 @@ class _CommentWidgetState extends State<CommentWidget> {
   String? _currentUserId;
   PostComment? _currentComment;
 
+
   @override
   void initState() {
     super.initState();
@@ -70,7 +71,7 @@ class _CommentWidgetState extends State<CommentWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<CommentBloc, CommentState>(
+    return BlocConsumer<CommentBloc, CommentState>(
       listener: (context, state) {
         if (state is CommentUpdateSuccessState) {
           setState(() {
@@ -109,36 +110,41 @@ class _CommentWidgetState extends State<CommentWidget> {
           });
           // Don't show snackbar here as it will be handled by CommentInputWidget
         } else if (state is CommentToggleLikeSuccessState) {
-          
-          // Update the current comment with new like status
+          // Update _currentComment và _toggledCommentId
           if (state.toggleResult.commentId == _currentComment?.commentId) {
-            print('🔍 IDs match, updating comment state');
+            print('🔍 Listener: Comment ${state.toggleResult.commentId} toggled');
+            print('🔍 Before - isLiked: ${_currentComment?.isLikedByCurrentUser}, count: ${_currentComment?.likeCount}');
+            print('🔍 New values - isLiked: ${state.toggleResult.isLiked}, count: ${state.toggleResult.commentTotalLikes}');
+            
             setState(() {
               _currentComment = _currentComment?.copyWith(
                 isLikedByCurrentUser: state.toggleResult.isLiked,
                 likeCount: state.toggleResult.commentTotalLikes ?? _currentComment!.likeCount,
               );
             });
-            print('🔍 After update - like status: ${_currentComment?.isLikedByCurrentUser}, count: ${_currentComment?.likeCount}');
-          } else {
-            print('🔍 IDs do not match, not updating');
-          }
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                state.toggleResult.isLiked == true
-                    ? 'Đã thích bình luận!'
-                    : 'Đã bỏ thích bình luận!',
+            
+            print('🔍 After - isLiked: ${_currentComment?.isLikedByCurrentUser}, count: ${_currentComment?.likeCount}');
+            
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.toggleResult.isLiked == true
+                      ? 'Đã thích bình luận!'
+                      : 'Đã bỏ thích bình luận!',
+                ),
+                duration: const Duration(milliseconds: 1500),
               ),
-            ),
-          );
+            );
+          }
         }
+        
       },
-      child: Container(
-        margin: EdgeInsets.only(left: widget.isReply ? 24 : 0, bottom: 12),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color:
+      builder: (context, state) {
+        return Container(
+          margin: EdgeInsets.only(left: widget.isReply ? 24 : 0, bottom: 12),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color:
               widget.isReply
                   ? const Color(0xFF5A2D09).withOpacity(0.2)
                   : const Color(0xFF5A2D09).withOpacity(0.4),
@@ -254,31 +260,56 @@ class _CommentWidgetState extends State<CommentWidget> {
               children: [
                 GestureDetector(
                   onTap: () {
+                    print('🔍 Toggle like clicked for comment: ${_currentComment?.commentId}');
+                    print('🔍 Current like status: ${_currentComment?.isLikedByCurrentUser}');
+                    print('🔍 Current like count: ${_currentComment?.likeCount}');
+                    
+                    if (_currentComment?.commentId == null) {
+                      print('❌ ERROR: commentId is null!');
+                      return;
+                    }
+                    
                     context.read<CommentBloc>().add(
-                      ToggleCommentLikeEvent(_currentComment?.commentId ?? ''),
+                      ToggleCommentLikeEvent(_currentComment!.commentId),
                     );
                   },
-                  child: Row(
-                    children: [
-                      Icon(
-                        _currentComment?.isLikedByCurrentUser == true
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color:
-                            _currentComment?.isLikedByCurrentUser == true
-                                ? Colors.red
-                                : Colors.white70,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        (_currentComment?.likeCount ?? 0).toString(),
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+                  child: BlocBuilder<CommentBloc, CommentState>(
+                    buildWhen: (previous, current) {
+                      // Chỉ rebuild khi toggle like thành công cho comment này
+                      if (current is CommentToggleLikeSuccessState) {
+                        final shouldRebuild = current.toggleResult.commentId == _currentComment?.commentId;
+                        if (shouldRebuild) {
+                          print('🔍 BlocBuilder: Rebuilding like button for comment ${_currentComment?.commentId}');
+                        }
+                        return shouldRebuild;
+                      }
+                      return false;
+                    },
+                    builder: (context, state) {
+                      // Lấy giá trị hiện tại từ _currentComment
+                      bool isLiked = _currentComment?.isLikedByCurrentUser ?? false;
+                      int likeCount = _currentComment?.likeCount ?? 0;
+                      
+                      print('🔍 BlocBuilder: Building icon - isLiked: $isLiked, count: $likeCount');
+                      
+                      return Row(
+                        children: [
+                          Icon(
+                            isLiked ? Icons.favorite : Icons.favorite_border,
+                            color: isLiked ? Colors.red : Colors.white70,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            likeCount.toString(),
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -352,7 +383,8 @@ class _CommentWidgetState extends State<CommentWidget> {
               ),
           ],
         ),
-      ),
+      );
+      },
     );
   }
 

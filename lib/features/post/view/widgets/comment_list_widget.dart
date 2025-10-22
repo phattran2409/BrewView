@@ -10,6 +10,7 @@ import 'package:briewview/app/di/locator.dart';
 class CommentListWidget extends StatefulWidget {
   final String postId;
   final VoidCallback? onCommentAdded;
+  
 
   const CommentListWidget({
     super.key,
@@ -24,6 +25,7 @@ class CommentListWidget extends StatefulWidget {
 class _CommentListWidgetState extends State<CommentListWidget> {
   List<PostComment> _comments = [];
   bool _isLoading = true;
+  String commentId = '';
 
   @override
   void initState() {

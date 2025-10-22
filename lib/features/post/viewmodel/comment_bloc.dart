@@ -25,20 +25,28 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     Emitter<CommentState> emit,
   ) async {
     try {
+      print('🔍 CommentBloc: Received ToggleCommentLikeEvent for commentId: ${event.commentId}');
       emit(const CommentLoadingState());
 
       final result = await postRepository.toggleCommentLike(event.commentId);
+      print('🔍 CommentBloc: Got result from repository');
 
       result.fold(
-        (failure) =>
-            emit(CommentToggleLikeErrorState(_mapFailureToMessage(failure))),
+        (failure) {
+          print('❌ CommentBloc: Toggle like failed - ${_mapFailureToMessage(failure)}');
+          emit(CommentToggleLikeErrorState(_mapFailureToMessage(failure)));
+        },
         (toggleResult) {
-          print('🔍 CommentBloc: Emitting CommentToggleLikeSuccessState');
-          print('🔍 Toggle result: $toggleResult');
+          print('✅ CommentBloc: Toggle like success!');
+          print('🔍 Toggle result - commentId: ${toggleResult.commentId}');
+          print('🔍 Toggle result - isLiked: ${toggleResult.isLiked}');
+          print('🔍 Toggle result - totalLikes: ${toggleResult.commentTotalLikes}');
           emit(CommentToggleLikeSuccessState(toggleResult));
+          print('🔍 CommentBloc: State emitted!');
         },
       );
     } catch (e) {
+      print('❌ CommentBloc: Exception - $e');
       emit(CommentToggleLikeErrorState(e.toString()));
     }
   }

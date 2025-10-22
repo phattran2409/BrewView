@@ -18,7 +18,7 @@ class PostComment extends Equatable {
   final DateTime? updatedAt;
   final DateTime? deletedAt;
   final List<PostComment> replies;
-  final List<CommentLikeModel> likes;
+  // final List<CommentLikeModel> likes;
   final String? userName;
   final String? avatarUser;
 
@@ -31,7 +31,7 @@ class PostComment extends Equatable {
     required this.replyCount,
     required this.createdAt,
     required this.replies,
-    required this.likes,
+    // required this.likes,
     this.isLikedByCurrentUser,
     this.post,
     this.parentCommentId,
@@ -57,9 +57,9 @@ class PostComment extends Equatable {
       replies: (json['replies'] as List<dynamic>? ?? [])
           .map((reply) => PostComment.fromJson(reply))
           .toList(),
-      likes: (json['likes'] as List<dynamic>? ?? [])
-          .map((like) => CommentLikeModel.fromJson(like))
-          .toList(),
+      // likes: (json['likes'] as List<dynamic>? ?? [])
+      //     .map((like) => CommentLikeModel.fromJson(like))
+      //     .toList(),
       post: json['post'] != null ? PostModel.fromJson(json['post']) : null,
       parentCommentId: json['parentCommentId'] as String?,
       parentComment: json['parentComment'] != null
@@ -84,7 +84,7 @@ class PostComment extends Equatable {
       'updatedAt': updatedAt?.toIso8601String(),
       'deletedAt': deletedAt?.toIso8601String(),
       'replies': replies.map((reply) => reply.toJson()).toList(),
-      'likes': likes.map((like) => like.toJson()).toList(),
+      // 'likes': likes.map((like) => like.toJson()).toList(),
       'post': post?.toJson(),
       'parentCommentId': parentCommentId,
       'parentComment': parentComment?.toJson(),
@@ -107,7 +107,7 @@ class PostComment extends Equatable {
         updatedAt,
         deletedAt,
         replies,
-        likes,
+        // likes,
         post,
         parentCommentId,
         parentComment,
@@ -133,7 +133,7 @@ class PostComment extends Equatable {
     DateTime? updatedAt,
     DateTime? deletedAt,
     List<PostComment>? replies,
-    List<CommentLikeModel>? likes,
+    // List<CommentLikeModel>? likes,
     String? userName,
     String? avatarUser,
   }) {
@@ -153,7 +153,7 @@ class PostComment extends Equatable {
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
       replies: replies ?? this.replies,
-      likes: likes ?? this.likes,
+      // likes: likes ?? this.likes,
       userName: userName ?? this.userName,
       avatarUser: avatarUser ?? this.avatarUser,
     );
