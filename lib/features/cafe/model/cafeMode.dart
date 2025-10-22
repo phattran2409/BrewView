@@ -5,11 +5,13 @@ import 'dart:io';
 
 class CafeModel extends Equatable {
   final String? cafeId;
-  final int? categoryId;  
+  final int? categoryId;
   final String? name;
   final String? address;
   final String? description;
   final double? distance;
+  final double? latitude;
+  final double? longitude;
   final int? priceMin;
   final int? priceMax;
   final String? openingTime;
@@ -27,7 +29,7 @@ class CafeModel extends Equatable {
   // final List<String>? tags;
   final List<CafeMedias>? cafeMedias;
   final List<dynamic>? cafeCategories;
-  final List<FeatureTagModel>? cafeFeatureTags;   
+  final List<FeatureTagModel>? cafeFeatureTags;
 
   const CafeModel({
     this.cafeId,
@@ -36,6 +38,8 @@ class CafeModel extends Equatable {
     this.address,
     this.description,
     this.distance,
+    this.latitude,
+    this.longitude,
     this.priceMin,
     this.priceMax,
     this.openingTime,
@@ -59,8 +63,10 @@ class CafeModel extends Equatable {
       cafeId: json['cafeId'] as String?,
       name: json['name'] as String?,
       address: json['address'] as String?,
-      description: json['description'] as String?, 
+      description: json['description'] as String?,
       distance: json['distance']?.toDouble(),
+      latitude: _parseDouble(json['latitude']),
+      longitude: _parseDouble(json['longitude']),
       priceMin: _parseInt(json['priceMin']),
       priceMax: _parseInt(json['priceMax']),
       openingTime: json['openingTime'] as String?,
@@ -85,12 +91,15 @@ class CafeModel extends Equatable {
                   .toList()
               : null,
       cafeCategories: json['cafeCategories'] as List<dynamic>?,
-      cafeFeatureTags: (json['cafeFeatureTags'] as List<dynamic>?)
-          ?.map((item) => FeatureTagModel(
-                tagId: item['tagId'] as int,
-                name: item['tagName'] as String,
-              ))
-          .toList(),
+      cafeFeatureTags:
+          (json['cafeFeatureTags'] as List<dynamic>?)
+              ?.map(
+                (item) => FeatureTagModel(
+                  tagId: item['tagId'] as int,
+                  name: item['tagName'] as String,
+                ),
+              )
+              .toList(),
       categoryId: _parseInt(json['categoryId']),
     );
   }
@@ -102,6 +111,8 @@ class CafeModel extends Equatable {
       'address': address,
       'description': description,
       'distance': distance,
+      'latitude': latitude,
+      'longitude': longitude,
       'priceMin': priceMin,
       'priceMax': priceMax,
       'openingTime': openingTime,
@@ -146,6 +157,8 @@ class CafeModel extends Equatable {
     name,
     address,
     description,
+    latitude,
+    longitude,
     priceMin,
     priceMax,
     openingTime,

@@ -70,7 +70,6 @@ class _SplashPageState extends State<SplashPage> {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
@@ -80,10 +79,9 @@ class _SplashPageState extends State<SplashPage> {
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.coffee,
-                size: 60,
-                color: Color(0xFF763C0C),
+              child: Image.asset(
+                'assets/images/logo_app.png',
+                fit: BoxFit.contain,
               ),
             ),
 

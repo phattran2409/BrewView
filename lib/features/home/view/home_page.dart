@@ -22,6 +22,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:go_router/go_router.dart';
+import 'package:go_router/go_router.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -119,7 +120,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ); // Recommendations
         if (_locationInitialized) {
           _cafeBloc.add(
-            LoadCafesByDistance(pageNumber: 1, pageSize: 5, maxDistanceKm: 10),
+            LoadCafesByDistance(pageNumber: 1, pageSize: 10, maxDistanceKm: 10),
           ); // Nearby
         }
         _cafeBloc.add(
@@ -148,58 +149,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ); // Top Rated
     }
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     body: Container(
-  //       decoration: const BoxDecoration(
-  //         gradient: LinearGradient(
-  //           colors: AppColor.primaryGradient,
-  //           begin: Alignment.topCenter,
-  //           end: Alignment.bottomCenter,
-  //         ),
-  //       ),
-  //       child: SafeArea(
-  //         child: Column(
-  //           children: [
-  //             // Header Section with User Info
-  //             _buildHeaderSection(),
-
-  //             // Search and Filters Section
-  //             _buildSearchAndFilters(),
-
-  //             // Recommendations Section
-  //             Expanded(
-  //               child: SingleChildScrollView(
-  //                 child: BlocProvider(
-  //                   create: (context) => _cafeBloc,
-  //                   child: BlocConsumer<CafeBloc, CafeState>(
-  //                     listener: (context, state) {
-  //                       if (state is CafeError) {
-  //                         ScaffoldMessenger.of(context).showSnackBar(
-  //                           SnackBar(content: Text(state.message)),
-  //                         );
-  //                       }
-  //                     },
-  //                     builder: (context, state) {
-  //                       return SingleChildScrollView(
-  //                         child: _buildContent(state),
-  //                       );
-  //                     },
-  //                   ),
-  //                 ),
-  //               ),
-  //             ),
-
-  //             // Bottom Navigation
-  //             const CustomNavigationBar(),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -296,9 +245,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (state is CafeLoading) {
       return const Center(child: CircularProgressIndicator());
     }
- 
+
     if (state is CombinedCafesLoaded) {
-    
       return Column(
         children: [
           RecomendationWidget(recommendations: state.recommendations),
@@ -443,44 +391,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ),
               ),
 
-              // Positioned(
-              //   right: 10,
-              //   top: 8,
-              //   child: BlocBuilder<PremiumBloc, PremiumState>(
-              //     builder: (context, state) {
-              //       final hasPremium =
-              //           state is PremiumLoaded && state.hasPremiumAccess;
-              //       return GestureDetector(
-              //         onTap: () {
-              //           _premiumBloc.add(const ShowHomePagePopup(
-              //             message:
-              //                 'Explore premium features like unlimited searches, detailed reviews, and more!',
-              //           ));
-              //         },
-              //         child: Container(
-              //           padding: const EdgeInsets.symmetric(
-              //             horizontal: 6,
-              //             vertical: 2,
-              //           ),
-              //           decoration: BoxDecoration(
-              //             color: hasPremium ? Colors.amber : Colors.grey,
-              //             borderRadius: BorderRadius.circular(12),
-              //           ),
-              //           child:
-              //               hasPremium
-              //                   ? PremiumHelper.premiumBadge(text: 'Premium')
-              //                   : const Text(
-              //                     'Free',
-              //                     style: TextStyle(
-              //                       color: Colors.white,
-              //                       fontSize: 10,
-              //                     ),
-              //                   ),
-              //         ),
-              //       );
-              //     },
-              //   ),
-              // ),
             ],
           ),
         ],
@@ -524,6 +434,54 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ),
                 const SizedBox(width: 10),
               ],
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Map button
+          GestureDetector(
+            onTap: () {
+              context.push('/map');
+            },
+            child: Container(
+              height: 50,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF8B4513), Color(0xFFA0522D)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                borderRadius: BorderRadius.circular(25),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.brown.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.map, color: Colors.white, size: 24),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Xem bản đồ quán cafe gần đây',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white.withOpacity(0.8),
+                    size: 16,
+                  ),
+                ],
+              ),
             ),
           ),
 

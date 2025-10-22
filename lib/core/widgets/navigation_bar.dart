@@ -31,9 +31,9 @@ class CustomNavigationBar extends StatelessWidget {
           ),
           _buildNavItem(
             context,
-            Icons.map,
-            'Bản đồ',
-            RoutePaths.map,
+            Icons.add_box,
+            'Bài viết',
+            RoutePaths.postList,
             currentLocation,
           ),
           _buildNavItem(

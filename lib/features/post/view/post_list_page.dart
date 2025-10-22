@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:briewview/core/widgets/dotIndicator.dart';
+import 'package:briewview/core/widgets/navigation_bar.dart';
 import 'package:briewview/features/post/model/post_model.dart';
 import 'package:briewview/features/post/viewmodel/post_bloc.dart';
 import 'package:briewview/features/post/viewmodel/post_event.dart';
 import 'package:briewview/features/post/viewmodel/post_state.dart';
-import 'package:briewview/features/post/view/post_detail.dart';
 import 'package:briewview/features/post/view/post_create_form.dart';
 import 'package:briewview/app/di/locator.dart';
 
@@ -133,6 +133,7 @@ class _PostListPageState extends State<PostListPage> {
           }
         },
         child: BlocBuilder<PostBloc, PostState>(
+          
           builder: (context, state) {
             if (state is PostListLoadingState && state.currentPosts.isEmpty) {
               return const Center(
@@ -214,6 +215,7 @@ class _PostListPageState extends State<PostListPage> {
           },
         ),
       ),
+      bottomNavigationBar: const CustomNavigationBar(),
     );
   }
 }
@@ -238,7 +240,6 @@ class _PostCardState extends State<_PostCard> {
   }
 
   String _timeAgo(DateTime dt) {
-    final diff = DateTime.now().difference(dt);
     return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}';
   }
 

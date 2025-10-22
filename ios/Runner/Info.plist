@@ -56,5 +56,12 @@
 			</array>
 		</dict>
 	</array>
+	<!-- Location Permission Descriptions -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>App cần quyền truy cập vị trí để hiển thị quán cafe gần bạn trên bản đồ</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>App cần quyền truy cập vị trí để cập nhật quán cafe gần bạn</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>App cần quyền truy cập vị trí để tìm quán cafe gần nhất và cập nhật thông tin</string>
 </dict>
 </plist>
