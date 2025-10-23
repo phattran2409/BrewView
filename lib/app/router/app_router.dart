@@ -1,3 +1,4 @@
+import 'package:briewview/features/auth/view/auth_register_pages.dart';
 import 'package:briewview/features/auth/view/otp_page.dart';
 import 'package:briewview/features/cafe/view/cafes_detail.dart';
 import 'package:briewview/features/home/view/home_page.dart';
@@ -48,6 +49,11 @@ class AppRouter {
           path: RoutePaths.login,
           name: 'login',
           builder: (context, state) => const AuthLoginPage(),
+        ),
+        GoRoute(
+          path: RoutePaths.register,  
+          name: 'register',
+          builder: (context, state) => const AuthRegisterPage(),  
         ),
         GoRoute(
           path: RoutePaths.userList,

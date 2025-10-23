@@ -326,11 +326,6 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
                             SocialLoginButtons(),
 
                             const SizedBox(height: 24),
-
-                            // Survey Demo Button
-                            SurveyNavigationButton(),
-                            PostNavigation(),
-                            MyCafeNavigationButton(),
                           ],
                         ),
                       ),
@@ -377,9 +372,10 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
 
   void _handleSignUp() {
     // Navigate to sign up page
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (context) => const AuthRegisterPage()));
+    // Navigator.of(
+    //   context,
+    // ).push(MaterialPageRoute(builder: (context) => const AuthRegisterPage()));
+    context.goNamed('register');
   }
 
 
