@@ -1,4 +1,5 @@
 import 'package:briewview/app/di/locator.dart';
+import 'package:briewview/core/utils/priceFormatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -530,7 +531,7 @@ class PremiumPlansPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '\$${plan.price}/month',
+                      PriceFormatter.format(int.parse(plan.formattedPrice), currency: "VND"), 
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,

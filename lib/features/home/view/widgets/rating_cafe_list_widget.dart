@@ -37,10 +37,10 @@ class _RatingCafeListWidgetState extends State<RatingCafeListWidget> {
   void _loadTopRatedCafes() {
     _cafeBloc.add(
       LoadCafesRating(
-        pageSize: 1,
-        pageNumber: 10,
+        pageSize: 10,
+        pageNumber: 1,
         sortBy: 'rating',
-        sortDirection: 'desc',
+        sortDirection: 'Descending',
       ),
     );
   }

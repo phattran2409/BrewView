@@ -1,3 +1,6 @@
+import 'dart:ffi';
+
+import 'package:briewview/core/utils/priceFormatter.dart';
 import 'package:flutter/material.dart';
 import 'package:briewview/features/premium/model/premium_plan_model.dart';
 
@@ -87,42 +90,63 @@ class PremiumPlanCard extends StatelessWidget {
 
             // Price section
             Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  plan.formattedPrice,
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.brown,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '/ ${plan.formattedDuration}',
-                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                ),
-                if (plan.savingsText.isNotEmpty) ...[
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.green[100],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      plan.savingsText,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green[700],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: [
+                            Text(
+                              PriceFormatter.format(
+                                int.parse(plan.formattedPrice),
+                                currency: "VND",
+                              ),
+                              style: const TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.brown,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '/ ${plan.formattedDuration}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                      if (plan.savingsText.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.green[100],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            plan.savingsText,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green[700],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                ],
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -184,9 +208,3 @@ class PremiumPlanCard extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-

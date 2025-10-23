@@ -1,5 +1,6 @@
 import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/core/network/user_storage_services.dart';
+import 'package:briewview/core/utils/priceFormatter.dart';
 import 'package:briewview/features/payment/viewModel/payment_bloc.dart';
 import 'package:briewview/features/payment/viewModel/payment_event.dart';
 import 'package:briewview/features/payment/viewModel/payment_state.dart';
@@ -201,7 +202,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 ],
               ),
               Text(
-                plan.formattedPrice,
+                PriceFormatter.format(int.parse(plan.formattedPrice), currency: "VND" ),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

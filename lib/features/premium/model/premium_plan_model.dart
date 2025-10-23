@@ -34,7 +34,7 @@ class PremiumPlanModel {
   Map<String, dynamic> toJson() => _$PremiumPlanModelToJson(this);
 
   // Helper methods
-  String get formattedPrice => '${price.toStringAsFixed(0)} $currency';
+  String get formattedPrice => '${price.toStringAsFixed(0)}';
   String get formattedDuration {
     if (durationDays >= 365) {
       return '${(durationDays / 365).toStringAsFixed(0)} năm';

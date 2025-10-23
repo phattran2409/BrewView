@@ -373,7 +373,9 @@ class PostService {
         // Handle different response formats
         if (data is Map<String, dynamic>) {
           if (data['isSuccess'] == true && data['data'] != null) {
-            return PostComment.fromJson(data['data']);
+
+            var resultData = PostComment.fromJson(data['data']);
+            return resultData;
           }
           // else if (data['commentId'] != null) {
           //   // Direct comment object

@@ -33,7 +33,6 @@ class _CommentWidgetState extends State<CommentWidget> {
   String? _currentUserId;
   PostComment? _currentComment;
 
-
   @override
   void initState() {
     super.initState();
@@ -100,31 +99,73 @@ class _CommentWidgetState extends State<CommentWidget> {
             const SnackBar(content: Text('Xóa bình luận thành công!')),
           );
         } else if (state is CommentCreateSuccessState) {
-          setState(() {
-            _isReplying = false;
-            _replyController.clear();
-            // Automatically show replies when a new reply is added
-            if (!widget.isReply) {
+          print(
+            '🔍 Listener: Reply created for comment: ${state.comment.parentCommentId}',
+          );
+
+          // Check if this reply belongs to current comment
+          if (state.comment.parentCommentId == _currentComment?.commentId) {
+            print('🔍 Listener: Adding reply to current comment');
+            print(
+              '🔍 Before - replies count: ${_currentComment?.replies.length}, replyCount: ${_currentComment?.replyCount}',
+            );
+
+            setState(() {
+              // Add new reply to the replies list
+              final updatedReplies = List<PostComment>.from(
+                _currentComment?.replies ?? [],
+              );
+              updatedReplies.add(state.comment);
+
+              // Update current comment with new reply
+              _currentComment = _currentComment?.copyWith(
+                replies: updatedReplies,
+                replyCount: (_currentComment?.replyCount ?? 0) + 1,
+              );
+
+              // Close reply form and show replies
+              _isReplying = false;
+              _replyController.clear();
               _showReplies = true;
-            }
-          });
+            });
+
+            print(
+              '🔍 After - replies count: ${_currentComment?.replies.length}, replyCount: ${_currentComment?.replyCount}',
+            );
+          } else {
+            // Reply belongs to another comment, just close form
+            setState(() {
+              _isReplying = false;
+              _replyController.clear();
+            });
+          }
           // Don't show snackbar here as it will be handled by CommentInputWidget
         } else if (state is CommentToggleLikeSuccessState) {
           // Update _currentComment và _toggledCommentId
           if (state.toggleResult.commentId == _currentComment?.commentId) {
-            print('🔍 Listener: Comment ${state.toggleResult.commentId} toggled');
-            print('🔍 Before - isLiked: ${_currentComment?.isLikedByCurrentUser}, count: ${_currentComment?.likeCount}');
-            print('🔍 New values - isLiked: ${state.toggleResult.isLiked}, count: ${state.toggleResult.commentTotalLikes}');
-            
+            print(
+              '🔍 Listener: Comment ${state.toggleResult.commentId} toggled',
+            );
+            print(
+              '🔍 Before - isLiked: ${_currentComment?.isLikedByCurrentUser}, count: ${_currentComment?.likeCount}',
+            );
+            print(
+              '🔍 New values - isLiked: ${state.toggleResult.isLiked}, count: ${state.toggleResult.commentTotalLikes}',
+            );
+
             setState(() {
               _currentComment = _currentComment?.copyWith(
                 isLikedByCurrentUser: state.toggleResult.isLiked,
-                likeCount: state.toggleResult.commentTotalLikes ?? _currentComment!.likeCount,
+                likeCount:
+                    state.toggleResult.commentTotalLikes ??
+                    _currentComment!.likeCount,
               );
             });
-            
-            print('🔍 After - isLiked: ${_currentComment?.isLikedByCurrentUser}, count: ${_currentComment?.likeCount}');
-            
+
+            print(
+              '🔍 After - isLiked: ${_currentComment?.isLikedByCurrentUser}, count: ${_currentComment?.likeCount}',
+            );
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
@@ -137,7 +178,6 @@ class _CommentWidgetState extends State<CommentWidget> {
             );
           }
         }
-        
       },
       builder: (context, state) {
         return Container(
@@ -145,245 +185,267 @@ class _CommentWidgetState extends State<CommentWidget> {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color:
-              widget.isReply
-                  ? const Color(0xFF5A2D09).withOpacity(0.2)
-                  : const Color(0xFF5A2D09).withOpacity(0.4),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color:
                 widget.isReply
-                    ? const Color(0xFF8B4513).withOpacity(0.2)
-                    : const Color(0xFF8B4513).withOpacity(0.4),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+                    ? const Color(0xFF5A2D09).withOpacity(0.2)
+                    : const Color(0xFF5A2D09).withOpacity(0.4),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color:
+                  widget.isReply
+                      ? const Color(0xFF8B4513).withOpacity(0.2)
+                      : const Color(0xFF8B4513).withOpacity(0.4),
+              width: 1,
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Comment header
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: const Color(0xFF8B4513),
-                  child: Text(
-                    ((_currentComment?.userName ?? 'Người dùng').isNotEmpty
-                            ? (_currentComment?.userName ?? 'Người dùng')[0]
-                            : 'U')
-                        .toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _currentComment?.userName ?? 'Người dùng',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
-                      ),
-                      Text(
-                        _timeAgo(_currentComment?.createdAt ?? DateTime.now()),
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (_isCurrentUserComment)
-                  PopupMenuButton<String>(
-                    icon: const Icon(
-                      Icons.more_vert,
-                      color: Colors.white70,
-                      size: 18,
-                    ),
-                    onSelected: (value) {
-                      switch (value) {
-                        case 'edit':
-                          _editController.text = _currentComment?.content ?? '';
-                          setState(() {
-                            _isEditing = true;
-                          });
-                          break;
-                        case 'delete':
-                          _showDeleteDialog();
-                          break;
-                      }
-                    },
-                    itemBuilder:
-                        (context) => [
-                          const PopupMenuItem(
-                            value: 'edit',
-                            child: Text('Chỉnh sửa'),
-                          ),
-                          const PopupMenuItem(
-                            value: 'delete',
-                            child: Text('Xóa'),
-                          ),
-                        ],
-                  ),
-              ],
-            ),
-            const SizedBox(height: 8),
-
-            // Comment content
-            if (_isEditing)
-              _buildEditForm()
-            else
-              Text(
-                _currentComment?.content ?? '',
-                style: const TextStyle(color: Colors.white, height: 1.4),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
-
-            const SizedBox(height: 8),
-
-            // Comment actions
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    print('🔍 Toggle like clicked for comment: ${_currentComment?.commentId}');
-                    print('🔍 Current like status: ${_currentComment?.isLikedByCurrentUser}');
-                    print('🔍 Current like count: ${_currentComment?.likeCount}');
-                    
-                    if (_currentComment?.commentId == null) {
-                      print('❌ ERROR: commentId is null!');
-                      return;
-                    }
-                    
-                    context.read<CommentBloc>().add(
-                      ToggleCommentLikeEvent(_currentComment!.commentId),
-                    );
-                  },
-                  child: BlocBuilder<CommentBloc, CommentState>(
-                    buildWhen: (previous, current) {
-                      // Chỉ rebuild khi toggle like thành công cho comment này
-                      if (current is CommentToggleLikeSuccessState) {
-                        final shouldRebuild = current.toggleResult.commentId == _currentComment?.commentId;
-                        if (shouldRebuild) {
-                          print('🔍 BlocBuilder: Rebuilding like button for comment ${_currentComment?.commentId}');
-                        }
-                        return shouldRebuild;
-                      }
-                      return false;
-                    },
-                    builder: (context, state) {
-                      // Lấy giá trị hiện tại từ _currentComment
-                      bool isLiked = _currentComment?.isLikedByCurrentUser ?? false;
-                      int likeCount = _currentComment?.likeCount ?? 0;
-                      
-                      print('🔍 BlocBuilder: Building icon - isLiked: $isLiked, count: $likeCount');
-                      
-                      return Row(
-                        children: [
-                          Icon(
-                            isLiked ? Icons.favorite : Icons.favorite_border,
-                            color: isLiked ? Colors.red : Colors.white70,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            likeCount.toString(),
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                if (!widget.isReply)
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isReplying = true;
-                      });
-                    },
-                    child: const Row(
-                      children: [
-                        Icon(Icons.reply, color: Colors.white70, size: 16),
-                        SizedBox(width: 4),
-                        Text(
-                          'Trả lời',
-                          style: TextStyle(color: Colors.white70, fontSize: 12),
-                        ),
-                      ],
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Comment header
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 16,
+                    backgroundColor: const Color(0xFF8B4513),
+                    child: Text(
+                      ((_currentComment?.userName ?? 'Người dùng').isNotEmpty
+                              ? (_currentComment?.userName ?? 'Người dùng')[0]
+                              : 'U')
+                          .toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                if (!widget.isReply && (_currentComment?.replyCount ?? 0) > 0)
-                  const SizedBox(width: 16),
-                if (!widget.isReply && (_currentComment?.replyCount ?? 0) > 0)
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _showReplies = !_showReplies;
-                      });
-                    },
-                    child: Row(
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          _showReplies ? Icons.expand_less : Icons.expand_more,
-                          color: Colors.white70,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 4),
                         Text(
-                          _showReplies
-                              ? 'Ẩn trả lời'
-                              : '${_currentComment?.replyCount ?? 0} trả lời',
+                          _currentComment?.userName ?? 'Người dùng',
                           style: const TextStyle(
-                            color: Colors.white70,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                        Text(
+                          _timeAgo(
+                            _currentComment?.createdAt ?? DateTime.now(),
+                          ),
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
                             fontSize: 12,
                           ),
                         ),
                       ],
                     ),
                   ),
-              ],
-            ),
-
-            // Reply form
-            if (_isReplying) _buildReplyForm(),
-
-            // Replies
-            if ((_currentComment?.replies.isNotEmpty ?? false) && _showReplies)
-              Column(
-                children:
-                    (_currentComment?.replies ?? []).map((reply) {
-                      return BlocProvider.value(
-                        value: context.read<CommentBloc>(),
-                        child: CommentWidget(
-                          comment: reply,
-                          postId: widget.postId,
-                          isReply: true,
-                        ),
-                      );
-                    }).toList(),
+                  if (_isCurrentUserComment)
+                    PopupMenuButton<String>(
+                      icon: const Icon(
+                        Icons.more_vert,
+                        color: Colors.white70,
+                        size: 18,
+                      ),
+                      onSelected: (value) {
+                        switch (value) {
+                          case 'edit':
+                            _editController.text =
+                                _currentComment?.content ?? '';
+                            setState(() {
+                              _isEditing = true;
+                            });
+                            break;
+                          case 'delete':
+                            _showDeleteDialog();
+                            break;
+                        }
+                      },
+                      itemBuilder:
+                          (context) => [
+                            const PopupMenuItem(
+                              value: 'edit',
+                              child: Text('Chỉnh sửa'),
+                            ),
+                            const PopupMenuItem(
+                              value: 'delete',
+                              child: Text('Xóa'),
+                            ),
+                          ],
+                    ),
+                ],
               ),
-          ],
-        ),
-      );
+              const SizedBox(height: 8),
+
+              // Comment content
+              if (_isEditing)
+                _buildEditForm()
+              else
+                Text(
+                  _currentComment?.content ?? '',
+                  style: const TextStyle(color: Colors.white, height: 1.4),
+                ),
+
+              const SizedBox(height: 8),
+
+              // Comment actions
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      print(
+                        '🔍 Toggle like clicked for comment: ${_currentComment?.commentId}',
+                      );
+                      print(
+                        '🔍 Current like status: ${_currentComment?.isLikedByCurrentUser}',
+                      );
+                      print(
+                        '🔍 Current like count: ${_currentComment?.likeCount}',
+                      );
+
+                      if (_currentComment?.commentId == null) {
+                        print('❌ ERROR: commentId is null!');
+                        return;
+                      }
+
+                      context.read<CommentBloc>().add(
+                        ToggleCommentLikeEvent(_currentComment!.commentId),
+                      );
+                    },
+                    child: BlocBuilder<CommentBloc, CommentState>(
+                      buildWhen: (previous, current) {
+                        // Chỉ rebuild khi toggle like thành công cho comment này
+                        if (current is CommentToggleLikeSuccessState) {
+                          final shouldRebuild =
+                              current.toggleResult.commentId ==
+                              _currentComment?.commentId;
+                          if (shouldRebuild) {
+                            print(
+                              '🔍 BlocBuilder: Rebuilding like button for comment ${_currentComment?.commentId}',
+                            );
+                          }
+                          return shouldRebuild;
+                        }
+                        return false;
+                      },
+                      builder: (context, state) {
+                        // Lấy giá trị hiện tại từ _currentComment
+                        bool isLiked =
+                            _currentComment?.isLikedByCurrentUser ?? false;
+                        int likeCount = _currentComment?.likeCount ?? 0;
+
+                        print(
+                          '🔍 BlocBuilder: Building icon - isLiked: $isLiked, count: $likeCount',
+                        );
+
+                        return Row(
+                          children: [
+                            Icon(
+                              isLiked ? Icons.favorite : Icons.favorite_border,
+                              color: isLiked ? Colors.red : Colors.white70,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              likeCount.toString(),
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  if (!widget.isReply)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isReplying = true;
+                        });
+                      },
+                      child: const Row(
+                        children: [
+                          Icon(Icons.reply, color: Colors.white70, size: 16),
+                          SizedBox(width: 4),
+                          Text(
+                            'Trả lời',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  if (!widget.isReply && (_currentComment?.replyCount ?? 0) > 0)
+                    const SizedBox(width: 16),
+                  if (!widget.isReply && (_currentComment?.replyCount ?? 0) > 0)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _showReplies = !_showReplies;
+                        });
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            _showReplies
+                                ? Icons.expand_less
+                                : Icons.expand_more,
+                            color: Colors.white70,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _showReplies
+                                ? 'Ẩn trả lời'
+                                : '${_currentComment?.replyCount ?? 0} trả lời',
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+
+              // Reply form
+              if (_isReplying) _buildReplyForm(),
+
+              // Replies
+              if ((_currentComment?.replies.isNotEmpty ?? false) &&
+                  _showReplies)
+                Column(
+                  children:
+                      (_currentComment?.replies ?? []).map((reply) {
+                        return BlocProvider.value(
+                          value: context.read<CommentBloc>(),
+                          child: CommentWidget(
+                            comment: reply,
+                            postId: widget.postId,
+                            isReply: true,
+                          ),
+                        );
+                      }).toList(),
+                ),
+            ],
+          ),
+        );
       },
     );
   }

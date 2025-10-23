@@ -8,7 +8,7 @@ class PremiumData {
         id: 'basic_monthly',
         name: 'Premium',
         description: 'Tất cả tính năng trong 1 tháng',
-        price: 99000,
+        price: 29000,
         currency: 'VND',
         durationDays: 30,
         features: [
