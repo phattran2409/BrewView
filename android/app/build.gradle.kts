@@ -7,6 +7,7 @@ plugins {
 }
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.1.0"))
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
 
 android {
@@ -17,10 +18,13 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+        }
     }
 
     defaultConfig {
@@ -35,13 +39,27 @@ android {
 
         manifestPlaceholders["appLinkScheme"] = "https"
         manifestPlaceholders["appLinkHost"] = "brewview.com"
+
+        multiDexEnabled = true
     }
 
     buildTypes {
+        debug {
+            isMinifyEnabled = false
+            isShrinkResources = false
+        }
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            // Minification disabled for now - enable when ready for production
+            isMinifyEnabled = false
+            isShrinkResources = false
+            // ProGuard rules available when minification is enabled
+            // proguardFiles(
+            //     getDefaultProguardFile("proguard-android-optimize.txt"),
+            //     "proguard-rules.pro"
+            // )
         }
     }
 }

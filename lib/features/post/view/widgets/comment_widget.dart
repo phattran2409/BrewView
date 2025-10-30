@@ -38,6 +38,17 @@ class _CommentWidgetState extends State<CommentWidget> {
     super.initState();
     _currentComment = widget.comment;
     _getCurrentUserId();
+
+    // Validate commentId on initialization
+    if (widget.comment.commentId.isEmpty) {
+      print('⚠️ WARNING: CommentWidget initialized with empty commentId!');
+      print('⚠️ Comment data: ${widget.comment.toJson()}');
+    } else {
+      print(
+        '✅ CommentWidget initialized with commentId: ${widget.comment.commentId}',
+      );
+      print('✅ Replies count: ${widget.comment.replies.length}');
+    }
   }
 
   @override
@@ -546,17 +557,49 @@ class _CommentWidgetState extends State<CommentWidget> {
               const SizedBox(width: 8),
               ElevatedButton(
                 onPressed: () {
-                  if (_replyController.text.trim().isNotEmpty &&
-                      _currentUserId != null) {
-                    context.read<CommentBloc>().add(
-                      CreateCommentEvent(
-                        postId: widget.postId,
-                        userId: _currentUserId!,
-                        content: _replyController.text.trim(),
-                        parentCommentId: _currentComment?.commentId ?? '',
+                  // Validate all required fields before creating reply
+                  if (_replyController.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Vui lòng nhập nội dung trả lời!'),
                       ),
                     );
+                    return;
                   }
+
+                  if (_currentUserId == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Vui lòng đăng nhập để trả lời!'),
+                      ),
+                    );
+                    return;
+                  }
+
+                  if (_currentComment?.commentId == null ||
+                      _currentComment!.commentId.isEmpty) {
+                    print(
+                      '❌ ERROR: Invalid commentId - ${_currentComment?.commentId}',
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Không thể trả lời bình luận này!'),
+                      ),
+                    );
+                    return;
+                  }
+
+                  print(
+                    '✅ Creating reply with commentId: ${_currentComment!.commentId}',
+                  );
+                  context.read<CommentBloc>().add(
+                    CreateCommentEvent(
+                      postId: widget.postId,
+                      userId: _currentUserId!,
+                      content: _replyController.text.trim(),
+                      parentCommentId: _currentComment!.commentId,
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF8B4513),

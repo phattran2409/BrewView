@@ -33,9 +33,10 @@ class PaymentRepositoryImpl implements PaymentRepository {
   }
 
   @override
-  Future<Map<String, dynamic>?> checkPaymentStatus({required int orderCode}) async {
+  Future<bool> checkPaymentStatus({required int orderCode}) async {
     try {
-      return await _paymentService.checkPaymentStatus(orderCode: orderCode);
+      bool result = await _paymentService.checkPaymentStatus(orderCode: orderCode); 
+       return result;
     } on PaymentServiceException catch (e) {
       throw PaymentRepositoryException(
         message: e.message,

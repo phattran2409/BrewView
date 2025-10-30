@@ -33,7 +33,7 @@ class PaymentService {
   }
 
   /// Kiểm tra trạng thái thanh toán
-  Future<Map<String, dynamic>?> checkPaymentStatus({
+  Future<bool> checkPaymentStatus({
     required int orderCode,
   }) async {
     try {
@@ -42,9 +42,14 @@ class PaymentService {
       );
 
       if (response.statusCode == 200) {
-        return response.data;
+        var data = response.data['data'] as Map<String, dynamic>; 
+        bool isPaid = data['isPaided'] as bool;
+        if (isPaid) {
+          return true;
+        } 
+        return false;
       }
-      return null;
+      return false;
     } on DioException catch (e) {
       print('Error checking payment status: $e');
       throw _handleDioError(e);
@@ -87,13 +92,12 @@ class PaymentService {
     required int orderCode,
   }) async {
     try {
-      final response = await _dio.post(
-        AppConstants.cancelPayment,
-        data: {'orderCode': orderCode},
-      );
+      final response = await _dio.get(
+        AppConstants.getCancelPayment(orderCode),
+      );  
 
       if (response.statusCode == 200) {
-        return response.data['success'] ?? false;
+        return true; 
       }
       return false;
     } on DioException catch (e) {

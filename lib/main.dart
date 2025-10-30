@@ -1,22 +1,20 @@
 import 'package:briewview/core/services/deep_link_handler.dart';
 import 'package:briewview/core/services/deep_link_service.dart';
-import 'package:briewview/features/auth/repository/auth_repository.dart';
-import 'package:briewview/features/auth/repository/auth_repository_impl.dart';
+import 'package:briewview/core/services/fcm_services.dart';
 import 'package:briewview/features/auth/viewModel/Bloc/Auth_Bloc.dart';
 import 'package:briewview/features/premium/viewmodel/premium_bloc.dart';
+import 'package:briewview/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:briewview/app/di/locator.dart';
 import 'package:briewview/app/router/app_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:get_it/get_it.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await MobileAds.instance.initialize();
+  
   // Set preferred orientations
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -24,14 +22,29 @@ void main() async {
   ]);
 
   try {
-    await Firebase.initializeApp();
-    print("✅ Firebase initialized successfully");
-    await FacebookAuth.instance.webAndDesktopInitialize(
-      appId: "1126275602705437", // Replace with your Facebook App ID
-      cookie: true,
-      xfbml: true,
-      version: "v15.0",
+    // Initialize Firebase first
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
     );
+    print("✅ Firebase initialized");
+
+    // Initialize Mobile Ads with better error handling
+    try {
+      await MobileAds.instance.initialize();
+      print("✅ Mobile Ads initialized");
+    } catch (e) {
+      print("⚠️ Mobile Ads initialization failed: $e");
+      // Continue without ads if initialization fails
+    }
+
+    // Initialize FCM
+    try {
+      await FcmServices().initializeFCM();
+      print("✅ FCM initialized");
+    } catch (e) {
+      print("⚠️ FCM initialization failed: $e");
+    }
+    
     // Configure Firebase for better locale handling
     await _configureFirebase();
     print("✅ Firebase configured for locale");
@@ -75,6 +88,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    FcmServices().setContext(context);  
     return MultiBlocProvider(
       providers: [
         // ✅ Global AuthBloc

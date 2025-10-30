@@ -11,6 +11,7 @@ import 'package:briewview/features/premium/viewmodel/premium_bloc.dart';
 import 'package:briewview/features/premium/viewmodel/premium_event.dart';
 import 'package:briewview/features/premium/viewmodel/premium_state.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class PaymentPage extends StatefulWidget {
   final String planId;
@@ -70,7 +71,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   setState(() {
                     isProcessing = false;
                   });
-                  
+
                   // Xử lý pending payment error đặc biệt
                   if (state.isPendingPaymentError) {
                     _showPendingPaymentDialog(state);
@@ -78,9 +79,11 @@ class _PaymentPageState extends State<PaymentPage> {
                     // Hiển thị error dialog thông thường
                     _showErrorDialog(state);
                   }
+                }else if (state is PaymentStatusChecked) {
+                  context.goNamed('payment-success'); 
                 } else if (state is PaymentLinkCreated) {
                   // Hiển thị payment result dialog
-                  _showPaymentDialog(state.paymentResult);
+                  _showPaymentDialog(state.paymentResult ,context);
                 } else if (state is PaymentVerified) {
                   setState(() {
                     isProcessing = false;
@@ -202,7 +205,10 @@ class _PaymentPageState extends State<PaymentPage> {
                 ],
               ),
               Text(
-                PriceFormatter.format(int.parse(plan.formattedPrice), currency: "VND" ),
+                PriceFormatter.format(
+                  int.parse(plan.formattedPrice),
+                  currency: "VND",
+                ),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -284,9 +290,9 @@ class _PaymentPageState extends State<PaymentPage> {
     context.read<PremiumBloc>().add(CreateSubscription(userId: user?.id ?? ''));
   }
 
-  void _showPaymentDialog(dynamic paymentResult) {
+  void _showPaymentDialog(dynamic paymentResult ,BuildContext _context ) {
     showDialog(
-      context: context,
+      context: _context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -307,6 +313,94 @@ class _PaymentPageState extends State<PaymentPage> {
                 _buildInfoRow('Mã đơn hàng:', paymentResult.displayOrderCode),
                 _buildInfoRow('Subscription ID:', paymentResult.subscriptionId),
                 const SizedBox(height: 16),
+
+                // QR Code Section
+                if (paymentResult.hasQrCode) ...[
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.brown.shade200,
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 5,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Quét mã QR để thanh toán',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Colors.brown,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // QR Code Widget với kích thước cố định
+                          Container(
+                            width: 200,
+                            height: 200,
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: QrImageView(
+                              data: paymentResult.qrCode,
+                              version: QrVersions.auto,
+                              size: 184.0,
+                              backgroundColor: Colors.white,
+                              errorCorrectionLevel: QrErrorCorrectLevel.H,
+                              padding: EdgeInsets.zero,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Quét mã bằng ứng dụng ngân hàng',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Divider với text "hoặc"
+                  Row(
+                    children: [
+                      Expanded(child: Divider(color: Colors.grey[400])),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(
+                          'HOẶC',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Expanded(child: Divider(color: Colors.grey[400])),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -315,14 +409,14 @@ class _PaymentPageState extends State<PaymentPage> {
                     border: Border.all(color: Colors.blue.shade200),
                   ),
                   child: Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
                         'Payment URL:',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
-                      
+
                       // URL text với scroll horizontal
                       Container(
                         width: double.infinity,
@@ -343,9 +437,9 @@ class _PaymentPageState extends State<PaymentPage> {
                           ),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 12),
-                      
+
                       // Action buttons
                       Row(
                         children: [
@@ -360,7 +454,9 @@ class _PaymentPageState extends State<PaymentPage> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
                               ),
                             ),
                           ),
@@ -384,23 +480,27 @@ class _PaymentPageState extends State<PaymentPage> {
           actions: [
             TextButton(
               onPressed: () {
+                _context.read<PaymentBloc>().add(
+                  CancelPaymentEvent(
+                    orderCode: int.parse(paymentResult.orderCode?.toString() ?? '0') ?? 0,
+                  ),
+                );  
                 Navigator.of(context).pop();
                 setState(() {
                   isProcessing = false;
                 });
+               
               },
               child: const Text('Hủy'),
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop();
-                // Verify payment
-                context.read<PaymentBloc>().add(
-                  VerifyPaymentEvent(
-                    orderCode: paymentResult.orderCode,
-                    subscriptionId: paymentResult.subscriptionId,
+                 _context.read<PaymentBloc>().add(
+                  CheckPaymentStatusEvent(
+                    orderCode: int.parse(paymentResult.orderCode?.toString() ?? '0') ?? 0,
                   ),
                 );
+                Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.brown,
@@ -441,11 +541,7 @@ class _PaymentPageState extends State<PaymentPage> {
         return AlertDialog(
           title: Row(
             children: [
-              Icon(
-                Icons.pending_actions,
-                color: Colors.orange,
-                size: 24,
-              ),
+              Icon(Icons.pending_actions, color: Colors.orange, size: 24),
               const SizedBox(width: 8),
               Text(errorState.userFriendlyTitle),
             ],
@@ -510,11 +606,7 @@ class _PaymentPageState extends State<PaymentPage> {
         return AlertDialog(
           title: Row(
             children: [
-              Icon(
-                Icons.error_outline,
-                color: Colors.red,
-                size: 24,
-              ),
+              Icon(Icons.error_outline, color: Colors.red, size: 24),
               const SizedBox(width: 8),
               Text(errorState.userFriendlyTitle),
             ],
@@ -542,10 +634,22 @@ class _PaymentPageState extends State<PaymentPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildErrorDetailRow('Status:', '${errorState.paymentError!.status}'),
-                          _buildErrorDetailRow('Type:', errorState.paymentError!.type),
-                          _buildErrorDetailRow('Detail:', errorState.paymentError!.detail),
-                          _buildErrorDetailRow('Trace ID:', errorState.paymentError!.traceId),
+                          _buildErrorDetailRow(
+                            'Status:',
+                            'Payment Failed',
+                          ),
+                          _buildErrorDetailRow(
+                            'Type:',
+                            errorState.paymentError!.type,
+                          ),
+                          _buildErrorDetailRow(
+                            'Detail:',
+                            errorState.paymentError!.detail,
+                          ),
+                          _buildErrorDetailRow(
+                            'Trace ID:',
+                            errorState.paymentError!.traceId,
+                          ),
                         ],
                       ),
                     ),
@@ -600,7 +704,9 @@ class _PaymentPageState extends State<PaymentPage> {
                 // Cần thêm API endpoint để lấy pending payment info và cancel
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Chức năng hủy thanh toán cũ đang được phát triển'),
+                    content: Text(
+                      'Chức năng hủy thanh toán cũ đang được phát triển',
+                    ),
                     backgroundColor: Colors.orange,
                   ),
                 );
@@ -627,24 +733,16 @@ class _PaymentPageState extends State<PaymentPage> {
             width: 80,
             child: Text(
               label,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
             ),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 12),
-            ),
-          ),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 12))),
         ],
       ),
     );
   }
 
-   Future<void> _launchPaymentURL(String url) async {
+  Future<void> _launchPaymentURL(String url) async {
     try {
       final Uri uri = Uri.parse(url);
       if (await canLaunchUrl(uri)) {

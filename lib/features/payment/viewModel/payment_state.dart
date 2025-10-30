@@ -27,12 +27,12 @@ class PaymentLinkCreated extends PaymentState {
 }
 
 class PaymentStatusChecked extends PaymentState {
-  final Map<String, dynamic> statusData;
+  final bool isPaid;
 
-  const PaymentStatusChecked({required this.statusData});
+  const PaymentStatusChecked({required this.isPaid});
 
   @override
-  List<Object?> get props => [statusData];
+  List<Object?> get props => [isPaid];
 }
 
 class PaymentVerified extends PaymentState {

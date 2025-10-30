@@ -5,7 +5,6 @@ import 'package:briewview/core/services/location_service.dart';
 import 'package:briewview/core/utils/ShowImage.dart';
 import 'package:briewview/core/utils/premium_helper.dart';
 import 'package:briewview/core/widgets/navigation_bar.dart';
-import 'package:briewview/features/cafe/model/cafeMode.dart';
 import 'package:briewview/features/cafe/viewmodel/cafe_bloc.dart';
 import 'package:briewview/features/cafe/viewmodel/cafe_event.dart';
 import 'package:briewview/features/cafe/viewmodel/cafe_sate.dart';
@@ -21,7 +20,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:go_router/go_router.dart';
 import 'package:go_router/go_router.dart';
 
 class HomePage extends StatefulWidget {
@@ -95,7 +93,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _bannerAd.load();
   }
 
-
   void _checkAndShowPopup() {
     _premiumBloc.showHomePopupIfAllowed(
       message: 'Hãy khám phá các tính năng cao cấp!  ',
@@ -105,24 +102,59 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<void> _loadCurrentUserAndCafes() async {
     try {
       _currentUser = await getIt<UserStorageServices>().getCurrentUser();
-      try {
-        _locationInitialized = await _locationService.initialize();
-        print('🗺️ LocationService initialized: $_locationInitialized');
-      } catch (e) {
-        print('❌ LocationService initialization failed: $e');
-        _locationInitialized = false;
-      }
+
+      // Delay location initialization slightly to avoid system startup conflicts
+      Future.delayed(const Duration(milliseconds: 500), () async {
+        try {
+          _locationInitialized = await _locationService.initialize();
+          print('🗺️ LocationService initialized: $_locationInitialized');
+
+          // Load nearby cafes only after location is successfully initialized
+          if (mounted && _locationInitialized) {
+            _cafeBloc.add(
+              LoadCafesByDistance(
+                pageNumber: 1,
+                pageSize: 10,
+                maxDistanceKm: 10,
+              ),
+            ); // Nearby
+          }
+        } catch (e) {
+          print('❌ LocationService initialization failed: $e');
+          _locationInitialized = false;
+          // Nếu có lỗi DeadSystemException, thử lại sau
+          if (e.toString().contains('DeadSystemException') ||
+              e.toString().contains('DEAD_OBJECT')) {
+            print('⏳ Will retry location initialization in 10 seconds...');
+            Future.delayed(const Duration(seconds: 10), () async {
+              if (mounted) {
+                try {
+                  _locationInitialized = await _locationService.initialize();
+                  if (_locationInitialized && mounted) {
+                    _cafeBloc.add(
+                      LoadCafesByDistance(
+                        pageNumber: 1,
+                        pageSize: 10,
+                        maxDistanceKm: 10,
+                      ),
+                    );
+                  }
+                } catch (retryError) {
+                  print('❌ Location retry failed: $retryError');
+                }
+              }
+            });
+          }
+        }
+      });
+
       if (mounted) {
         setState(() {});
         final userId = _currentUser?.id ?? '';
         _cafeBloc.add(
           LoadRecommendedCafes(pageNumber: 1, pageSize: 5, userId: userId),
         ); // Recommendations
-        if (_locationInitialized) {
-          _cafeBloc.add(
-            LoadCafesByDistance(pageNumber: 1, pageSize: 10, maxDistanceKm: 10),
-          ); // Nearby
-        }
+
         _cafeBloc.add(
           LoadCafesRating(
             pageNumber: 1,
@@ -138,7 +170,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _cafeBloc.add(
         LoadCafes(pageNumber: 1, pageSize: 5),
       ); // Load cafes without user context
-      _cafeBloc.add(LoadCafesByDistance(pageNumber: 1, pageSize: 5)); // Nearby
+
       _cafeBloc.add(
         LoadCafesRating(
           pageNumber: 1,
@@ -172,7 +204,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   child: AdWidget(ad: _bannerAd),
                 ),
               ),
-                
+
             // Premium popup overlay
             BlocBuilder<PremiumBloc, PremiumState>(
               builder: (context, state) {
@@ -390,7 +422,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   ),
                 ),
               ),
-
             ],
           ),
         ],

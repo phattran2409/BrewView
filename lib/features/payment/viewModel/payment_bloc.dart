@@ -55,7 +55,7 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
       );
 
       if (statusData != null) {
-        emit(PaymentStatusChecked(statusData: statusData));
+        emit(PaymentStatusChecked(isPaid: statusData));
       } else {
         emit(const PaymentError(message: 'Không thể kiểm tra trạng thái thanh toán'));
       }

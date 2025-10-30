@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "859739397646",
+    "firebase_url": "https://brew-view-b04f3-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "brew-view-b04f3",
     "storage_bucket": "brew-view-b04f3.firebasestorage.app"
   },
@@ -12,7 +13,28 @@
           "package_name": "com.example.briewview"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "859739397646-5r8lnut5g7u7000imivkorjdfvcktm97.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.briewview",
+            "certificate_hash": "66e4e301f011960b944427e382361a277971b4e9"
+          }
+        },
+        {
+          "client_id": "859739397646-djnh0mr93btne473kevngairglebhclp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.briewview",
+            "certificate_hash": "6d4541b67fc933af634ae89ffb6771bd6223ae53"
+          }
+        },
+        {
+          "client_id": "859739397646-i6ttl287e1c12tngktoepajnaoa0dt77.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB9DFIGdCcr_OTHK1UY-aJAn6D3v3nI8nY"
@@ -20,7 +42,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "859739397646-i6ttl287e1c12tngktoepajnaoa0dt77.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

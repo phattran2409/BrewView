@@ -151,14 +151,16 @@ class AppConstants {
   // Payment endpoints
   static const String createPaymentLink =
       '/api/subscriptions/create-payment-link/{userId}';
-  static const String paymentStatusEndpoint = '/api/payment/status/{orderCode}';
-  static const String verifyPaymentEndpoint = '/api/payment/verify';
-  static const String cancelPaymentEndpoint = '/api/payment/cancel';
+  static const String paymentStatusEndpoint = '/api/subscriptions/check-payment-status/{orderCode}';
+  static const String verifyPaymentEndpoint = '/api/subscriptions/verify-payment/{orderCode}';
+  static const String cancelPaymentEndpoint = '/api/subscriptions/cancel-payment/{orderCode}';
   
   static String getCreatePaymentLink(String userId) { 
     return createPaymentLink.replaceAll('{userId}', userId);
   }
-  
+  static String getCancelPayment(int orderCode) {
+    return cancelPaymentEndpoint.replaceAll('{orderCode}', orderCode.toString());
+  } 
   static String getPaymentStatus(int orderCode) {
     return paymentStatusEndpoint.replaceAll('{orderCode}', orderCode.toString());
   }
