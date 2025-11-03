@@ -1,7 +1,8 @@
 class AppConstants {
   static const String appName = 'BrewView';
   // static const String apiBaseUrl = 'https://10.0.2.2:7117';
-  static const String apiBaseUrl = 'https://10.0.2.2:7117';
+  static const String apiBaseUrl =
+      'https://brewview-api.bluemeadow-ff35afd4.eastasia.azurecontainerapps.io';
   static const int timeoutDuration = 30000; // milliseconds
 
   // API Endpoints
@@ -94,7 +95,8 @@ class AppConstants {
       },
     );
     return uri.toString();
-  } 
+  }
+
   static String getCafeByDistance({
     double latitude = 0.0,
     double longitude = 0.0,
@@ -112,7 +114,7 @@ class AppConstants {
       },
     );
     return uri.toString();
-  } 
+  }
 
   // Review
   static const String reviewEndpoint = '/api/reviews/{cafeId}';
@@ -151,22 +153,33 @@ class AppConstants {
   // Payment endpoints
   static const String createPaymentLink =
       '/api/subscriptions/create-payment-link/{userId}';
-  static const String paymentStatusEndpoint = '/api/subscriptions/check-payment-status/{orderCode}';
-  static const String verifyPaymentEndpoint = '/api/subscriptions/verify-payment/{orderCode}';
-  static const String cancelPaymentEndpoint = '/api/subscriptions/cancel-payment/{orderCode}';
-  
-  static String getCreatePaymentLink(String userId) { 
+  static const String paymentStatusEndpoint =
+      '/api/subscriptions/check-payment-status/{orderCode}';
+  static const String verifyPaymentEndpoint =
+      '/api/subscriptions/verify-payment/{orderCode}';
+  static const String cancelPaymentEndpoint =
+      '/api/subscriptions/cancel-payment/{orderCode}';
+
+  static String getCreatePaymentLink(String userId) {
     return createPaymentLink.replaceAll('{userId}', userId);
   }
+
   static String getCancelPayment(int orderCode) {
-    return cancelPaymentEndpoint.replaceAll('{orderCode}', orderCode.toString());
-  } 
-  static String getPaymentStatus(int orderCode) {
-    return paymentStatusEndpoint.replaceAll('{orderCode}', orderCode.toString());
+    return cancelPaymentEndpoint.replaceAll(
+      '{orderCode}',
+      orderCode.toString(),
+    );
   }
-  
+
+  static String getPaymentStatus(int orderCode) {
+    return paymentStatusEndpoint.replaceAll(
+      '{orderCode}',
+      orderCode.toString(),
+    );
+  }
+
   static String get verifyPayment => verifyPaymentEndpoint;
-  static String get cancelPayment => cancelPaymentEndpoint; 
+  static String get cancelPayment => cancelPaymentEndpoint;
 
   // Wishlist
   static const String wishlistEndpoint = '/api/favorite-cafe/{userId}';
@@ -222,14 +235,15 @@ class AppConstants {
   static const String mutationCommentEndpoint = '/api/comments/{commentId}';
   static const String likeCommentEndpoint = '/api/comments/like/{commentId}';
 
-   static String getCommentsEndpoint(String postId) {
-     return commentsEndpoint.replaceAll('{postId}', postId);
-   }
+  static String getCommentsEndpoint(String postId) {
+    return commentsEndpoint.replaceAll('{postId}', postId);
+  }
+
   static String getMutationCommentEndpoint(String commentId) {
     return mutationCommentEndpoint.replaceAll('{commentId}', commentId);
   }
+
   static String getLikeCommentEndpoint(String commentId) {
     return likeCommentEndpoint.replaceAll('{commentId}', commentId);
   }
-  
 }

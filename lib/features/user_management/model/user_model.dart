@@ -22,14 +22,14 @@ class UserModel extends User {
     super.accessToken,
     super.refreshToken,
     super.isSurvey,
-    String? identityId,
-    String? role,
-    int? age, // Thêm 
-    String? gender, // Thêm
-    String? provinceName, // Thêm
-    bool? isPremium, // Thêm
-    bool? status, // Thêm
-    DateTime? createdAt, // Thêm
+    this.identityId,
+    this.role,
+    this.age, // Thêm 
+    this.gender, // Thêm
+    this.provinceName, // Thêm
+    this.isPremium, // Thêm
+    this.status, // Thêm
+    this.createdAt, // Thêm
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -60,7 +60,7 @@ class UserModel extends User {
       phoneNumber: json['phoneNumber'] as String?,
       age: json['age'] as int?,
       provinceName: json['provinceName'] as String?,
-      isPremium: json['isPremium'] as bool?,
+      isPremium: json['isPremium'] ?? false,
       status: json['status'] as bool?,
       isSurvey: json['isSurvey'] as bool?,
       createdAt: createdAtDateTime,

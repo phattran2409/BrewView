@@ -108,7 +108,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         try {
           _locationInitialized = await _locationService.initialize();
           print('🗺️ LocationService initialized: $_locationInitialized');
-
+          print('⭐ Current User Premium Status: ${_currentUser?.isPremium}');
           // Load nearby cafes only after location is successfully initialized
           if (mounted && _locationInitialized) {
             _cafeBloc.add(
@@ -121,6 +121,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           }
         } catch (e) {
           print('❌ LocationService initialization failed: $e');
+
           _locationInitialized = false;
           // Nếu có lỗi DeadSystemException, thử lại sau
           if (e.toString().contains('DeadSystemException') ||
@@ -317,7 +318,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               child:
                   _currentUser?.profilePicture != null
                       ? ShowImage.get(_currentUser!.profilePicture!)
-                      : ShowImage.asset('assets/images/user_profile.png'),
+                      : ShowImage.asset('assets/images/user.png'),
             ),
           ),
 
@@ -344,8 +345,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 Container(
                   child: BlocBuilder<PremiumBloc, PremiumState>(
                     builder: (context, state) {
-                      final hasPremium =
-                          state is PremiumLoaded && state.hasPremiumAccess;
+                      final hasPremium = _currentUser?.isPremium ?? false;
                       return GestureDetector(
                         onTap: () {
                           _premiumBloc.add(

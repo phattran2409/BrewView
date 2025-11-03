@@ -72,20 +72,17 @@ class GoogleSignInService {
         final isSuccess = responseData['isSuccess'] as bool;
         if (isSuccess == true && responseData['data'] != null) {
           try {
-            final userData = responseData['data'] as Map<String, dynamic>;
-            final userModel = UserModel.fromJson(userData);
-             print('Parsed UserModel: $userModel');
-
+            UserModel userModel = UserModel.fromJson(
+              responseData['data'] as Map<String, dynamic>,
+            );
             return AuthResult(isSuccess: true, userJson: userModel);
           } catch (e) {
-            print('Error parsing user data: $e');
             return AuthResult(isSuccess: false, userJson: null);
           }
         }
         return AuthResult(isSuccess: false, userJson: null);
       }
     } catch (e) {
-      print('Error fetching token from server: $e');
       return null;
     }
     return null;
@@ -101,7 +98,8 @@ class GoogleSignInService {
       'email': user.email,
       'displayName': user.displayName,
       'photoURL': user.photoURL,
-      'emailVerified': user.emailVerified,
+      'emailVerified':
+          user.emailVerified, // Placeholder, replace with actual logic
     };
   }
 

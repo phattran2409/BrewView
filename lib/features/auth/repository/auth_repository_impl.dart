@@ -160,8 +160,6 @@ class AuthRepositoryImpl implements AuthRepository {
         return Left(ServerFailure('Invalid user data format from server'));
       }
 
-      print('✅ Server user model created: $serverUserModel');
-
       // ✅ Step 4: Save tokens from SERVER (not empty strings!)
       final accessToken = serverUserModel.accessToken ?? '';
       final refreshToken = serverUserModel.refreshToken ?? '';
@@ -171,20 +169,21 @@ class AuthRepositoryImpl implements AuthRepository {
         refresh: refreshToken ?? '',
       );
 
-      print('✅ Tokens saved: access=$accessToken, refresh=$refreshToken');
-      await _userStorageServices.saveUser(
-        UserModel(
-          id: serverUserModel.id,
-          name: cred.user?.displayName ?? '',
-          email: cred.user?.email ?? '',
-          profilePicture: cred.user?.photoURL ?? '',
-          role: 'customer',
-          identityId: '',
-          isSurvey: serverUserModel.isSurvey,
-          isPremium: serverUserModel.isPremium,
-        ),
+      var completeGetUserModel = UserModel(
+        id: serverUserModel.id,
+        email: serverUserModel.email ?? cred.user?.email ?? '',
+        name: serverUserModel.name ?? cred.user?.displayName ?? '',
+        profilePicture:
+            serverUserModel.profilePicture ?? cred.user?.photoURL ?? '',
+        role: serverUserModel.role ?? 'customer',
+        identityId: serverUserModel.identityId ?? '',
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        isSurvey: serverUserModel.isSurvey,
+        isPremium: serverUserModel.isPremium,
       );
-      print('✅ User data saved locally');
+      await _userStorageServices.saveUser(completeGetUserModel);
+
       return Right(AuthResult(isSuccess: true, userJson: serverUserModel));
     } on FirebaseAuthException catch (e) {
       return Left(ServerFailure(e.message ?? 'Google Sign-In failed'));
@@ -204,7 +203,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, AuthResult?>> getCurrentUser(String userId) async {
     try {
       final result = await _api.getCurrentUser(userId);
-      
+
       if (result != null) {
         if (result['isSuccess'] == true && result['data'] != null) {
           final userJson = result['data'] as Map<String, dynamic>;
@@ -213,7 +212,7 @@ class AuthRepositoryImpl implements AuthRepository {
           return Right(AuthResult(isSuccess: true, userJson: userModel));
         }
       }
-      return left(ServerFailure('User not found')); 
+      return left(ServerFailure('User not found'));
     } catch (e) {
       print('Error getting current user: $e');
       return Left(ServerFailure('Error getting current user: $e'));
