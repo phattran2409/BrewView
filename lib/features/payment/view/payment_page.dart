@@ -73,17 +73,24 @@ class _PaymentPageState extends State<PaymentPage> {
                   });
 
                   // Xử lý pending payment error đặc biệt
-                  if (state.isPendingPaymentError) {
-                    _showPendingPaymentDialog(state);
-                  } else {
-                    // Hiển thị error dialog thông thường
-                    _showErrorDialog(state);
-                  }
-                }else if (state is PaymentStatusChecked) {
-                  context.goNamed('payment-success'); 
+                  // if (state.isPendingPaymentError) {
+
+                  //   _showPendingPaymentDialog(state, context);
+                  // } else {
+                  //   // Hiển thị error dialog thông thường
+                  //
+                  // }
+                  _showErrorDialog(state, context);
+                } else if (state is PaymentStatusChecked) {
+                  context.goNamed('payment-success');
+                } else if (state is PaymentPending) {
+                  setState(() {
+                    isProcessing = false;
+                  });
+                  _showPendingPaymentDialog(state, context);
                 } else if (state is PaymentLinkCreated) {
                   // Hiển thị payment result dialog
-                  _showPaymentDialog(state.paymentResult ,context);
+                  _showPaymentDialog(state.paymentResult, context);
                 } else if (state is PaymentVerified) {
                   setState(() {
                     isProcessing = false;
@@ -96,6 +103,39 @@ class _PaymentPageState extends State<PaymentPage> {
                       const SnackBar(
                         content: Text('Xác thực thanh toán thất bại'),
                         backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                } else if (state is PaymentCancelled) {
+                  setState(() {
+                    isProcessing = false;
+                  });
+                  if (state.isCancelled) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Row(
+                          children: [
+                            Icon(Icons.check_circle, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text('Đã hủy thanh toán thành công'),
+                          ],
+                        ),
+                        backgroundColor: Colors.green,
+                        duration: Duration(seconds: 3),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Row(
+                          children: [
+                            Icon(Icons.error, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text('Không thể hủy thanh toán'),
+                          ],
+                        ),
+                        backgroundColor: Colors.red,
+                        duration: Duration(seconds: 3),
                       ),
                     );
                   }
@@ -290,7 +330,10 @@ class _PaymentPageState extends State<PaymentPage> {
     context.read<PremiumBloc>().add(CreateSubscription(userId: user?.id ?? ''));
   }
 
-  void _showPaymentDialog(dynamic paymentResult ,BuildContext _context ) {
+  void _showPaymentDialog(dynamic paymentResult, BuildContext _context) {
+    // Lấy PaymentBloc trước khi show dialog để tránh context issue
+    final paymentBloc = _context.read<PaymentBloc>();
+
     showDialog(
       context: _context,
       barrierDismissible: false,
@@ -480,24 +523,27 @@ class _PaymentPageState extends State<PaymentPage> {
           actions: [
             TextButton(
               onPressed: () {
-                _context.read<PaymentBloc>().add(
+                paymentBloc.add(
                   CancelPaymentEvent(
-                    orderCode: int.parse(paymentResult.orderCode?.toString() ?? '0') ?? 0,
+                    orderCode: int.parse(
+                      paymentResult.orderCode?.toString() ?? '0',
+                    ),
                   ),
-                );  
+                );
                 Navigator.of(context).pop();
                 setState(() {
                   isProcessing = false;
                 });
-               
               },
               child: const Text('Hủy'),
             ),
             ElevatedButton(
               onPressed: () {
-                 _context.read<PaymentBloc>().add(
+                paymentBloc.add(
                   CheckPaymentStatusEvent(
-                    orderCode: int.parse(paymentResult.orderCode?.toString() ?? '0') ?? 0,
+                    orderCode: int.parse(
+                      paymentResult.orderCode?.toString() ?? '0',
+                    ),
                   ),
                 );
                 Navigator.of(context).pop();
@@ -533,75 +579,165 @@ class _PaymentPageState extends State<PaymentPage> {
     );
   }
 
-  void _showPendingPaymentDialog(PaymentError errorState) {
+  void _showPendingPaymentDialog(
+    PaymentPending pendingState,
+    BuildContext _context,
+  ) {
+    // Lấy PaymentBloc trước khi show dialog để tránh context issue
+    final paymentBloc = _context.read<PaymentBloc>();
+
     showDialog(
-      context: context,
+      context: _context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Row(
-            children: [
-              Icon(Icons.pending_actions, color: Colors.orange, size: 24),
-              const SizedBox(width: 8),
-              Text(errorState.userFriendlyTitle),
-            ],
-          ),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                errorState.userFriendlyMessage,
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.orange.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.orange.shade200),
+      builder: (BuildContext dialogContext) {
+        return BlocProvider.value(
+          value: paymentBloc,
+          child: AlertDialog(
+            title: Row(
+              children: [
+                Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.orange,
+                  size: 24,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Bạn có thể:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text('• Hoàn tất thanh toán hiện tại'),
-                    const Text('• Hủy thanh toán để tạo thanh toán mới'),
-                  ],
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Text(
+                    "Thanh toán đang chờ xử lý",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Đóng'),
+              ],
             ),
-            if (errorState.canCancelPending) ...[
-              OutlinedButton(
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.orange.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.receipt_long, color: Colors.orange.shade700),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Mã đơn hàng: ${pendingState.orderCode?.toString() ?? 'Không có'}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Trạng thái: Đang chờ thanh toán',
+                              style: TextStyle(fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Bạn có một thanh toán chưa hoàn tất. Để tạo thanh toán mới, bạn cần hủy thanh toán hiện tại.',
+                  style: TextStyle(fontSize: 15),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.blue.shade200),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            color: Colors.blue.shade700,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          const Expanded(
+                            child: Text(
+                              'Bạn có thể:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        '• Tiếp tục hoàn tất thanh toán hiện tại',
+                        style: TextStyle(fontSize: 13),
+                      ),
+                      const Text(
+                        '• Hủy thanh toán này để tạo thanh toán mới',
+                        style: TextStyle(fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
-                  _showCancelPendingPaymentDialog();
+                  Navigator.of(dialogContext).pop();
+                  setState(() {
+                    isProcessing = false;
+                  });
                 },
-                child: const Text('Hủy thanh toán cũ'),
+                style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
+                child: const Text('Đóng'),
               ),
+              if (pendingState.orderCode != null) ...[
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop();
+                    // Gọi dialog xác nhận hủy với nhiều thông tin cảnh báo hơn
+                    _showCancelPendingPaymentDialog(
+                      pendingState.orderCode!,
+                      _context,
+                    );
+                  },
+                  icon: const Icon(Icons.cancel_outlined, size: 18),
+                  label: const Text('Hủy và tạo mới'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         );
       },
     );
   }
 
-  void _showErrorDialog(PaymentError errorState) {
+  void _showErrorDialog(PaymentError errorState, BuildContext _context) {
     showDialog(
-      context: context,
+      context: _context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Row(
@@ -634,10 +770,7 @@ class _PaymentPageState extends State<PaymentPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildErrorDetailRow(
-                            'Status:',
-                            'Payment Failed',
-                          ),
+                          _buildErrorDetailRow('Status:', 'Payment Failed'),
                           _buildErrorDetailRow(
                             'Type:',
                             errorState.paymentError!.type,
@@ -669,7 +802,7 @@ class _PaymentPageState extends State<PaymentPage> {
               ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  _processPayment(context); // Thử lại
+                  _processPayment(_context); // Thử lại
                 },
                 child: const Text('Thử lại'),
               ),
@@ -680,42 +813,201 @@ class _PaymentPageState extends State<PaymentPage> {
     );
   }
 
-  void _showCancelPendingPaymentDialog() {
+  void _showCancelPendingPaymentDialog(int orderCode, BuildContext _context) {
+    // Lấy PaymentBloc trước khi show dialog để tránh context issue
+    final paymentBloc = _context.read<PaymentBloc>();
+
     showDialog(
-      context: context,
+      context: _context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Hủy thanh toán cũ'),
-          content: const Text(
-            'Bạn có chắc chắn muốn hủy thanh toán đang chờ xử lý không?\n\n'
-            'Sau khi hủy, bạn có thể tạo thanh toán mới.',
+          title: Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 24),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'Hủy thanh toán chưa hoàn thành',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.orange.shade700),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Mã đơn hàng: $orderCode',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Trạng thái: Đang chờ thanh toán',
+                            style: TextStyle(fontSize: 13),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Bạn chưa hoàn tất thanh toán cho đơn hàng này.',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          color: Colors.red.shade700,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'Lưu ý khi hủy:',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      '• Thanh toán hiện tại sẽ bị hủy hoàn toàn',
+                      style: TextStyle(fontSize: 13),
+                    ),
+                    const Text(
+                      '• Bạn cần tạo thanh toán mới để tiếp tục',
+                      style: TextStyle(fontSize: 13),
+                    ),
+                    const Text(
+                      '• Nếu đã chuyển khoản, vui lòng KHÔNG hủy',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.green.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.check_circle_outline,
+                      color: Colors.green.shade700,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        'Sau khi hủy, nhấn nút "Thanh toán" để tạo thanh toán mới',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Bạn có chắc chắn muốn hủy thanh toán này?',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+            ],
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Không'),
+              style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
+              child: const Text('Quay lại'),
             ),
-            ElevatedButton(
+            ElevatedButton.icon(
               onPressed: () {
                 Navigator.of(context).pop();
-                // TODO: Implement cancel pending payment
-                // Cần thêm API endpoint để lấy pending payment info và cancel
-                ScaffoldMessenger.of(context).showSnackBar(
+                // Dispatch event để hủy payment
+                paymentBloc.add(CancelPaymentEvent(orderCode: orderCode));
+
+                // Hiển thị loading
+                ScaffoldMessenger.of(_context).showSnackBar(
                   const SnackBar(
-                    content: Text(
-                      'Chức năng hủy thanh toán cũ đang được phát triển',
+                    content: Row(
+                      children: [
+                        SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Text('Đang hủy thanh toán...'),
+                      ],
                     ),
-                    backgroundColor: Colors.orange,
+                    duration: Duration(seconds: 2),
                   ),
                 );
               },
+              icon: const Icon(Icons.cancel, size: 18),
+              label: const Text('Xác nhận hủy'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
               ),
-              child: const Text('Hủy thanh toán'),
             ),
           ],
         );

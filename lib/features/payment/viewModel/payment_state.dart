@@ -26,6 +26,14 @@ class PaymentLinkCreated extends PaymentState {
   List<Object?> get props => [paymentResult];
 }
 
+class PaymentPending extends PaymentState {
+  final int? orderCode;
+  const PaymentPending({ this.orderCode});
+
+  @override
+  List<Object?> get props => [orderCode];
+}
+
 class PaymentStatusChecked extends PaymentState {
   final bool isPaid;
 
@@ -57,20 +65,20 @@ class PaymentError extends PaymentState {
   final String message;
   final PaymentErrorModel? paymentError;
 
-  const PaymentError({
-    required this.message, 
-    this.paymentError,
-  });
+  const PaymentError({required this.message, this.paymentError});
 
   @override
   List<Object?> get props => [message, paymentError];
 
   // Helper methods
-  bool get isPendingPaymentError => paymentError?.isPendingPaymentError ?? false;
+  bool get isPendingPaymentError =>
+      paymentError?.isPendingPaymentError ?? false;
   bool get canRetry => paymentError?.canRetry ?? true;
   bool get canCancelPending => paymentError?.canCancelPending ?? false;
-  String get userFriendlyTitle => paymentError?.userFriendlyTitle ?? 'Lỗi thanh toán';
-  String get userFriendlyMessage => paymentError?.userFriendlyMessage ?? message;
+  String get userFriendlyTitle =>
+      paymentError?.userFriendlyTitle ?? 'Lỗi thanh toán';
+  String get userFriendlyMessage =>
+      paymentError?.userFriendlyMessage ?? message;
 }
 
 class PaymentSuccess extends PaymentState {

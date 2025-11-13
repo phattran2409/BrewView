@@ -19,9 +19,9 @@ class PaymentService {
       var response = await _dio.post(AppConstants.getCreatePaymentLink(userId));
       if (response.statusCode == 200) {
         var responseData = response.data['data'] as Map<String, dynamic>;
-        print('Response Data: $responseData');  
-        if (responseData != null ) {
-          var dataResult = PaymentResultModel.fromJson(responseData); 
+        print('Response Data: $responseData');
+        if (responseData != null) {
+          var dataResult = PaymentResultModel.fromJson(responseData);
           return dataResult;
         }
       }
@@ -33,20 +33,45 @@ class PaymentService {
   }
 
   /// Kiểm tra trạng thái thanh toán
-  Future<bool> checkPaymentStatus({
-    required int orderCode,
-  }) async {
+  // Future<bool> checkPaymentStatus({required int orderCode}) async {
+  //   try {
+  //     final response = await _dio.get(AppConstants.getPaymentStatus(orderCode));
+
+  //     if (response.statusCode == 200) {
+  //       var data = response.data['data'] as Map<String, dynamic>;
+  //       print('Payment Status Data: $data');
+  //       bool isPaid = data['isPaided'] as bool;
+  //       if (isPaid) {
+  //         return true;
+  //       }
+  //       return false;
+  //     }
+  //     return false;
+  //   } on DioException catch (e) {
+  //     print('Error checking payment status: $e');
+  //     throw _handleDioError(e);
+  //   } catch (e) {
+  //     print('Unexpected error: $e');
+  //     throw Exception('Unexpected error: $e');
+  //   }
+  // }
+
+  Future<bool> checkPaymentStatus({required int orderCode}) async {
     try {
-      final response = await _dio.get(
-        AppConstants.getPaymentStatus(orderCode),
-      );
+      final response = await _dio.get(AppConstants.getPaymentStatus(orderCode));
 
       if (response.statusCode == 200) {
-        var data = response.data['data'] as Map<String, dynamic>; 
-        bool isPaid = data['isPaided'] as bool;
-        if (isPaid) {
-          return true;
-        } 
+        final data = response.data['data'];
+        print('Payment Status Data: $data');
+
+        if (data is Map<String, dynamic>) {
+          final isPaided = data['isPaided'];
+          if (isPaided is bool) return isPaided;
+          if (isPaided is String) return isPaided.toLowerCase() == 'true';
+          if (isPaided is num) return isPaided != 0;
+        }
+
+        // fallback
         return false;
       }
       return false;
@@ -67,10 +92,7 @@ class PaymentService {
     try {
       final response = await _dio.post(
         AppConstants.verifyPayment,
-        data: {
-          'orderCode': orderCode,
-          'subscriptionId': subscriptionId,
-        },
+        data: {'orderCode': orderCode, 'subscriptionId': subscriptionId},
       );
 
       if (response.statusCode == 200) {
@@ -88,16 +110,12 @@ class PaymentService {
   }
 
   /// Cancel payment
-  Future<bool> cancelPayment({
-    required int orderCode,
-  }) async {
+  Future<bool> cancelPayment({required int orderCode}) async {
     try {
-      final response = await _dio.get(
-        AppConstants.getCancelPayment(orderCode),
-      );  
+      final response = await _dio.get(AppConstants.getCancelPayment(orderCode));
 
       if (response.statusCode == 200) {
-        return true; 
+        return true;
       }
       return false;
     } on DioException catch (e) {
@@ -121,7 +139,8 @@ class PaymentService {
       case DioExceptionType.badResponse:
         // Parse API error response
         try {
-          if (e.response?.data != null && e.response?.data is Map<String, dynamic>) {
+          if (e.response?.data != null &&
+              e.response?.data is Map<String, dynamic>) {
             final errorData = e.response!.data as Map<String, dynamic>;
             final paymentError = PaymentErrorModel.fromJson(errorData);
             return PaymentServiceException(
@@ -132,13 +151,17 @@ class PaymentService {
         } catch (parseError) {
           print('Error parsing PaymentErrorModel: $parseError');
         }
-        
+
         // Fallback cho các lỗi không parse được
         final statusCode = e.response?.statusCode;
-        final message = e.response?.data?['message'] ?? 
-                       e.response?.data?['detail'] ?? 
-                       'Lỗi không xác định';
-        return PaymentServiceException('Lỗi server [$statusCode]: $message', null);
+        final message =
+            e.response?.data?['message'] ??
+            e.response?.data?['detail'] ??
+            'Lỗi không xác định';
+        return PaymentServiceException(
+          'Lỗi server [$statusCode]: $message',
+          null,
+        );
       case DioExceptionType.cancel:
         return PaymentServiceException('Request bị hủy', null);
       case DioExceptionType.connectionError:

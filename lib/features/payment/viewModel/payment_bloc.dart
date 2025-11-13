@@ -54,10 +54,10 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
         orderCode: event.orderCode,
       );
 
-      if (statusData != null) {
+      if (statusData) {
         emit(PaymentStatusChecked(isPaid: statusData));
       } else {
-        emit(const PaymentError(message: 'Không thể kiểm tra trạng thái thanh toán'));
+        emit(PaymentPending(orderCode: event.orderCode));
       }
     } on PaymentRepositoryException catch (e) {
       emit(PaymentError(

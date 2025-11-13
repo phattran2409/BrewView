@@ -40,27 +40,39 @@ class AuthRepositoryImpl implements AuthRepository {
         // Trả về Left với Failure nếu đăng nhập thất bại
         return Left(ServerFailure('Email or password is incorrect'));
       }
-      final access = authResp.userJson?.accessToken ?? '';
-      final refresh = authResp.userJson?.refreshToken ?? '';
+      UserModel userModelData;
+      if (authResp.userJson is UserModel) {
+        userModelData = authResp.userJson as UserModel;
+      } else if (authResp.userJson is Map<String, dynamic>) {
+        userModelData = UserModel.fromJson(
+          authResp.userJson as Map<String, dynamic>,
+        );
+      } else {
+        print('❌ Invalid user data type from server');
+        return Left(ServerFailure('Invalid user data format from server'));
+      } 
+      
+      final access = userModelData.accessToken ?? '';
+      final refresh = userModelData.refreshToken ?? '';
 
       // Lưu token
       await _tokenStorage.saveTokens(access: access, refresh: refresh);
 
       // Lưu user vào local storage
       final userDataSave = UserModel(
-        id: authResp.userJson?.id ?? '',
-        name: authResp.userJson?.name ?? '',
-        email: authResp.userJson?.email ?? '',
-        profilePicture: authResp.userJson?.profilePicture ?? '',
-        role: authResp.userJson?.role ?? '',
-        identityId: authResp.userJson?.identityId ?? '',
-        isSurvey: authResp.userJson?.isSurvey,
-        isPremium: authResp.userJson?.isPremium,
+        id: userModelData.id ?? '',
+        name: userModelData.name ?? '',
+        email: userModelData.email ?? '',
+        profilePicture: userModelData.profilePicture ?? '',
+        role: userModelData.role ?? '',
+        identityId: userModelData.identityId ?? '',
+        isSurvey: userModelData.isSurvey,
+        isPremium: userModelData.isPremium,
       );
       await _userStorageServices.saveUser(userDataSave);
 
       // Map lại UserModel đầy đủ
-      final Map<String, dynamic> userMap = authResp.userJson?.toJson() ?? {};
+      final Map<String, dynamic> userMap = userModelData.toJson() ?? {};
       final userModel = userMap.isNotEmpty ? UserModel.fromJson(userMap) : null;
 
       if (userModel != null) {
