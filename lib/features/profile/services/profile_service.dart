@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:briewview/core/utils/FileUpload.dart';
 import 'package:briewview/features/profile/model/profile_dto.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:path/path.dart' as path;
 import 'package:briewview/core/constants/app_constants.dart';
 import 'package:briewview/core/network/user_storage_services.dart';
@@ -29,16 +30,40 @@ class ProfileService {
   }
 
   Future<UserModel> getCurrentProfile() async {
-    final userData = await _userStorageServices.getCurrentUser();
-    return userData ??
-        UserModel(
-          id: '',
-          name: '',
-          email: '',
-          profilePicture: '',
-          role: '',
-          identityId: '',
+    // final userData = await _userStorageServices.getCurrentUser();
+    // return userData ??
+    //     UserModel(
+    //       id: '',
+    //       name: '',
+    //       email: '',
+    //       profilePicture: '',
+    //       role: '',
+    //       identityId: '',
+    //     );
+
+    try {
+      final usrCurData = await _userStorageServices.getCurrentUser();
+      if (usrCurData?.id == null || usrCurData!.id.isEmpty) {
+        throw Exception('not found user information');
+      } 
+      final response = await _dio.get(
+        AppConstants.getCurrentUserEndpoint(usrCurData.id),
+      );
+      if (response.statusCode == 200) {
+        print('response data Services : ${response.data}');
+        final responseData = response.data as Map<String, dynamic>;
+        final userJson = responseData['data'] as Map<String, dynamic>;  
+        final userModel = UserModel.fromJson(userJson);
+        print('user current data Services : ${userModel.toJson()}');
+        return userModel;
+      } else {
+        throw Exception(
+          'Failed to fetch profile: ${response.statusCode} - ${response.data}',
         );
+      } 
+    } catch (e) {
+      throw Exception('Failed to get current profile Services : $e');
+    }
   }
 
   Future<ProfileDTO> updateProfile(ProfileDTO user) async {
@@ -60,11 +85,10 @@ class ProfileService {
       );
 
       final data = result.data as Map<String, dynamic>;
-  
+
       return data['isSuccess'] == true
           ? ProfileDTO.fromJson(data['data'])
           : throw Exception('Failed to update profile: ${data['message']}');
-          
     } catch (e) {
       throw Exception('Failed to update profile Services : $e');
     }
@@ -90,45 +114,19 @@ class ProfileService {
       if (!await file.exists()) {
         throw Exception('File does not exist at path: $imagePath');
       }
-
-      final fileSize = await file.length();
       final fileName = path.basename(imagePath);
-
-      final boundary =
-          '----WebKitFormBoundary${DateTime.now().millisecondsSinceEpoch}';
-
-      final fileBytes = await file.readAsBytes();
-
-      final multipartBody = HandleFileUpload.createMultipartBody(
-        boundary: boundary,
-        fileName: fileName,
-        fileBytes: fileBytes,
-        mimeType: HandleFileUpload.getMimeType(imagePath) ?? '',
+      final requestBody = FormData.fromMap({
+        'avatarFile': await MultipartFile.fromFile(
+          imagePath,
+          filename: fileName,
+        ),
+      });
+      var response = await _dio.post(
+        AppConstants.updateProfilePicture(dataUser.id),
+        data: requestBody,
+        options: Options(headers: {'Content-Type': 'multipart/form-data'}),
       );
-
-      final uri = Uri.parse(
-        '${AppConstants.apiBaseUrl}/api/users/avatar/${dataUser.id}',
-      );
-
-      final request = await _httpClient.postUrl(uri);
-
-      request.headers.set('accept', '*/*');
-      request.headers.set(
-        'Content-Type',
-        'multipart/form-data; boundary=$boundary',
-      );
-      request.headers.set('Content-Length', multipartBody.length.toString());
-
-      if (dataUser.accessToken != null && dataUser.accessToken!.isNotEmpty) {
-        request.headers.set('Authorization', 'Bearer ${dataUser.accessToken}');
-      }
-
-      request.add(multipartBody);
-
-      final response = await request.close();
-      final responseBody =
-          await response.transform(const SystemEncoding().decoder).join();
-
+      var responseBody = response.data;
       if (response.statusCode == 200) {
         try {
           return {'isSuccess': true, 'data': responseBody};
@@ -136,6 +134,9 @@ class ProfileService {
           return {'isSuccess': true, 'data': responseBody};
         }
       } else {
+        print(
+          'Failed to update profile picture: ${response.statusCode} - $responseBody',
+        );
         throw Exception(
           'Failed to update profile picture: ${response.statusCode} - $responseBody',
         );

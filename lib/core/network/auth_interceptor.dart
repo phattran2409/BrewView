@@ -62,8 +62,7 @@ class AuthInterceptor extends Interceptor {
       path.contains('/api/auth/reset-password') ||
       path.contains('/api/auth/email/register') ||
       path.contains('/api/auth/forgot-password') ||
-      path.contains('/api/auth/reset-password') ||
-      path.contains('/api/users/avatar/');
+      path.contains('/api/auth/reset-password');
 
   @override
   void onRequest(

@@ -54,11 +54,6 @@ class ReviewService {
     List<File> medias = const [],
   }) async {
      try {
-      print('🚀 Creating review for cafe: $cafeId');
-      print('📤 Request URL: ${_dio.options.baseUrl}/api/reviews/$cafeId');
-      print(' medias : ${medias.length}');
-
-      // ✅ Always use FormData - API expects PascalCase field names
       final requestBody = FormData.fromMap({
         'Rating': rating.toString(),  // PascalCase as expected by API
         'Content': content,           // PascalCase as expected by API
@@ -70,10 +65,7 @@ class ReviewService {
               filename: 'review_media_$i.jpg',
             ),
       });
-      
-      print('📤 Sending FormData with PascalCase fields');
-      print('📤 Rating: $rating, Content: $content');
-
+    
       final response = await _dio.post(
         '/api/reviews/$cafeId',
         data: requestBody,
@@ -85,13 +77,10 @@ class ReviewService {
         ),
       );
 
-      print('✅ Review created successfully: ${response.statusCode}');
-      print('📥 Response data: ${response.data}');
       
       return response.data;
       
     } on DioException catch (dioError) {
-      // ✅ Parse server error message
       String errorMessage = 'Tạo đánh giá thất bại';
       
       if (dioError.response?.data != null) {
@@ -111,7 +100,6 @@ class ReviewService {
       throw Exception('Create review error: $errorMessage');
       
     } catch (e) {
-      print('❌ General Error: $e');
       throw Exception('Unexpected error: $e');
     }
   }

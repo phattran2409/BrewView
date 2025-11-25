@@ -11,6 +11,7 @@ import 'package:briewview/features/cafe/viewmodel/cafe_sate.dart';
 import 'package:briewview/features/home/view/widgets/NearbyCoffeShop_widget.dart';
 import 'package:briewview/features/home/view/widgets/Recomendation_widget.dart';
 import 'package:briewview/features/home/view/widgets/rating_cafe_widget.dart';
+import 'package:briewview/features/home/view/widgets/notification_list_widget.dart';
 import 'package:briewview/features/premium/view/widgets/premium_popup_widget.dart';
 import 'package:briewview/features/premium/viewmodel/premium_bloc.dart';
 import 'package:briewview/features/premium/viewmodel/premium_event.dart';
@@ -96,6 +97,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void _checkAndShowPopup() {
     _premiumBloc.showHomePopupIfAllowed(
       message: 'Hãy khám phá các tính năng cao cấp!  ',
+    );
+  }
+
+  void _showNotifications() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const NotificationListWidget(),
     );
   }
 
@@ -209,7 +219,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             // Premium popup overlay
             BlocBuilder<PremiumBloc, PremiumState>(
               builder: (context, state) {
-                if (state is PremiumLoaded && state.showPopup) {
+                if (state is PremiumLoaded && state.showPopup && _currentUser?.isPremium == false) {
                   return PremiumPopupWidget(
                     feature: state.popupFeature!,
                     message: state.popupMessage!,
@@ -401,7 +411,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             children: [
               IconButton(
                 onPressed: () {
-                  // Handle notifications
+                  _showNotifications();
                 },
                 icon: Icon(
                   Icons.notifications_outlined,

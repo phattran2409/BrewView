@@ -40,19 +40,7 @@ class ProfileHeaderWidget extends StatelessWidget {
         decoration: BoxDecoration(color: Color(0xFFEDE4DD)),
         child: Column(
           children: [
-            // Back button and language toggle
-            Row(
-              children: [
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(
-                    Icons.arrow_back_ios,
-                    color: Color(0xFF8B4513),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10), // Giảm từ 20 xuống 10
+            const SizedBox(height: 30), // Giảm từ 20 xuống 10
             // Profile info section
             Row(
               mainAxisAlignment: MainAxisAlignment.center,

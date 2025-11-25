@@ -93,7 +93,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         state is ProfileLoaded
                             ? state.profile
                             : (state as ProfileUpdated).profile;
-
                     // return _buildProfileContent(profile);
                     currentProfile = profile as UserModel;
                     return Stack(

@@ -20,7 +20,7 @@ class AppConstants {
   static const String refreshTokenEndpoint =
       '/api/auth/login-with-refresh-token';
   // Profile
-  static const String updatePictureProfileEndpoint = '/api/user/avatar/{id}';
+  static const String updatePictureProfileEndpoint = '/api/users/avatar/{id}';
   // Survey
   static const String categoriesEndpoint = '/api/categories';
   static const String featureTagsEndpoint = '/api/feature-tags';
