@@ -1,0 +1,82 @@
+import 'package:flutter/material.dart';
+
+class DotIndicator extends StatelessWidget {
+  final int currentIndex;
+  final int dotCount;
+  final PageController? pageController;
+  final Color? activeColor;
+  final Color? inactiveColor;
+  final double? activeWidth;
+  final double? inactiveWidth;
+  final double? height;
+  final double? spacing;
+  final Duration? animationDuration;
+  final Curve? animationCurve;
+  final VoidCallback? onTap;
+  final Function(int)? onDotTap;
+
+  const DotIndicator({
+    super.key,
+    required this.currentIndex,
+    required this.dotCount,
+    this.pageController,
+    this.activeColor,
+    this.inactiveColor,
+    this.activeWidth,
+    this.inactiveWidth,
+    this.height,
+    this.spacing,
+    this.animationDuration,
+    this.animationCurve,
+    this.onTap,
+    this.onDotTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(dotCount, (index) {
+        return GestureDetector(
+          onTap: () {
+            // Xử lý khi nhấn vào chấm
+            if (onDotTap != null) {
+              onDotTap!(index);
+            }
+
+            // Tự động chuyển trang nếu có pageController
+            if (pageController != null) {
+              pageController!.animateToPage(
+                index,
+                duration:
+                    animationDuration ?? const Duration(milliseconds: 300),
+                curve: animationCurve ?? Curves.easeInOut,
+              );
+            }
+
+            // Callback khi nhấn chung
+            if (onTap != null) {
+              onTap!();
+            }
+          },
+          child: AnimatedContainer(
+            duration: animationDuration ?? const Duration(milliseconds: 300),
+            margin: EdgeInsets.symmetric(horizontal: spacing ?? 4),
+            width:
+                currentIndex == index
+                    ? (activeWidth ?? 24)
+                    : (inactiveWidth ?? 8),
+            height: height ?? 8,
+            decoration: BoxDecoration(
+              color:
+                  currentIndex == index
+                      ? (activeColor ?? Colors.white)
+                      : (inactiveColor ?? Colors.grey[600]),
+              borderRadius: BorderRadius.circular((height ?? 8) / 2),
+            ),
+          ),
+        );
+      }),
+    );
+  }
+}
