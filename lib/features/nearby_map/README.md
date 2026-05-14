@@ -135,7 +135,7 @@ OpenStreetMap hoàn toàn miễn phí và không yêu cầu API key. Chỉ cần
 flutter run
 ```
 
-Xem chi tiết tại `OPENSTREETMAP_SETUP.md` ở root directory.
+Không cần thêm file cấu hình trong repo; chỉ cần quyền vị trí và mạng như mục dưới đây.
 
 ## Tile Providers
 
@@ -149,7 +149,7 @@ Có thể dễ dàng thay đổi sang providers khác như:
 - CartoDB Dark Matter (dark theme)
 - OpenStreetMap HOT
 
-Chi tiết trong `OPENSTREETMAP_SETUP.md`.
+Có thể đổi `urlTemplate` của `TileLayer` trong `cafe_map_view.dart` nếu cần theme khác.
 
 ## Usage Example
 

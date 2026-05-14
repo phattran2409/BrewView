@@ -61,10 +61,12 @@ WishlistPage đã được tích hợp sẵn với CafeDetail. Khi nhấn vào m
 
 ## API Endpoints
 
-Các endpoint được sử dụng:
-- `GET /api/wishlist/{userId}` - Lấy danh sách wishlist
-- `POST /api/wishlist/{userId}/add` - Thêm vào wishlist
-- `DELETE /api/wishlist/{userId}/remove` - Xóa khỏi wishlist
+Theo `AppConstants` và `WishlistServiceImpl`:
+
+- `GET /api/favorite-cafe/{userId}` — lấy danh sách yêu thích
+- `POST /api/favorite-cafe/{userId}` — thêm quán (body: `{"cafeIds": ["<cafeId>"]}`)
+
+Xóa khỏi wishlist qua API có thể được bổ sung sau (code remove hiện đang comment trong service).
 
 ## Dependency Injection
 
